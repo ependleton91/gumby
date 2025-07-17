@@ -1,0 +1,151 @@
+{
+  "flowing_sequences": {
+    "sun_salutation_flow": {
+      "name": "Sun Salutation Flow",
+      "duration": 3,
+      "flow": [
+        {"name": "Mountain Pose", "duration": 0.3, "type": "setup"},
+        {"name": "Upward Salute", "duration": 0.25, "type": "main"},
+        {"name": "Forward Fold", "duration": 0.4, "type": "main"},
+        {"name": "Halfway Lift", "duration": 0.25, "type": "main"},
+        {"name": "Low Push-Up", "duration": 0.25, "type": "main"},
+        {"name": "Upward Dog", "duration": 0.3, "type": "main"},
+        {"name": "Downward Dog", "duration": 0.5, "type": "main"},
+        {"name": "Forward Fold", "duration": 0.4, "type": "main"},
+        {"name": "Mountain Pose", "duration": 0.25, "type": "closing"}
+      ],
+      "category": "warm_up",
+      "style": ["vinyasa", "hatha"],
+      "muscle_groups": ["full_body", "arms", "back"],
+      "difficulty": 2,
+      "energy_level": "building"
+    },
+
+    "warrior_standing_flow": {
+      "name": "Warrior Standing Flow",
+      "duration": 5,
+      "flow": [
+        {"name": "Mountain Pose", "duration": 0.25, "type": "setup"},
+        {"name": "Forward Fold", "duration": 0.3, "type": "transition"},
+        {"name": "Warrior I Right", "duration": 0.75, "type": "right_side"},
+        {"name": "Warrior II Right", "duration": 0.65, "type": "right_side"},
+        {"name": "Side Angle Right", "duration": 0.6, "type": "right_side"},
+        {"name": "Vinyasa Flow", "duration": 0.5, "type": "transition"},
+        {"name": "Downward Dog", "duration": 0.3, "type": "transition"},
+        {"name": "Warrior I Left", "duration": 0.75, "type": "left_side"},
+        {"name": "Warrior II Left", "duration": 0.65, "type": "left_side"},
+        {"name": "Side Angle Left", "duration": 0.6, "type": "left_side"},
+        {"name": "Mountain Pose", "duration": 0.25, "type": "closing"}
+      ],
+      "category": "standing_flow",
+      "style": ["vinyasa"],
+      "muscle_groups": ["legs", "core", "arms"],
+      "difficulty": 3,
+      "energy_level": "peak"
+    },
+
+    "seated_twist_flow": {
+      "name": "Seated Twist Flow",
+      "duration": 4,
+      "flow": [
+        {"name": "Easy Pose", "duration": 0.3, "type": "setup"},
+        {"name": "Gentle Neck Rolls", "duration": 0.3, "type": "preparation"},
+        {"name": "Seated Cat-Cow", "duration": 0.5, "type": "preparation"},
+        {"name": "Seated Twist Right", "duration": 1, "type": "right_side"},
+        {"name": "Forward Fold Seated", "duration": 0.5, "type": "transition"},
+        {"name": "Seated Twist Left", "duration": 1, "type": "left_side"},
+        {"name": "Easy Pose", "duration": 0.3, "type": "closing"}
+      ],
+      "category": "seated_flow",
+      "style": ["yin", "hatha"],
+      "muscle_groups": ["back", "spine", "core"],
+      "difficulty": 1,
+      "energy_level": "calming"
+    },
+
+    "hip_opening_flow": {
+      "name": "Hip Opening Flow",
+      "duration": 6,
+      "flow": [
+        {"name": "Child's Pose", "duration": 0.5, "type": "setup"},
+        {"name": "Table Top", "duration": 0.25, "type": "preparation"},
+        {"name": "Cat-Cow Stretches", "duration": 0.5, "type": "preparation"},
+        {"name": "Low Lunge Right", "duration": 0.75, "type": "right_side"},
+        {"name": "Lizard Pose Right", "duration": 1, "type": "right_side"},
+        {"name": "Half Pigeon Right", "duration": 1.25, "type": "right_side"},
+        {"name": "Downward Dog", "duration": 0.3, "type": "transition"},
+        {"name": "Child's Pose", "duration": 0.25, "type": "transition"},
+        {"name": "Low Lunge Left", "duration": 0.75, "type": "left_side"},
+        {"name": "Lizard Pose Left", "duration": 1, "type": "left_side"},
+        {"name": "Half Pigeon Left", "duration": 1.25, "type": "left_side"},
+        {"name": "Child's Pose", "duration": 0.5, "type": "closing"}
+      ],
+      "category": "hip_opener",
+      "style": ["yin", "vinyasa"],
+      "muscle_groups": ["hips", "pelvic_floor", "legs"],
+      "difficulty": 2,
+      "energy_level": "releasing"
+    },
+
+    "simple_backbend_flow": {
+      "name": "Simple Backbend Flow",
+      "duration": 4.5,
+      "flow": [
+        {"name": "Child's Pose", "duration": 0.5, "type": "setup"},
+        {"name": "Cat-Cow Stretches", "duration": 0.75, "type": "preparation"},
+        {"name": "Low Cobra", "duration": 0.5, "type": "main"},
+        {"name": "Child's Pose", "duration": 0.3, "type": "counter"},
+        {"name": "Cobra Pose", "duration": 0.7, "type": "main"},
+        {"name": "Child's Pose", "duration": 0.4, "type": "counter"},
+        {"name": "Camel Pose Prep", "duration": 0.5, "type": "main"},
+        {"name": "Child's Pose", "duration": 0.5, "type": "counter"},
+        {"name": "Supine Spinal Twist", "duration": 0.25, "type": "closing"}
+      ],
+      "category": "backbend_flow",
+      "style": ["hatha", "vinyasa"],
+      "muscle_groups": ["back", "core", "arms"],
+      "difficulty": 2,
+      "energy_level": "energizing"
+    },
+
+    "gentle_cooldown_flow": {
+      "name": "Gentle Cool-down Flow",
+      "duration": 5,
+      "flow": [
+        {"name": "Seated Forward Fold", "duration": 1, "type": "main"},
+        {"name": "Supine Knee to Chest", "duration": 0.5, "type": "main"},
+        {"name": "Happy Baby Pose", "duration": 0.75, "type": "main"},
+        {"name": "Supine Spinal Twist Right", "duration": 1, "type": "right_side"},
+        {"name": "Knees to Chest", "duration": 0.25, "type": "transition"},
+        {"name": "Supine Spinal Twist Left", "duration": 1, "type": "left_side"},
+        {"name": "Savasana", "duration": 0.5, "type": "closing"}
+      ],
+      "category": "cool_down",
+      "style": ["yin", "hatha", "vinyasa"],
+      "muscle_groups": ["full_body"],
+      "difficulty": 1,
+      "energy_level": "deeply_relaxing"
+    }
+  },
+
+  "sequence_categories": {
+    "warm_up": ["sun_salutation_flow"],
+    "main_flow": ["warrior_standing_flow", "seated_twist_flow", "hip_opening_flow", "simple_backbend_flow"],
+    "cool_down": ["gentle_cooldown_flow"]
+  },
+
+  "class_structure_templates": {
+    "vinyasa": {
+      "structure": ["warm_up", "main_flow", "main_flow", "cool_down"],
+      "ratios": [0.2, 0.4, 0.3, 0.1]
+    },
+    "hatha": {
+      "structure": ["warm_up", "main_flow", "cool_down"],
+      "ratios": [0.25, 0.5, 0.25]
+    },
+    "yin": {
+      "structure": ["warm_up", "main_flow", "cool_down"],
+      "ratios": [0.15, 0.7, 0.15]
+    }
+  }
+}

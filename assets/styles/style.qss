@@ -1,0 +1,18 @@
+QLabel {
+        background-color: #262626;
+        color: #FFFFFF;
+        font-family: Titillium;
+        font-size: 18px;
+    }
+QGroupBox {
+        background-color: #7f65e7ff;
+        color: #FFFFFF;
+        font-family: Titillium;
+        font-size: 16px;
+}
+QPushButton {
+     background-color: #61c72aff;
+    color: #FFFFFF;
+    font-family: Titillium;
+    font-size: 20px;
+}
