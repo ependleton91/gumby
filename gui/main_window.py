@@ -6,7 +6,6 @@ from services.sequence_generator import SequenceGeneratorWidget
 from gui.favorites_page import FavoritesWidget
 from gui.all_poses import PosesWidget
 from gui.practice_mode import PracticeWidget
-import assets.styles
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -14,7 +13,8 @@ class MainWindow(QMainWindow):
 
         with open("assets/styles/style.qss", "r") as f:
             style = f.read()
-            app.setStyleSheet(style)
+            QApplication.instance().setStyleSheet(style)
+
 
         self.main_title = "GUMBY"
         self.setWindowTitle(self.main_title)
@@ -51,22 +51,17 @@ class MainWindow(QMainWindow):
         #Button 1 - Generate a sequence
         self.generate_button = QPushButton("Generate a Sequence!")
         self.generate_button.clicked.connect(self.generate_button_was_clicked)
-        self.generate_button.setMaximumSize(200,50)
 
         #Button 2 - Favorite Sequence
         self.favorites_button = QPushButton("View Favorites")
         self.favorites_button.clicked.connect(self.favorites_button_was_clicked)
-        self.favorites_button.setMaximumSize(200,50)
-
         #Button 3 - See all poses
         self.poses_button = QPushButton("All Poses!")
         self.poses_button.clicked.connect(self.poses_button_was_clicked)
-        self.poses_button.setMaximumSize(200,50)
 
          #Button 4 - Practice Mode
         self.practice_button = QPushButton("Practice Mode")
         self.practice_button.clicked.connect(self.practice_button_was_clicked)
-        self.practice_button.setMaximumSize(200,50)
 
 
         self.main_buttons = [
@@ -146,12 +141,3 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.main_title+" - Practice Mode")
         self.hide_all_widgets()
         self.practice_widget.setVisible(True) 
-
-
-
-app = QApplication(sys.argv)
-
-window = MainWindow()
-window.show() 
-
-app.exec()

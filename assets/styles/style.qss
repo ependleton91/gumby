@@ -1,18 +1,165 @@
-QLabel {
-        background-color: #262626;
-        color: #FFFFFF;
-        font-family: Titillium;
-        font-size: 18px;
-    }
-QGroupBox {
-        background-color: #7f65e7ff;
-        color: #FFFFFF;
-        font-family: Titillium;
-        font-size: 16px;
+/* Clean Yoga App Stylesheet - GUMBY */
+
+/* Main Application */
+QMainWindow {
+    background-color: #f8faf9;
+    color: #2d3436;
 }
+
+/* Labels */
+QLabel {
+    background-color: transparent;
+    color: #2d3436;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 5px;
+}
+
+/* Group Boxes */
+QGroupBox {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #2d3436;
+    padding-top: 15px;
+    margin-top: 10px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 5px 10px;
+    background-color: #00b894;
+    color: white;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+/* Buttons */
 QPushButton {
-     background-color: #61c72aff;
-    color: #FFFFFF;
-    font-family: Titillium;
-    font-size: 20px;
+    background-color: #00b894;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    margin: 5px;
+}
+
+QPushButton:hover {
+    background-color: #00cec9;
+}
+
+QPushButton:pressed {
+    background-color: #00a085;
+}
+
+/* Sliders */
+QSlider::groove:horizontal {
+    border: 1px solid #bdc3c7;
+    height: 6px;
+    background: #ecf0f1;
+    border-radius: 3px;
+}
+
+QSlider::handle:horizontal {
+    background: #00b894;
+    border: 2px solid white;
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    margin: -6px 0;
+}
+
+QSlider::handle:horizontal:hover {
+    background: #00cec9;
+}
+
+QSlider::sub-page:horizontal {
+    background: #00b894;
+    border-radius: 3px;
+}
+
+/* ComboBox */
+QComboBox {
+    background-color: white;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    font-size: 14px;
+    min-height: 20px;
+}
+
+QComboBox:hover {
+    border-color: #00b894;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 20px;
+}
+
+QComboBox::down-arrow {
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #2d3436;
+}
+
+/* CheckBox */
+QCheckBox {
+    font-size: 14px;
+    color: #2d3436;
+    padding: 5px;
+}
+
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #bdc3c7;
+    border-radius: 3px;
+    background-color: white;
+}
+
+QCheckBox::indicator:hover {
+    border-color: #00b894;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #00b894;
+    border-color: #00b894;
+}
+
+/* Menu Bar */
+QMenuBar {
+    background-color: white;
+    border-bottom: 1px solid #ddd;
+}
+
+QMenuBar::item {
+    padding: 5px 10px;
+    color: #2d3436;
+}
+
+QMenuBar::item:selected {
+    background-color: #00b894;
+    color: white;
+}
+
+QMenu {
+    background-color: white;
+    border: 1px solid #ddd;
+}
+
+QMenu::item {
+    padding: 5px 15px;
+}
+
+QMenu::item:selected {
+    background-color: #00b894;
+    color: white;
 }
