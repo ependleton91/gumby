@@ -1,6 +1,7 @@
 # ui/build_sequence.py
 import json
 import pathlib
+import random
 
 def generate_yoga_class(style, muscles, duration):
     """
@@ -15,7 +16,7 @@ def load_sequences():
         data = json.load(file)
     return data
 
-def filter_sequences(sequences, user_style, user_muscles):
+def filter_sequences(sequences, user_style):
 
     flowing_sequences = sequences['flowing_sequences']
     matching_sequences = []
@@ -30,6 +31,38 @@ def filter_sequences(sequences, user_style, user_muscles):
             matching_sequences.append(sequence_data)
 
     return matching_sequences
+
+def calculate_muscle_percentage(selected_sequences,target_muscles):
+    muscle_sequences=0
+    for sequence_data in selected_sequences:
+        if any(muscle in target_muscles for muscle in sequence_data['muscle_groups']):
+            muscle_sequences+=1
+
+    muscle_percentage = muscle_sequences/selected_sequences.len()
+    return muscle_percentage
+
+def sequence_matches_muscles(sequence,muscles):
+    return any(muscle in muscles for muscle in sequence['muscle_groups'])
+
+def score_sequence(sequence, time_needed, target_muscles, current_percentage,desired_percentage):
+    sequence_score = 0
+    percentage_gap = desired_percentage-current_percentage
+    if sequence['duration'] <= time_needed:
+        sequence_score+=30
+    else:
+        sequence_score-=900
+    
+    if any(muscle in target_muscles for muscle in sequence['muscle_groups']):
+        sequence_score+=(percentage_gap*100)
+    elif percentage_gap>0:
+        sequence_score-=10
+
+    sequence_score+= random.randint(0,20)
+
+    return sequence_score
+
+def select_from_top_candidates(scored_sequences, top_n=3):
+    pass
 
 def build_class(sequences, user_style, filtered_sequences, target_duration):
     class_templates = sequences['class_structure_templates']
