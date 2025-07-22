@@ -61,8 +61,14 @@ def score_sequence(sequence, time_needed, target_muscles, current_percentage,des
 
     return sequence_score
 
-def select_from_top_candidates(scored_sequences, top_n=3):
-    pass
+def select_from_top_candidates(scored_sequences):
+    #sort by second tuple which is score
+    scored_sequences.sort(key=lambda x: x[1],reverse = True)
+    keep_count = max(3, int(len(scored_sequences) * 0.7))
+    top_candidates = scored_sequences[:keep_count]
+    chosen_sequence = random.choice(top_candidates)
+    return chosen_sequence[0]
+
 
 def build_class(sequences, user_style, filtered_sequences, target_duration):
     class_templates = sequences['class_structure_templates']
