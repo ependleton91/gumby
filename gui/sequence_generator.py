@@ -55,6 +55,7 @@ class SequenceGeneratorWidget(QWidget):
         
         self.setLayout(self.main_layout)
         self.main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        print(f"Initial layout has {self.main_layout.count()} items")
     
     def create_duration_section(self):
         # Create group box for organization
@@ -120,6 +121,7 @@ class SequenceGeneratorWidget(QWidget):
         return group
     
     def show_results(self,results):
+        print(f"Layout has {self.main_layout.count()} items before showing results")
         for widget in self.group_of_widgets:
             widget.setVisible(False)
         self.generate_btn.setVisible(False)
@@ -174,14 +176,17 @@ class SequenceGeneratorWidget(QWidget):
             self.main_layout.addWidget(widget)
     
     def return_to_main(self):
-            # Show form widgets
+        # FIRST: Remove results widgets completely
+        for widget in self.results_widgets:
+            widget.setVisible(False)
+            self.main_layout.removeWidget(widget)
+            widget.deleteLater()
+        self.results_widgets = []
+        
+        # THEN: Show form widgets
         for widget in self.group_of_widgets:
             widget.setVisible(True)
         self.generate_btn.setVisible(True)
-        
-        # Hide results widgets
-        for widget in self.results_widgets:
-            widget.setVisible(False)
 
     def add_to_favorites(self,results,style):
         dialog = favorites_dialog_box(results, style)
@@ -213,8 +218,6 @@ class SequenceGeneratorWidget(QWidget):
 
             with open(FAVORITES_FILE, 'w') as f:
                 json.dump(favorites_data, f, indent=2)
-
-
 
     def generate_sequence(self):
         class_type = self.style_dropdown.currentText()

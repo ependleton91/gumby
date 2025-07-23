@@ -2,7 +2,7 @@
 import sys
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QVBoxLayout
-from services.sequence_generator import SequenceGeneratorWidget
+from gui.sequence_generator import SequenceGeneratorWidget
 from gui.favorites_page import FavoritesWidget
 from gui.all_poses import PosesWidget
 from gui.practice_mode import PracticeWidget
@@ -101,6 +101,7 @@ class MainWindow(QMainWindow):
 
         # Set as central widget
         self.setCentralWidget(container)
+
     ####### END OF INIT ##########
 
     def hide_all_widgets(self):
