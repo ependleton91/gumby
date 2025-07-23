@@ -119,12 +119,23 @@ class SequenceGeneratorWidget(QWidget):
             widget.setVisible(False)
         self.generate_btn.setVisible(False)
 
+        section_display_names = {
+        "warm_up": "WARM UP",
+        "main_flow": "MAIN FLOW", 
+        "cool_down": "COOL DOWN"
+        }
+
         results_title = QLabel("Your Generated Sequence")
         results_title.setStyleSheet("font-size: 24px; font-weight: bold; color: #2E86AB;")
         results_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         results_string = ""
-        for index, sequence in enumerate(results['sequences']):
-            results_string += str(index + 1) + '. ' + sequence['name'] + '\n'
+
+        counter = 1
+        for section_key, sequence_list in results['sequences'].items():
+            results_string += f'=== {section_display_names[section_key]} ===\n'
+            for sequence in sequence_list:
+                results_string += str(counter) + '. ' + sequence['name'] + '\n'
+            counter += 1
         results_list = QLabel(results_string)
 
         results_details = QLabel(

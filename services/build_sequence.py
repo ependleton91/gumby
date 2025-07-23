@@ -19,7 +19,13 @@ def generate_yoga_class(style, muscles, duration):
    loaded_sequences = load_sequences()
    filtered_sequences = filter_sequences(loaded_sequences,style)
    generated_class = build_class(loaded_sequences,style,filtered_sequences,duration,translated_muscles)
-   for sequence in generated_class:
+
+   
+   all_sequences=[]
+   for value in generated_class.values():
+        all_sequences.extend(value)
+
+   for sequence in all_sequences:
        class_duration+=sequence['duration']
        for muscle in muscles:
            if ui_to_json[muscle] in sequence['muscle_groups'] and muscle not in muscles_used:
@@ -92,7 +98,7 @@ def select_from_top_candidates(scored_sequences):
 
 def build_class(sequences, user_style, filtered_sequences, target_duration, target_muscles):
     class_templates = sequences['class_structure_templates']
-    class_sequences = []
+    class_sequences = {}
 
     # Direct lookup - no mapping needed!
     template_name = user_style.lower()
@@ -100,6 +106,9 @@ def build_class(sequences, user_style, filtered_sequences, target_duration, targ
     
     structure = class_template['structure']
     ratios = class_template['ratios']
+
+    for section in structure:
+        class_sequences[section]=[]
     
     # Calculate time for each section
     time_slots = []
@@ -136,8 +145,11 @@ def build_class(sequences, user_style, filtered_sequences, target_duration, targ
         for item in energy_to_sections.items():
             if section[0] in item[1]:
                 compatible_energy_levels.append(item[0])
-        while (section_duration+(section[1]*.2)) < section[1]:
-            muscle_group_coverage = calculate_muscle_percentage(class_sequences,target_muscles)
+        while section_duration < section[1] * 0.8:
+            all_sequences=[]
+            for value in class_sequences.values():
+                all_sequences.extend(value)
+            muscle_group_coverage = calculate_muscle_percentage(all_sequences,target_muscles)
             section_sequences = []
             for sequence in filtered_sequences:
                 if category_to_section[sequence['category']] == section[0] and sequence['name'] not in used_names:
@@ -163,7 +175,7 @@ def build_class(sequences, user_style, filtered_sequences, target_duration, targ
                 sequence_tuples.append((sequence,score_sequence(sequence,section[1],target_muscles,muscle_group_coverage,desired_percentage)))
             sequence_to_add = select_from_top_candidates(sequence_tuples)
             section_duration+=sequence_to_add['duration']
-            class_sequences.append(sequence_to_add)
+            class_sequences[section[0]].append(sequence_to_add)
             used_names.append(sequence_to_add['name'])
 
     return class_sequences
