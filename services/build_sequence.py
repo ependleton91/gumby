@@ -4,11 +4,18 @@ import pathlib
 import random
 
 def generate_yoga_class(style, muscles, duration):
-    """
-    Main function that takes user preferences and returns a complete yoga class
-    """
-    # Your logic will go here
-    pass
+   loaded_sequences = load_sequences()
+   filtered_sequences = filter_sequences(loaded_sequences,style)
+   generated_class = build_class(loaded_sequences,style,filtered_sequences,duration,muscles)
+   class_duration = 0
+   muscles_used = []
+   for sequence in generated_class:
+       class_duration+=sequence['duration']
+       for muscle in muscles:
+           if muscle in sequence['muscle_groups'] and muscle not in muscles_used:
+               muscles_used.append(muscle) 
+   results_dictionary = {"sequences":generated_class,"muscles":muscles_used,"duration":class_duration}
+   return results_dictionary
 
 def load_sequences():
     file_path = pathlib.Path("app_data/sequences.json")
@@ -38,7 +45,10 @@ def calculate_muscle_percentage(selected_sequences,target_muscles):
         if any(muscle in target_muscles for muscle in sequence_data['muscle_groups']):
             muscle_sequences+=1
 
-    muscle_percentage = muscle_sequences/selected_sequences.len()
+    if selected_sequences.len() == 0:
+        muscle_percentage = 0.0
+    else:
+        muscle_percentage = muscle_sequences/selected_sequences.len()
     return muscle_percentage
 
 def sequence_matches_muscles(sequence,muscles):
@@ -70,10 +80,10 @@ def select_from_top_candidates(scored_sequences):
     return chosen_sequence[0]
 
 
-def build_class(sequences, user_style, filtered_sequences, target_duration):
+def build_class(sequences, user_style, filtered_sequences, target_duration, target_muscles):
     class_templates = sequences['class_structure_templates']
     class_sequences = []
-    
+
     # Direct lookup - no mapping needed!
     template_name = user_style.lower()
     class_template = class_templates[template_name]
@@ -86,6 +96,8 @@ def build_class(sequences, user_style, filtered_sequences, target_duration):
     for ratio in ratios:
         slot_duration = target_duration * ratio
         time_slots.append(slot_duration)
+    
+    timed_structure = zip(structure,time_slots)
 
     category_to_section = {
         'warm_up': 'warm_up',
@@ -104,15 +116,42 @@ def build_class(sequences, user_style, filtered_sequences, target_duration):
         'releasing': ['main_flow'],
         'building': ['main_flow', 'warm_up']
         }
-    
+
     #Next: fill each slot with appropriate sequences
-    for i, (section_type, time_needed) in enumerate(zip(structure, time_slots)):
-        print(f"Section {i+1}: Need a {section_type} sequence that's ~{time_needed} minutes")
-        for sequence in filtered_sequences:
-            if category_to_section.get(sequence['category']) == section_type:
-                if sequence not in class_sequences:
-                    class_sequences.append(sequence)
-                    break 
+    for section in timed_structure:
+        section_duration = 0
+        desired_percentage = 0.6
+        used_names=[]
+        compatible_energy_levels = []
+        for item in energy_to_sections.items():
+            if section[0] in item[1]:
+                compatible_energy_levels.append(item[0])
+        while section_duration < section[1]:
+            muscle_group_coverage = calculate_muscle_percentage(class_sequences,target_muscles)
+            section_sequences = []
+            for sequence in filtered_sequences:
+                if category_to_section[sequence['category']] == section[0]:
+                    section_sequences.append(sequence)
+                    
+            if len(section_sequences) == 0:
+                for sequence in filtered_sequences:
+                    if sequence['energy_level'] in compatible_energy_levels:
+                        section_sequences.append(sequence)
+            if len(section_sequences)==0:
+                for sequence in filtered_sequences:
+                    if sequence['name'] not in used_names:
+                        section_sequences.append(sequence)
+
+            if len(section_sequences) == 0:
+                raise Exception("Zero sequences found, please retry with different parameters")
+
+            sequence_tuples = []
+            for sequence in section_sequences:
+                sequence_tuples.append((sequence,score_sequence(sequence,section[1],target_muscles,muscle_group_coverage,desired_percentage)))
+            sequence_to_add = select_from_top_candidates(sequence_tuples)
+            section_duration+=sequence_to_add['duration']
+            class_sequences.append(sequence_to_add)
+            used_names.append(sequence_to_add['name'])
 
     return class_sequences
 
