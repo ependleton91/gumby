@@ -4,15 +4,25 @@ import pathlib
 import random
 
 def generate_yoga_class(style, muscles, duration):
-   loaded_sequences = load_sequences()
-   filtered_sequences = filter_sequences(loaded_sequences,style)
-   generated_class = build_class(loaded_sequences,style,filtered_sequences,duration,muscles)
+ 
    class_duration = 0
    muscles_used = []
+   print(f"Requested muscles: {muscles}")
+   ui_to_json = {
+    "Abs": "core",
+    "Arms": "arms", 
+    "Back": "back",
+    "Pelvic Floor": "pelvic_floor",
+    "All": "full_body"
+    }
+   translated_muscles = [ui_to_json[muscle] for muscle in muscles]
+   loaded_sequences = load_sequences()
+   filtered_sequences = filter_sequences(loaded_sequences,style)
+   generated_class = build_class(loaded_sequences,style,filtered_sequences,duration,translated_muscles)
    for sequence in generated_class:
        class_duration+=sequence['duration']
        for muscle in muscles:
-           if muscle in sequence['muscle_groups'] and muscle not in muscles_used:
+           if ui_to_json[muscle] in sequence['muscle_groups'] and muscle not in muscles_used:
                muscles_used.append(muscle) 
    results_dictionary = {"sequences":generated_class,"muscles":muscles_used,"duration":class_duration}
    return results_dictionary
@@ -126,16 +136,19 @@ def build_class(sequences, user_style, filtered_sequences, target_duration, targ
         for item in energy_to_sections.items():
             if section[0] in item[1]:
                 compatible_energy_levels.append(item[0])
-        while section_duration < section[1]:
+        while (section_duration+(section[1]*.2)) < section[1]:
             muscle_group_coverage = calculate_muscle_percentage(class_sequences,target_muscles)
             section_sequences = []
             for sequence in filtered_sequences:
-                if category_to_section[sequence['category']] == section[0]:
+                if category_to_section[sequence['category']] == section[0] and sequence['name'] not in used_names:
                     section_sequences.append(sequence)
-                    
             if len(section_sequences) == 0:
                 for sequence in filtered_sequences:
-                    if sequence['energy_level'] in compatible_energy_levels:
+                    if category_to_section[sequence['category']] == section[0]:
+                        section_sequences.append(sequence)    
+            if len(section_sequences) == 0:
+                for sequence in filtered_sequences:
+                    if sequence['energy_level'] in compatible_energy_levels and sequence['name'] not in used_names:
                         section_sequences.append(sequence)
             if len(section_sequences)==0:
                 for sequence in filtered_sequences:
