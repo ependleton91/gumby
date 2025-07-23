@@ -1,8 +1,13 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                             QPushButton, QSlider, QComboBox, QCheckBox, 
-                            QGroupBox, QGridLayout,QApplication)
+                            QGroupBox, QGridLayout,QApplication,QDialog)
 from PyQt6.QtCore import Qt
 from services.build_sequence import generate_yoga_class
+from gui.dialogs.favorites_dialogue import favorites_dialog_box
+import os
+import json
+import datetime
+from config import FAVORITES_FILE
 
 
 class SequenceGeneratorWidget(QWidget):
@@ -154,8 +159,9 @@ class SequenceGeneratorWidget(QWidget):
         refresh_btn = QPushButton("Generate a New Sequence")
         refresh_btn.clicked.connect(self.return_to_main)
 
+        style = self.style_dropdown.currentText()
         favorite_btn= QPushButton("Favorite This Sequence")
-        favorite_btn.clicked.connect(self.add_to_favorites)
+        favorite_btn.clicked.connect(lambda: self.add_to_favorites(results, style))
 
         self.results_widgets = [
             results_title,
@@ -177,9 +183,39 @@ class SequenceGeneratorWidget(QWidget):
         for widget in self.results_widgets:
             widget.setVisible(False)
 
-    def add_to_favorites(self):
-        pass
+    def add_to_favorites(self,results,style):
+        dialog = favorites_dialog_box(results, style)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+        # User clicked Save - get their edited text and save
+            name = dialog.name_field.text()
+            description = dialog.description_field.toPlainText()
+            duration = dialog.duration_field.text()
+        # Save to favorites file
+            if os.path.exists(FAVORITES_FILE):
+                print(f"The path '{FAVORITES_FILE}' exists.")
+                with open(FAVORITES_FILE, 'r') as f:
+                    favorites_data = json.load(f)
+            else:
+                print(f"The path '{FAVORITES_FILE}' does not exist.")
+                favorites_data = {"favorites": []}
     
+            new_favorite = {
+                "name": name,
+                "description": description,
+                "duration": duration,
+                "sequences": results['sequences'],
+                "muscles": results['muscles'], 
+                "style": style,
+                "created_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+
+            favorites_data["favorites"].append(new_favorite)
+
+            with open(FAVORITES_FILE, 'w') as f:
+                json.dump(favorites_data, f, indent=2)
+
+
+
     def generate_sequence(self):
         class_type = self.style_dropdown.currentText()
         current_duration = current_duration = self.duration_slider.value()
