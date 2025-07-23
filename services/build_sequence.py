@@ -45,10 +45,10 @@ def calculate_muscle_percentage(selected_sequences,target_muscles):
         if any(muscle in target_muscles for muscle in sequence_data['muscle_groups']):
             muscle_sequences+=1
 
-    if selected_sequences.len() == 0:
+    if len(selected_sequences) == 0:
         muscle_percentage = 0.0
     else:
-        muscle_percentage = muscle_sequences/selected_sequences.len()
+        muscle_percentage = muscle_sequences/len(selected_sequences)
     return muscle_percentage
 
 def sequence_matches_muscles(sequence,muscles):

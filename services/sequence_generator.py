@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                             QPushButton, QSlider, QComboBox, QCheckBox, 
                             QGroupBox, QGridLayout,QApplication)
 from PyQt6.QtCore import Qt
+from services.build_sequence import generate_yoga_class
 
 
 class SequenceGeneratorWidget(QWidget):
@@ -113,15 +114,7 @@ class SequenceGeneratorWidget(QWidget):
         group.setLayout(layout)
         return group
     
-    def show_results(self):
-        current_duration = self.duration_slider.value()  
-        selected_muscles = [] 
-        for checkbox in self.muscle_checkboxes:
-            if checkbox.isChecked():
-                selected_muscles.append(checkbox.text())
-        class_type = self.style_dropdown.currentText()
-
-
+    def show_results(self,results):
         for widget in self.group_of_widgets:
             widget.setVisible(False)
         self.generate_btn.setVisible(False)
@@ -129,16 +122,23 @@ class SequenceGeneratorWidget(QWidget):
         results_title = QLabel("Your Generated Sequence")
         results_title.setStyleSheet("font-size: 24px; font-weight: bold; color: #2E86AB;")
         results_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        results_string = ""
+        for index, sequence in enumerate(results['sequences']):
+            results_string += str(index + 1) + '. ' + sequence['name'] + '\n'
+        results_list = QLabel(results_string)
 
-
-        results_list = QLabel("1. Mountain Pose\n2. Downward Dog\n...")
-
-        
         results_details = QLabel(
             f"Here is your sequence for a class that meets the following requirements.... \n"
-            f"Total: {current_duration} minutes, \n"
-            f"Targeted Muscle Groups: {selected_muscles}, \n"
-            f"Class Type: {class_type}"
+            f"Total: {results['duration']} minutes, \n"
+            f"Targeted Muscle Groups: {results['muscles']}, \n"
+            f"Class Type: {self.style_dropdown.currentText()}"
+            )
+        print(
+            f"results sequence = {results_string}"
+            f"Here is your sequence for a class that meets the following requirements.... \n"
+            f"Total: {results['duration']} minutes, \n"
+            f"Targeted Muscle Groups: {results['muscles']}, \n"
+            f"Class Type: {self.style_dropdown.currentText()}"
             )
         refresh_btn = QPushButton("Generate a New Sequence")
         refresh_btn.clicked.connect(self.return_to_main)
@@ -170,15 +170,11 @@ class SequenceGeneratorWidget(QWidget):
         pass
     
     def generate_sequence(self):
-        fake_sequence = [
-            "Mountain Pose - 30 seconds",
-            "Downward Dog - 45 seconds", 
-            "Warrior I - 60 seconds",
-            "Child's Pose - 30 seconds"
-            ]
-    
-        print("Generated Sequence:")
-        for pose in fake_sequence:
-            print(f"  {pose}")
-
-        self.show_results()
+        class_type = self.style_dropdown.currentText()
+        current_duration = current_duration = self.duration_slider.value()
+        selected_muscles = [] 
+        for checkbox in self.muscle_checkboxes:
+            if checkbox.isChecked():
+                selected_muscles.append(checkbox.text())
+        results = generate_yoga_class(class_type, selected_muscles, current_duration)
+        self.show_results(results) 
