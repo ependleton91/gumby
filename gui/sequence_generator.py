@@ -38,6 +38,7 @@ class SequenceGeneratorWidget(QWidget):
         muscles_group = self.create_muscle_groups_section()
         self.main_layout.addWidget(muscles_group)
 
+        #store widgets in list
         self.group_of_widgets = [
             self.title,
             duration_group,
@@ -45,6 +46,7 @@ class SequenceGeneratorWidget(QWidget):
             muscles_group
         ]
 
+        #format widget width
         for widget in self.group_of_widgets:
             widget.setMaximumWidth(sub_widget_width)
         
@@ -53,9 +55,9 @@ class SequenceGeneratorWidget(QWidget):
         self.generate_btn.clicked.connect(self.generate_sequence) 
         self.main_layout.addWidget(self.generate_btn)
         
+        #Build layout
         self.setLayout(self.main_layout)
         self.main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        print(f"Initial layout has {self.main_layout.count()} items")
     
     def create_duration_section(self):
         # Create group box for organization
@@ -97,46 +99,57 @@ class SequenceGeneratorWidget(QWidget):
         self.style_dropdown.addItems(["YIN","HATHA","VINYASA"])
         selected_style = self.style_dropdown.currentText()
 
+        #Add dropdown to layout
         layout.addWidget(self.style_dropdown)
         group.setLayout(layout)
         return group
 
     def create_muscle_groups_section(self):
+        #Build muscle group checkboxes
         group = QGroupBox("Select Targeted Muscled Groups")
         layout = QVBoxLayout()
 
+        #add each muscle checkbox to layout
         muscle_groups = ["Abs", "Arms", "Back", "Pelvic Floor","All"]
         self.muscle_checkboxes = []
         for muscle in muscle_groups:
             checkbox = QCheckBox(muscle)
-            self.muscle_checkboxes.append(checkbox)  # Save it!
+            self.muscle_checkboxes.append(checkbox)  
             layout.addWidget(checkbox)
         
+        #store selected muscles
         selected_muscles = []
         for checkbox in self.muscle_checkboxes:
             if checkbox.isChecked():
                 selected_muscles.append(checkbox.text())
         
+        #add checkboxes to layout
         group.setLayout(layout)
         return group
     
     def show_results(self,results):
-        print(f"Layout has {self.main_layout.count()} items before showing results")
+
+        print(f"Printing results")
+
+        #Hide all option widgets/generate button
         for widget in self.group_of_widgets:
             widget.setVisible(False)
         self.generate_btn.setVisible(False)
 
+       #Map section to display name
         section_display_names = {
         "warm_up": "WARM UP",
         "main_flow": "MAIN FLOW", 
         "cool_down": "COOL DOWN"
         }
 
+        #Initialize results text
         results_title = QLabel("Your Generated Sequence")
         results_title.setStyleSheet("font-size: 24px; font-weight: bold; color: #2E86AB;")
         results_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         results_string = ""
 
+        #Print sequence and headers with numbers
         counter = 1
         for section_key, sequence_list in results['sequences'].items():
             results_string += f'=== {section_display_names[section_key]} ===\n'
@@ -144,7 +157,8 @@ class SequenceGeneratorWidget(QWidget):
                 results_string += str(counter) + '. ' + sequence['name'] + '\n'
             counter += 1
         results_list = QLabel(results_string)
-
+        
+        #Build result details 
         results_details = QLabel(
             f"Here is your sequence for a class that meets the following requirements.... \n"
             f"Total: {results['duration']} minutes, \n"
@@ -158,6 +172,8 @@ class SequenceGeneratorWidget(QWidget):
             f"Targeted Muscle Groups: {results['muscles']}, \n"
             f"Class Type: {self.style_dropdown.currentText()}"
             )
+        
+        #Build navigation buttons
         refresh_btn = QPushButton("Generate a New Sequence")
         refresh_btn.clicked.connect(self.return_to_main)
 
@@ -165,6 +181,7 @@ class SequenceGeneratorWidget(QWidget):
         favorite_btn= QPushButton("Favorite This Sequence")
         favorite_btn.clicked.connect(lambda: self.add_to_favorites(results, style))
 
+        #Create list of results widgets
         self.results_widgets = [
             results_title,
             results_list,
@@ -172,11 +189,14 @@ class SequenceGeneratorWidget(QWidget):
             refresh_btn,
             favorite_btn
         ]
+
+        #make all widgets visible
         for widget in self.results_widgets:
             self.main_layout.addWidget(widget)
     
     def return_to_main(self):
         # FIRST: Remove results widgets completely
+        print(f"Returning to main")
         for widget in self.results_widgets:
             widget.setVisible(False)
             self.main_layout.removeWidget(widget)
@@ -189,7 +209,10 @@ class SequenceGeneratorWidget(QWidget):
         self.generate_btn.setVisible(True)
 
     def add_to_favorites(self,results,style):
+        print(f"Add to favorites selected.")
+
         dialog = favorites_dialog_box(results, style)
+
         if dialog.exec() == QDialog.DialogCode.Accepted:
         # User clicked Save - get their edited text and save
             name = dialog.name_field.text()
@@ -203,7 +226,8 @@ class SequenceGeneratorWidget(QWidget):
             else:
                 print(f"The path '{FAVORITES_FILE}' does not exist.")
                 favorites_data = {"favorites": []}
-    
+
+            #initialize favorite json object for current sequence
             new_favorite = {
                 "name": name,
                 "description": description,
@@ -214,12 +238,16 @@ class SequenceGeneratorWidget(QWidget):
                 "created_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
 
+            #Add favorited sequence jObject to favorites
             favorites_data["favorites"].append(new_favorite)
-
+            
+            #Write to favorites file
+            print("Saving sequence to favorites file")
             with open(FAVORITES_FILE, 'w') as f:
                 json.dump(favorites_data, f, indent=2)
 
     def generate_sequence(self):
+        
         class_type = self.style_dropdown.currentText()
         current_duration = current_duration = self.duration_slider.value()
         selected_muscles = [] 
