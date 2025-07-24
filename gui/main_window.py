@@ -11,11 +11,12 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        #Read qss style sheet
         with open("assets/styles/style.qss", "r") as f:
             style = f.read()
             QApplication.instance().setStyleSheet(style)
 
-
+        #Generate site title
         self.main_title = "GUMBY"
         self.setWindowTitle(self.main_title)
         self.showMaximized() 
@@ -40,19 +41,18 @@ class MainWindow(QMainWindow):
         poses_action = nav_menu.addAction("🧘 All Poses") 
         practice_action = nav_menu.addAction("🎯 Practice Mode")
 
-        # Connect to existing methods
+        # Connect to click methods
         home_action.triggered.connect(self.back_to_main)
         generate_action.triggered.connect(self.generate_button_was_clicked)
         favorites_action.triggered.connect(self.favorites_button_was_clicked)
         poses_action.triggered.connect(self.poses_button_was_clicked)
         practice_action.triggered.connect(self.practice_button_was_clicked)
 
-
         #Button 1 - Generate a sequence
         self.generate_button = QPushButton("Generate a Sequence!")
         self.generate_button.clicked.connect(self.generate_button_was_clicked)
 
-        #Button 2 - Favorite Sequence
+        #Button 2 - Favorite Sequences
         self.favorites_button = QPushButton("View Favorites")
         self.favorites_button.clicked.connect(self.favorites_button_was_clicked)
         #Button 3 - See all poses
@@ -63,7 +63,7 @@ class MainWindow(QMainWindow):
         self.practice_button = QPushButton("Practice Mode")
         self.practice_button.clicked.connect(self.practice_button_was_clicked)
 
-
+        #Build list of buttons 
         self.main_buttons = [
             self.generate_button,
             self.favorites_button, 
@@ -71,13 +71,15 @@ class MainWindow(QMainWindow):
             self.practice_button
             ]
 
+        #Build list of widgets for main window
         self.all_widgets = [
             self.sequence_generator,
             self.favorites_widget,
             self.poses_widget,
             self.practice_widget
             ] 
-    
+
+        #Set all main window widgets visible
         for widget in self.all_widgets:
             widget.setVisible(False)
 
@@ -105,12 +107,14 @@ class MainWindow(QMainWindow):
     ####### END OF INIT ##########
 
     def hide_all_widgets(self):
+        #when loading other pages, make main widgets invisible
         for button in self.main_buttons:
             button.setVisible(False)
         for widget in self.all_widgets:
             widget.setVisible(False)
 
     def show_main_buttons(self):
+        #when returning to main, show main widgets
         for button in self.main_buttons:
             button.setVisible(True) 
 
@@ -118,27 +122,32 @@ class MainWindow(QMainWindow):
         self.show_main_page()
     
     def show_main_page(self):
+        #build main page
         self.hide_all_widgets()
         self.show_main_buttons()
         self.setWindowTitle(self.main_title)
 
     def generate_button_was_clicked(self):
+        print(f"Generate a sequence was clicked.")
         self.setWindowTitle(self.main_title+" - Generate a Sequence")
         self.hide_all_widgets()
         self.sequence_generator.setVisible(True) 
         
 
     def favorites_button_was_clicked(self):
+        print(f"View favorites was clicked.")
         self.setWindowTitle(self.main_title+" - Favorites")
         self.hide_all_widgets()
         self.favorites_widget.setVisible(True) 
 
     def poses_button_was_clicked(self):
+        print(f"view all poses was clicked.")
         self.setWindowTitle(self.main_title+" - All Poses")
         self.hide_all_widgets()
         self.poses_widget.setVisible(True) 
 
     def practice_button_was_clicked(self):
+        print(f"Practice mode was clicked.")
         self.setWindowTitle(self.main_title+" - Practice Mode")
         self.hide_all_widgets()
         self.practice_widget.setVisible(True) 
