@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QLabel, QPushButt
 import json
 import os
 from config import FAVORITES_FILE
+from gui.dialogs.details_dialogue import details_dialogue_box
 
 class FavoritesWidget(QWidget):
     def create_favorites_display(self):
@@ -76,6 +77,7 @@ class FavoritesWidget(QWidget):
                 practice_btn = QPushButton("Practice")
 
                 delete_btn.clicked.connect(lambda checked, fav = favorite: self.delete_favorite(fav))
+                details_btn.clicked.connect(lambda checked, fav=favorite: self.show_details(fav))
 
                 #Add buttons to button layout
                 button_layout.addWidget(details_btn)
@@ -151,4 +153,8 @@ class FavoritesWidget(QWidget):
         # User clicked No, so return early
         return
     
+    def show_details(self,favorite):
+        dialog = details_dialogue_box(favorite)
+        dialog.exec()
+
   
