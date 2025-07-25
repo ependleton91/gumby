@@ -1,4 +1,6 @@
-from PyQt6.QtWidgets import QDialog, QPushButton,QLineEdit,QTabWidget,QScrollArea,QLabel,QVBoxLayout,QHBoxLayout,QTextEdit, QDialogButtonBox,QWidget
+from PyQt6.QtWidgets import QDialog, QMessageBox,QPushButton,QLineEdit,QTabWidget,QScrollArea,QLabel,QVBoxLayout,QHBoxLayout,QTextEdit, QDialogButtonBox,QWidget
+from config import FAVORITES_FILE
+import json
 
 class details_dialogue_box(QDialog):
         def __init__(self,favorite):
@@ -110,20 +112,64 @@ class General_Tab(QWidget):
         self.edit_mode = True
         self.description_content.setReadOnly(False)
 
-        self.name_layout.removeWidget(self.name_content)
-        self.name_edit=QTextEdit(self.favorite["name"])
+        self.original_name = self.favorite['name']
+        self.original_description = self.favorite['description']
+
+        self.name_content.setVisible(False)
+        self.name_edit=QLineEdit(self.favorite["name"])
         self.name_edit.setReadOnly(False)
         self.name_layout.addWidget(self.name_edit)
-        self.main_layout.addLayout(self.name_layout)
-
-
-
 
     def save_changes(self):
-        pass
+        try:
+            with open(FAVORITES_FILE, 'r') as f:
+                    favorites_data = json.load(f)
+
+            new_name = self.name_edit.text().strip()
+            new_description = self.description_content.toPlainText().strip()
+
+            if len(new_name) == 0:
+                QMessageBox.warning(self, "Invalid Name", "Name cannot be empty!")
+                return 
+
+            for favorite in favorites_data["favorites"]:
+                    if favorite["created_date"] == self.favorite["created_date"]:
+                        favorite["name"] = new_name
+                        favorite["description"] = new_description
+                        break
+            
+            self.favorite["name"] = new_name
+            self.favorite["description"] = new_description
+            self.Parent().setWindowTitle(f"Favorite Details: {self.favorite['name']}")
+
+            with open(FAVORITES_FILE, 'w') as f:
+                    json.dump(favorites_data, f, indent=2)
+
+            self.exit_edit_mode()
+        except Exception as e:
+            QMessageBox.critical(self, "Save Error", f"Could not save changes: {str(e)}")
+            return
 
     def cancel_edit(self):
-        pass
+        self.favorite["name"] = self.original_name
+        self.favorite["description"] = self.original_description
+        
+        # Reset edit widgets to original values
+        self.name_edit.setText(self.original_name)
+        self.description_content.setText(self.original_description)
+        self.exit_edit_mode()
+        
+    def exit_edit_mode(self):
+
+        self.edit_button.setVisible(True)
+        self.save_button.setVisible(False)
+        self.cancel_button.setVisible(False)
+        self.edit_mode = False
+        self.description_content.setReadOnly(True)
+        self.name_content.setVisible(True)
+        self.name_edit.setVisible(False)
+        self.name_content.setText(self.favorite["name"]) 
+
 class Sequence_Tab(QWidget):
     def __init__(self, favorite):
         super().__init__()
