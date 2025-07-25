@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QDialog, QTabWidget,QScrollArea,QLabel,QVBoxLayout,QHBoxLayout,QTextEdit, QDialogButtonBox,QWidget
+from PyQt6.QtWidgets import QDialog, QPushButton,QLineEdit,QTabWidget,QScrollArea,QLabel,QVBoxLayout,QHBoxLayout,QTextEdit, QDialogButtonBox,QWidget
 
 class details_dialogue_box(QDialog):
         def __init__(self,favorite):
@@ -24,15 +24,15 @@ class General_Tab(QWidget):
     def __init__(self, favorite):
         super().__init__()
         self.favorite = favorite
-        main_layout = QVBoxLayout()
+        self.main_layout = QVBoxLayout()
 
         # NAME
-        name_layout = QHBoxLayout()
+        self.name_layout = QHBoxLayout()
         name_label = QLabel("NAME:")
-        name_content = QLabel(self.favorite['name'])
-        name_layout.addWidget(name_label)
-        name_layout.addWidget(name_content)
-        main_layout.addLayout(name_layout) 
+        self.name_content = QLabel(self.favorite['name'])
+        self.name_layout.addWidget(name_label)
+        self.name_layout.addWidget(self.name_content)
+        self.main_layout.addLayout(self.name_layout) 
 
         #STYLE
         style_layout = QHBoxLayout()
@@ -40,7 +40,7 @@ class General_Tab(QWidget):
         style_content = QLabel(self.favorite['style'])
         style_layout.addWidget(style_label)
         style_layout.addWidget(style_content)
-        main_layout.addLayout(style_layout) 
+        self.main_layout.addLayout(style_layout) 
 
         #CREATED DATE
         created_layout = QHBoxLayout()
@@ -48,7 +48,7 @@ class General_Tab(QWidget):
         created_content = QLabel(self.favorite['created_date'])
         created_layout.addWidget(created_label)
         created_layout.addWidget(created_content)
-        main_layout.addLayout(created_layout) 
+        self.main_layout.addLayout(created_layout) 
 
         # DURATION
         duration_layout = QHBoxLayout()
@@ -56,7 +56,7 @@ class General_Tab(QWidget):
         duration_content = QLabel(self.favorite['duration'])
         duration_layout.addWidget(duration_label)
         duration_layout.addWidget(duration_content)
-        main_layout.addLayout(duration_layout) 
+        self.main_layout.addLayout(duration_layout) 
 
         #MUSCLES
         muscles_layout = QHBoxLayout()
@@ -64,24 +64,66 @@ class General_Tab(QWidget):
         muscles_content = QLabel(", ".join(self.favorite['muscles']))
         muscles_layout.addWidget(muscles_label)
         muscles_layout.addWidget(muscles_content)
-        main_layout.addLayout(muscles_layout) 
+        self.main_layout.addLayout(muscles_layout) 
 
         #DESCRIPTION
         description_layout = QHBoxLayout()
         description_label = QLabel("DESCRIPTION:")
-        description_content = QTextEdit(self.favorite['description'])
-        description_content.setReadOnly(True)
+        self.description_content = QTextEdit(self.favorite['description'])
+        self.description_content.setReadOnly(True)
         description_layout.addWidget(description_label)
-        description_layout.addWidget(description_content)
-        main_layout.addLayout(description_layout) 
-
-
-
+        description_layout.addWidget(self.description_content)
+        self.main_layout.addLayout(description_layout) 
 
         
+        bottom_content = QWidget()
+        bottom_buttons = QHBoxLayout()
 
-        self.setLayout(main_layout)
 
+        self.edit_mode = False
+        self.edit_button = QPushButton("EDIT")
+        self.edit_button.setVisible(True)
+        self.edit_button.clicked.connect(self.enter_edit_mode)
+        bottom_buttons.addWidget(self.edit_button)
+
+        self.save_button = QPushButton("SAVE")
+        self.save_button.setVisible(False)
+        self.save_button.clicked.connect(self.save_changes)
+        bottom_buttons.addWidget(self.save_button)
+
+        self.cancel_button = QPushButton("CANCEL")
+        self.cancel_button.setVisible(False)
+        self.cancel_button.clicked.connect(self.cancel_edit)
+        bottom_buttons.addWidget(self.cancel_button)
+
+        bottom_content.setLayout(bottom_buttons)
+
+        
+        self.main_layout.addWidget(bottom_content)
+        self.setLayout(self.main_layout)
+
+    def enter_edit_mode(self):
+
+        self.edit_button.setVisible(False)
+        self.save_button.setVisible(True)
+        self.cancel_button.setVisible(True)
+        self.edit_mode = True
+        self.description_content.setReadOnly(False)
+
+        self.name_layout.removeWidget(self.name_content)
+        self.name_edit=QTextEdit(self.favorite["name"])
+        self.name_edit.setReadOnly(False)
+        self.name_layout.addWidget(self.name_edit)
+        self.main_layout.addLayout(self.name_layout)
+
+
+
+
+    def save_changes(self):
+        pass
+
+    def cancel_edit(self):
+        pass
 class Sequence_Tab(QWidget):
     def __init__(self, favorite):
         super().__init__()
@@ -126,14 +168,56 @@ class History_Tab(QWidget):
         header_label = QLabel("PRACTICE HISTORY")
         main_layout.addWidget(header_label)
         
+        practice_history = self.favorite.get("practice_history", [])
 
-        if len(self.favorite["practice_history"]) == 0:
+        if len(practice_history) == 0:
             empty_message = QLabel("No practice sessions for this sequence yet!")
             scroll_layout.addWidget(empty_message)
             print(f"Zero Practice History. Message Displayed: {empty_message}")
         else:
             for session in self.favorite["practice_history"]:
-                pass
+                card_widget = QWidget()
+                card_layout = QVBoxLayout()
+
+                horizontal_widget = QWidget()
+                horizontal_layout = QHBoxLayout()
+
+                date_widget=QWidget()
+                date_layout = QHBoxLayout()
+                date_label = QLabel("DATE:")
+                date_content = QLabel(session['date'])
+                date_layout.addWidget(date_label)
+                date_layout.addWidget(date_content)
+                date_widget.setLayout(date_layout)
+
+
+                rating_widget = QWidget()
+                rating_layout = QHBoxLayout()
+                rating_label = QLabel("RATING:")
+                rating_content = QLabel(str(session['rating']))
+                rating_layout.addWidget(rating_label)
+                rating_layout.addWidget(rating_content)
+                rating_widget.setLayout(rating_layout)
+                
+
+                horizontal_layout.addWidget(date_widget)
+                horizontal_layout.addWidget(rating_widget)
+                horizontal_widget.setLayout(horizontal_layout)
+
+                notes_widget = QWidget()
+                notes_layout=QVBoxLayout()
+                notes_label = QLabel("NOTES:")
+                notes_text = QTextEdit(session["notes"])
+                notes_text.setReadOnly(True)
+                notes_layout.addWidget(notes_label)
+                notes_layout.addWidget(notes_text)
+                notes_widget.setLayout(notes_layout)
+
+                
+                card_layout.addWidget(horizontal_widget)
+                card_layout.addWidget(notes_widget)
+                card_widget.setLayout(card_layout)
+                scroll_layout.addWidget(card_widget)
             
         scroll_content.setLayout(scroll_layout)
         scroll_area.setWidget(scroll_content)
