@@ -1,7 +1,9 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QMessageBox, QComboBox, QStyle,QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QMessageBox, QComboBox, QStyle,QHBoxLayout, QDialog
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import QSize, Qt, QTimer
-from config import FAVORITES_FILE, POSES_IMAGE_DIR
+from PyQt6.QtCore import Qt, QTimer
+from config import FAVORITES_FILE
+from gui.dialogs.completion_dialogue import completion_dialogue_box
+from datetime import datetime
 import json
 
 class PracticeWidget(QWidget):
@@ -219,6 +221,8 @@ class PracticeWidget(QWidget):
         print("Practice started.")
         self.session_started = True
         self.current_state = "ACTIVE_PRACTICE"
+        self.session_start_time = datetime.now()
+
         
         #flatten list to grab all poses
         self.list_of_poses = []
@@ -356,7 +360,7 @@ class PracticeWidget(QWidget):
         if self.current_pose_index < (len(self.list_of_poses)-1):
             self.load_next_pose()
         else:
-            return
+            self.end_of_class()
 
     def pause_practice(self):
         self.timer_is_paused = True
@@ -370,10 +374,58 @@ class PracticeWidget(QWidget):
 
     def toggle_pause_play_buttons(self):
         if self.timer_is_paused == True:
-            self.pause_button.setVisible(False)
-            self.play_button.setVisible(True)
+            self.pause_button.setEnabled(False)
+            self.play_button.setEnabled(True)
             self.update_view()
         else:
-            self.pause_button.setVisible(True)
-            self.play_button.setVisible(False)
+            self.pause_button.setEnabled(True)
+            self.play_button.setEnabled(False)
             self.update_view()
+
+    def end_of_class(self):
+        print("Class complete!")
+        self.practice_timer.stop()
+
+        completion_dialog = QMessageBox()
+        completion_dialog.setWindowTitle("Practice Complete!")
+        completion_dialog.setText("Congratulations! You've completed your yoga session. Would you like to save this session to your practice history?")
+        completion_dialog.setStandardButtons(QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Cancel)
+
+        if completion_dialog.exec() == QMessageBox.StandardButton.Save:
+        # User wants to save session
+            dialog = completion_dialogue_box(self.selected_favorite,self.session_start_time)
+            if dialog.exec() == QDialog.DialogCode.Accepted:  # User clicked Save
+                 # Extract data from dialog
+                rating = dialog.rating_field.text()
+                notes = dialog.notes_field.toPlainText()
+                date = dialog.date_field.text()
+                # Save to practice history              
+                self.save_practice_session(rating, notes, date)
+        # Else just return to selection
+    
+        self.current_state = "SELECTION"
+        self.session_started = False
+        self.update_view()
+
+    def save_practice_session(self,rating,notes,date):
+
+        try:
+            rating_int = int(rating)
+            if rating_int < 1 or rating_int > 5:
+                rating_int = 3  # Default to middle rating
+        except ValueError:
+            rating_int = 3 
+        
+        with open(FAVORITES_FILE, 'r') as f:
+            favorites_data = json.load(f)
+
+
+        for item in favorites_data["favorites"]:
+            if "practice_history" not in item:
+                item["practice_history"] = []
+            if item['name'] == self.selected_favorite['name']:
+               item["practice_history"].append({"date": str(date), "rating": int(rating), "notes": notes})  
+               break
+
+        with open(FAVORITES_FILE, 'w') as f:
+            json.dump(favorites_data, f, indent=2)
