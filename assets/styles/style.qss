@@ -362,3 +362,10 @@ QLabel[objectName="sequences_text"] {
     line-height: 1.6;
 }
 
+QFrame[objectName="poseCard"] {
+    background-color: #f9f4e8;
+    border: 2px solid #d4af7a;
+    border-radius: 12px;
+    padding: 8px;
+}
+

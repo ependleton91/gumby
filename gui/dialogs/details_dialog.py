@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QDialog, QMessageBox,QPushButton,QLineEdit,QTabWidge
 from config import FAVORITES_FILE
 import json
 
-class details_dialogue_box(QDialog):
+class details_dialog_box(QDialog):
         def __init__(self,favorite):
             super().__init__()
             self.favorite = favorite

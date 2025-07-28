@@ -97,7 +97,7 @@ class PosesWidget(QWidget):
         # Create image widget but don't load image yet
         pose_image_widget = QLabel("Loading...")
 
-        pose_image_widget.setFixedSize(275, 200)
+        pose_image_widget.setFixedSize(275, 190)
         pose_image_widget.pose_name = pose_info["name"] 
         self.pose_image_widgets.append(pose_image_widget)
         pose_image_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)

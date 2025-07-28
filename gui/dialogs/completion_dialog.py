@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QDialog,QLineEdit,QTextEdit,QPushButton,QFormLayout,QLabel, QMessageBox
 from datetime import datetime
 
-class completion_dialogue_box(QDialog):
+class completion_dialog_box(QDialog):
     def __init__(self,practiced_favorite,session_start_time):
         super().__init__()
           # Show completion dialog

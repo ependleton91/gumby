@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QLabel, QPushButt
 import json
 import os
 from config import FAVORITES_FILE
-from gui.dialogs.details_dialogue import details_dialogue_box
+from gui.dialogs.details_dialog import details_dialog_box
 
 class FavoritesWidget(QWidget):
     def create_favorites_display(self):
@@ -163,7 +163,7 @@ class FavoritesWidget(QWidget):
         return
     
     def show_details(self,favorite):
-        dialog = details_dialogue_box(favorite)
+        dialog = details_dialog_box(favorite)
         dialog.exec()
 
   

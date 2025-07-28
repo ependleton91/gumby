@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QMessageB
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, QTimer
 from config import FAVORITES_FILE
-from gui.dialogs.completion_dialogue import completion_dialogue_box
+from gui.dialogs.completion_dialog import completion_dialog_box
 from datetime import datetime
 import json
 
@@ -393,7 +393,7 @@ class PracticeWidget(QWidget):
 
         if completion_dialog.exec() == QMessageBox.StandardButton.Save:
         # User wants to save session
-            dialog = completion_dialogue_box(self.selected_favorite,self.session_start_time)
+            dialog = completion_dialog_box(self.selected_favorite,self.session_start_time)
             if dialog.exec() == QDialog.DialogCode.Accepted:  # User clicked Save
                  # Extract data from dialog
                 rating = dialog.rating_field.text()

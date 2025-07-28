@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                             QGroupBox, QGridLayout,QApplication,QDialog)
 from PyQt6.QtCore import Qt
 from services.build_sequence import generate_yoga_class
-from gui.dialogs.favorites_dialogue import favorites_dialog_box
+from gui.dialogs.favorites_dialog import favorites_dialog_box
 import os
 import json
 import datetime
