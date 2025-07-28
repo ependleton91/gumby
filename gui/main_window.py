@@ -1,11 +1,13 @@
 
 import sys
 from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QVBoxLayout
 from gui.sequence_generator import SequenceGeneratorWidget
 from gui.favorites_page import FavoritesWidget
 from gui.all_poses import PosesWidget
 from gui.practice_mode import PracticeWidget
+from config import POSES_IMAGE_DIR
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -86,7 +88,9 @@ class MainWindow(QMainWindow):
         # build layout
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            
+        self.build_image_cache()
+
+
         # Add buttons to layout
         layout.addWidget(self.generate_button)
         layout.addWidget(self.favorites_button) 
@@ -105,6 +109,17 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
 
     ####### END OF INIT ##########
+    def build_image_cache(self):
+        self.image_cache = {}
+        for image_path in POSES_IMAGE_DIR.glob("*.png"):
+            try:
+                pixmap = QPixmap(str(image_path)) 
+                filename = image_path.name
+                if not pixmap.isNull():
+                    self.image_cache[filename] = pixmap
+                    print(f"image added to cache: {filename}")
+            except:
+                print(f"Failed to load {filename}: {e}")
 
     def hide_all_widgets(self):
         #when loading other pages, make main widgets invisible
@@ -133,12 +148,13 @@ class MainWindow(QMainWindow):
         self.hide_all_widgets()
         self.sequence_generator.setVisible(True) 
         
-
     def favorites_button_was_clicked(self):
         print(f"View favorites was clicked.")
         self.setWindowTitle(self.main_title+" - Favorites")
         self.hide_all_widgets()
+        self.favorites_widget.refresh_favorites() 
         self.favorites_widget.setVisible(True) 
+    
 
     def poses_button_was_clicked(self):
         print(f"view all poses was clicked.")

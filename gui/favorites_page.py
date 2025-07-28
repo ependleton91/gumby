@@ -109,6 +109,15 @@ class FavoritesWidget(QWidget):
         layout.addWidget(self.scroll_area)    
         self.setLayout(layout)
 
+    def refresh_favorites(self):
+        # Same refresh logic as in delete_favorite
+        self.layout().removeWidget(self.scroll_area)
+        self.scroll_area.deleteLater()
+        new_scroll_area = self.create_favorites_display()
+        self.layout().addWidget(new_scroll_area)
+        self.scroll_area = new_scroll_area
+        print("refresh requested!")
+
     def toggle_sequences(self,sequences_widget,button):
         #On click, make opposite of current status 
         if sequences_widget.isVisible():

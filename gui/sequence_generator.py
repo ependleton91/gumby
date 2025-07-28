@@ -211,6 +211,7 @@ class SequenceGeneratorWidget(QWidget):
     def add_to_favorites(self,results,style):
         print(f"Add to favorites selected.")
 
+
         dialog = favorites_dialog_box(results, style)
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
@@ -223,6 +224,8 @@ class SequenceGeneratorWidget(QWidget):
                 print(f"The path '{FAVORITES_FILE}' exists.")
                 with open(FAVORITES_FILE, 'r') as f:
                     favorites_data = json.load(f)
+                main_window = self.parent().parent()  # Navigate to MainWindow
+                main_window.favorites_button_was_clicked()
             else:
                 print(f"The path '{FAVORITES_FILE}' does not exist.")
                 favorites_data = {"favorites": []}
@@ -245,6 +248,8 @@ class SequenceGeneratorWidget(QWidget):
             print("Saving sequence to favorites file")
             with open(FAVORITES_FILE, 'w') as f:
                 json.dump(favorites_data, f, indent=2)
+
+            main_window.favorites_widget.refresh_favorites()
 
     def generate_sequence(self):
         
