@@ -57,6 +57,7 @@ QPushButton:pressed {
     background-color: #8b4513;
 }
 
+
 /* Sliders */
 QSlider::groove:horizontal {
     border: 1px solid #d2b48c;
@@ -174,6 +175,63 @@ QMenu::item:selected {
     color: white;
 }
 
+/* Tab Widget */
+QTabWidget::pane {
+    border: 1px solid #d2b48c;
+    background-color: #fdf5e6;
+}
+
+QTabBar::tab {
+    background-color: #f5e6d3;
+    border: 1px solid #d2b48c;
+    padding: 8px 16px;
+    margin-right: 2px;
+    color: #3e2723;
+}
+
+QTabBar::tab:selected {
+    background-color: #a0522d;
+    color: white;
+}
+
+QTabBar::tab:hover {
+    background-color: #cd853f;
+    color: white;
+}
+
+/* Scrollbars - Unified Definition */
+QScrollArea {
+    background-color: #fdf5e6;
+    border: none;
+}
+
+QScrollArea > QWidget > QWidget {
+    background-color: #fdf5e6;
+}
+
+QScrollBar:vertical {
+    background-color: #f5e6d3;
+    width: 12px;
+    border-radius: 6px;
+    margin: 0;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #a0522d;
+    border-radius: 6px;
+    min-height: 30px;
+    margin: 2px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #cd853f;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    border: none;
+    background: none;
+}
+
 /* Dialog Styling */
 QDialog {
     background-color: #fdf5e6;
@@ -270,33 +328,18 @@ QDialog QLabel {
     margin-right: 10px;
 }
 
-/* Scrollbars */
-QScrollArea {
-    background-color: #fdf5e6;
-    border: none;
+/* Pose Cards */
+QFrame[objectName="pose_card"] {
+    background-color: #fffef7;
+    border: 1px solid #d2b48c;
+    border-radius: 8px;
+    margin: 4px;
+    padding: 5px;
 }
 
-QScrollBar:vertical {
-    background-color: #f5e6d3;
-    width: 12px;
-    border-radius: 6px;
-    margin: 0;
-}
-
-QScrollBar::handle:vertical {
-    background-color: #a0522d;
-    border-radius: 6px;
-    min-height: 30px;
-    margin: 2px;
-}
-
-QScrollBar::handle:vertical:hover {
-    background-color: #cd853f;
-}
-
-QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-    border: none;
-    background: none;
+QFrame[objectName="pose_card"]:hover {
+    border-color: #a0522d;
+    box-shadow: 2px 2px 8px rgba(160, 82, 45, 0.3);
 }
 
 /* Favorites Cards */
@@ -318,3 +361,4 @@ QLabel[objectName="sequences_text"] {
     color: #5d4037;
     line-height: 1.6;
 }
+

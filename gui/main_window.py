@@ -23,6 +23,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.main_title)
         self.showMaximized() 
 
+        self.build_image_cache()
+
         # Add All Widgets
         self.sequence_generator = SequenceGeneratorWidget()
         self.favorites_widget = FavoritesWidget()
@@ -88,7 +90,7 @@ class MainWindow(QMainWindow):
         # build layout
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.build_image_cache()
+        
 
 
         # Add buttons to layout
@@ -160,6 +162,7 @@ class MainWindow(QMainWindow):
         print(f"view all poses was clicked.")
         self.setWindowTitle(self.main_title+" - All Poses")
         self.hide_all_widgets()
+        self.poses_widget.load_pose_images()
         self.poses_widget.setVisible(True) 
 
     def practice_button_was_clicked(self):
