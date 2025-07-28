@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QScrollAr
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 from config import POSES_FILE
+from gui.dialogs.pose_details_dialog import pose_details_box
 import json
 
 class PosesWidget(QWidget):
@@ -105,6 +106,7 @@ class PosesWidget(QWidget):
         self.edit_button = QPushButton("EDIT")
         self.edit_button.setMaximumWidth(100)
         self.edit_button.setStyleSheet("background-color: #a0522d; color: white; font-size: 12px; border-radius: 4px; padding: 4px 8px;")
+        self.edit_button.clicked.connect(lambda: self.display_pose_deets(pose_info)) 
 
         # Add to layout
         layout.addWidget(pose_image_widget)
@@ -116,7 +118,7 @@ class PosesWidget(QWidget):
         click_button = QPushButton(card_frame)
         click_button.setGeometry(0, 0, 200, 200) 
         click_button.setStyleSheet("background: transparent; border: none;")
-        click_button.clicked.connect(lambda: self.show_details(pose_info))
+        click_button.clicked.connect(lambda: self.display_pose_deets(pose_info))
         
         
         return card_frame        
@@ -140,3 +142,7 @@ class PosesWidget(QWidget):
                 image_widget.setPixmap(scaled_image)
             else:
                 image_widget.setText("No Image")
+
+    def display_pose_deets(self,pose_info):
+        dialog = pose_details_box(pose_info)
+        dialog.exec()
