@@ -106,7 +106,7 @@ class PosesWidget(QWidget):
         self.edit_button = QPushButton("EDIT")
         self.edit_button.setMaximumWidth(100)
         self.edit_button.setStyleSheet("background-color: #a0522d; color: white; font-size: 12px; border-radius: 4px; padding: 4px 8px;")
-        self.edit_button.clicked.connect(lambda: self.display_pose_deets(pose_info)) 
+        self.edit_button.clicked.connect(lambda: self.edit_pose(pose_info))
 
         # Add to layout
         layout.addWidget(pose_image_widget)
