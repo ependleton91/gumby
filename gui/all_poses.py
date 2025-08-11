@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QScrollArea,QTabWidget, QGridLayout, QFrame,QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QDialog, QVBoxLayout, QLabel, QPushButton, QScrollArea,QTabWidget, QGridLayout, QFrame,QHBoxLayout
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 from config import POSES_FILE
@@ -9,6 +9,7 @@ class PosesWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.pose_image_widgets = []
+        self.pose_cards = {}
         tab_widget = QTabWidget()
         tab_widget.addTab(self.Poses_Tab(),"POSES")
         tab_widget.addTab(self.Sequence_Tab(),"SEQUENCES")
@@ -74,13 +75,15 @@ class PosesWidget(QWidget):
         for index, (pose_key, pose_info) in enumerate(poses.items()):
             row = index // 3
             column = index % 3
-            
-            pose_card = self.create_pose_card(pose_info)
+
+            pose_card = self.create_pose_card(pose_info, pose_key)
             card_grid.addWidget(pose_card, row, column)
+            # Store the card reference
+            self.pose_cards[pose_key] = pose_card
         
         return card_grid
     
-    def create_pose_card(self,pose_info):
+    def create_pose_card(self,pose_info,pose_key):
         card_frame = QFrame()
         card_frame.setObjectName("poseCard")
         card_frame.setFrameStyle(QFrame.Shape.Box)
@@ -119,6 +122,8 @@ class PosesWidget(QWidget):
         click_button.setGeometry(0, 0, 200, 200) 
         click_button.setStyleSheet("background: transparent; border: none;")
         click_button.clicked.connect(lambda: self.display_pose_deets(pose_info))
+
+        card_frame.pose_key = pose_key
         
         
         return card_frame        
@@ -144,5 +149,58 @@ class PosesWidget(QWidget):
                 image_widget.setText("No Image")
 
     def display_pose_deets(self,pose_info):
-        dialog = pose_details_box(pose_info)
+        dialog = pose_details_box(pose_info, edit_mode=False)
         dialog.exec()
+
+    def edit_pose(self, pose_info):
+        dialog = pose_details_box(pose_info, edit_mode=True)
+        result = dialog.exec()
+
+        if result == QDialog.DialogCode.Accepted:
+            self.save_pose_changes(dialog,pose_info)
+
+
+    def save_pose_changes(self, dialog, original_pose_info):
+        # Extract edited data and save to poses.json
+        new_data = {}
+        new_data["name"]= dialog.name_field.text()
+        new_data["description"] = dialog.description_field.toPlainText()
+        try:
+            new_data["default_duration"] = float(dialog.duration_field.text())
+        except:
+            print(f"Invalid duration value, keeping original: {original_pose_info['default_duration']}")
+        new_data["muscle_groups"] = [muscle.strip() for muscle in dialog.muscles_field.text().split(",")]
+        new_data["type"] = dialog.type_field.text()
+        new_data["instructions"] = dialog.instructions_field.toPlainText()
+        new_data["modifications"] = dialog.modifications_field.toPlainText()
+        try: 
+            new_data["difficulty"] =  int(dialog.difficulty_field.text())
+        except:
+            print(f"Invalid difficulty value, keeping original: {original_pose_info['difficulty']}")
+
+
+        with open(POSES_FILE, 'r') as f:
+            poses_data = json.load(f)
+
+        # Single loop to update and capture pose_key
+        found_pose_key = None
+        for pose_key, pose_data in poses_data["poses"].items():
+            if pose_data["name"] == original_pose_info["name"]:
+                for key, value in new_data.items():
+                    pose_data[key] = value
+                found_pose_key = pose_key  # Capture the key
+                break
+
+        # Save updated data
+        with open(POSES_FILE, 'w') as f:
+            json.dump(poses_data, f, indent=2)
+
+        # Update UI card
+        if found_pose_key:
+            # Get the updated pose data for UI refresh
+            updated_pose_data = poses_data["poses"][found_pose_key]
+            self.update_pose_card(found_pose_key, updated_pose_data)
+
+    def update_pose_card(self, pose_key, updated_pose_info):
+        if pose_key in self.pose_cards:
+            card = self.pose_cards[pose_key]

@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QDialog,QLineEdit,QTextEdit,QPushButton,QFormLayout,QLabel,QFileDialog
+from PyQt6.QtWidgets import QDialog, QLineEdit, QTextEdit, QPushButton, QFormLayout, QLabel, QFileDialog, QScrollArea, QWidget, QVBoxLayout
 
 class pose_details_box(QDialog):
     def __init__(self, pose_info, edit_mode=False):
@@ -10,6 +10,9 @@ class pose_details_box(QDialog):
             self.setWindowTitle(f"Edit Pose: {pose_info['name']}")
         else:
             self.setWindowTitle(f"Pose Details: {pose_info['name']}")
+
+        # Set dialog size
+        self.resize(600, 800)
 
         self.name_field = QLineEdit()
         self.duration_field = QLineEdit()
@@ -31,37 +34,52 @@ class pose_details_box(QDialog):
             self.instructions_field.setReadOnly(True)
             self.modifications_field.setReadOnly(True)
 
-        layout = QFormLayout()
+        # Create the form layout
+        form_layout = QFormLayout()
+        form_layout.setSpacing(10)  # Add more spacing between rows
         
         # Add upload button only in edit mode
         if edit_mode:
             self.upload_button = QPushButton("Upload New Image")
             self.upload_button.clicked.connect(self.upload_image)
-            layout.addRow("Image:", self.upload_button)
+            form_layout.addRow("Image:", self.upload_button)
         
-        layout.addRow("Name: ", self.name_field)
-        layout.addRow("Duration: ", self.duration_field)
-        layout.addRow("Pose Type: ", self.type_field)
-        layout.addRow("Muscles Targeted: ", self.muscles_field)
-        layout.addRow("Difficulty Level: ", self.difficulty_field)
-        layout.addRow("Description:", self.description_field)
-        layout.addRow("Instructions:", self.instructions_field)
-        layout.addRow("Modifications:", self.modifications_field)
+        form_layout.addRow("Name: ", self.name_field)
+        form_layout.addRow("Duration: ", self.duration_field)
+        form_layout.addRow("Pose Type: ", self.type_field)
+        form_layout.addRow("Muscles Targeted: ", self.muscles_field)
+        form_layout.addRow("Difficulty Level: ", self.difficulty_field)
+        form_layout.addRow("Description:", self.description_field)
+        form_layout.addRow("Instructions:", self.instructions_field)
+        form_layout.addRow("Modifications:", self.modifications_field)
         
-        # Different buttons based on mode
+        # Create widget to hold the form
+        form_widget = QWidget()
+        form_widget.setLayout(form_layout)
+        
+        # Create scroll area and add the form widget
+        scroll_area = QScrollArea()
+        scroll_area.setWidget(form_widget)
+        scroll_area.setWidgetResizable(True)
+        
+        # Create main layout for the dialog
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(scroll_area)
+        
+        # Add buttons below the scroll area
         if edit_mode:
             self.save_button = QPushButton("SAVE")
             self.cancel_button = QPushButton("CANCEL")
-            layout.addWidget(self.save_button)
-            layout.addWidget(self.cancel_button)
+            main_layout.addWidget(self.save_button)
+            main_layout.addWidget(self.cancel_button)
             self.save_button.clicked.connect(self.accept)
             self.cancel_button.clicked.connect(self.reject)
         else:
             self.ok_button = QPushButton("OK")
-            layout.addWidget(self.ok_button)
+            main_layout.addWidget(self.ok_button)
             self.ok_button.clicked.connect(self.accept)
 
-        self.setLayout(layout)
+        self.setLayout(main_layout)
 
         # Populate fields
         self.name_field.setText(pose_info["name"])
