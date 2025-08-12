@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QDialog, QVBoxLayout, QLabel, QPushButton, QScrollArea,QTabWidget, QGridLayout, QFrame,QHBoxLayout
+from PyQt6.QtWidgets import QMessageBox,QWidget, QDialog, QVBoxLayout, QLabel, QPushButton, QScrollArea,QTabWidget, QGridLayout, QFrame,QHBoxLayout
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 from config import POSES_FILE
@@ -39,10 +39,16 @@ class PosesWidget(QWidget):
         self.add_button = QPushButton("ADD")
         self.add_button.setMaximumWidth(100)
         button_box.addWidget(self.add_button)
+        self.add_button.clicked.connect(lambda: self.add_button_clicked())
         
         main_layout.addLayout(button_box)
             
-        scroll_area = QScrollArea()
+
+        if title == "POSES":
+            self.poses_scroll_area = QScrollArea()
+            scroll_area = self.poses_scroll_area
+        else:
+            scroll_area = QScrollArea()
         scroll_content = QWidget()
         scroll_content.setLayout(cards_layout)  # Use the passed layout
         
@@ -149,16 +155,17 @@ class PosesWidget(QWidget):
                 image_widget.setText("No Image")
 
     def display_pose_deets(self,pose_info):
-        dialog = pose_details_box(pose_info, edit_mode=False)
+        dialog = pose_details_box(pose_info, edit_mode=False,create_mode=False)
         dialog.exec()
 
     def edit_pose(self, pose_info):
-        dialog = pose_details_box(pose_info, edit_mode=True)
+        main_window = self.parent().parent() 
+        dialog = pose_details_box(pose_info, edit_mode=True, create_mode=False)
+        dialog.image_cache = main_window.image_cache 
         result = dialog.exec()
 
         if result == QDialog.DialogCode.Accepted:
             self.save_pose_changes(dialog,pose_info)
-
 
     def save_pose_changes(self, dialog, original_pose_info):
         # Extract edited data and save to poses.json
@@ -199,8 +206,83 @@ class PosesWidget(QWidget):
         if found_pose_key:
             # Get the updated pose data for UI refresh
             updated_pose_data = poses_data["poses"][found_pose_key]
-            self.update_pose_card(found_pose_key, updated_pose_data)
+            self.update_pose_grid()
 
-    def update_pose_card(self, pose_key, updated_pose_info):
-        if pose_key in self.pose_cards:
-            card = self.pose_cards[pose_key]
+    def update_pose_grid(self):
+        # Clear pose cards reference
+        self.pose_cards = {}
+        self.pose_image_widgets = []
+        
+        # Create new grid
+        new_grid = self.create_poses_grid()
+        
+        # Create new scroll content
+        new_scroll_content = QWidget()
+        new_scroll_content.setLayout(new_grid)
+        
+        # Replace the content in existing scroll area
+        self.poses_scroll_area.setWidget(new_scroll_content)
+        self.load_pose_images()
+
+    def add_button_clicked(self):
+        default_pose_info = {}
+        main_window = self.parent().parent()  # Get main window reference
+        dialog = pose_details_box(default_pose_info, edit_mode=False, create_mode=True)
+        dialog.image_cache = main_window.image_cache  # Pass cache directly
+        result = dialog.exec()
+
+        if result == QDialog.DialogCode.Accepted:
+            self.add_new_pose(dialog)
+
+    def add_new_pose(self,dialog):
+        new_data = {}
+        
+        #Extract data from dialog fields
+        #Create pose dictionary structure matching your JSON format
+   
+        new_data["name"]= dialog.name_field.text()
+        #Generate unique pose key from the name (convert to snake_case)
+        pose_reference = new_data["name"].lower().replace(" ", "_").strip()
+        new_data["description"] = dialog.description_field.toPlainText()
+        try:
+            new_data["default_duration"] = float(dialog.duration_field.text())
+        except:
+            print(f"Invalid duration value, keeping default: .5")
+            new_data["default_duration"] = float(.5)
+        new_data["muscle_groups"] = [muscle.strip() for muscle in dialog.muscles_field.text().split(",")]
+        new_data["type"] = dialog.type_field.text()
+        new_data["instructions"] = dialog.instructions_field.toPlainText()
+        new_data["modifications"] = dialog.modifications_field.toPlainText()
+        try: 
+            new_data["difficulty"] =  int(dialog.difficulty_field.text())
+        except:
+            print(f"Invalid difficulty value, keeping default: 2")
+            new_data["difficulty"] =  int(2)
+        new_data["image_filename"] = dialog.pose_info.get("image_filename", "no_image.png")
+
+
+        if (new_data["name"] == "Name Your Pose" or 
+            new_data["name"].strip() == "" or
+            new_data["description"] == "Describe this pose" or
+            new_data["description"].strip() == ""):
+            
+            QMessageBox.warning(self, "Invalid Input", "Please fill out the pose name and description with real values.")
+            return
+
+        #Load existing poses JSON
+        with open(POSES_FILE, 'r') as f:
+            poses_data = json.load(f)
+
+        if pose_reference in poses_data["poses"]:
+            QMessageBox.warning(self, "Duplicate Pose", f"A pose with the name '{new_data['name']}' already exists.")
+            return
+
+        #Add new pose to the structure
+        poses_data["poses"][pose_reference] = new_data
+
+        #Save updated JSON
+        with open(POSES_FILE, 'w') as f:
+            json.dump(poses_data, f, indent=2)
+        
+        #Refresh the poses grid to show the new pose
+        self.update_pose_grid()

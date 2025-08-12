@@ -1,13 +1,20 @@
 from PyQt6.QtWidgets import QDialog, QLineEdit, QTextEdit, QPushButton, QFormLayout, QLabel, QFileDialog, QScrollArea, QWidget, QVBoxLayout
+from PIL import Image 
+from config import POSES_IMAGE_DIR 
+from PyQt6.QtGui import QPixmap
+import shutil 
 
 class pose_details_box(QDialog):
-    def __init__(self, pose_info, edit_mode=False):
+    def __init__(self, pose_info, edit_mode=False, create_mode = False):
         super().__init__()
         self.pose_info = pose_info
         self.edit_mode = edit_mode
+        self.create_mode = create_mode
         
         if edit_mode:
             self.setWindowTitle(f"Edit Pose: {pose_info['name']}")
+        elif create_mode:
+            self.setWindowTitle(f"Add New Pose")
         else:
             self.setWindowTitle(f"Pose Details: {pose_info['name']}")
 
@@ -24,7 +31,7 @@ class pose_details_box(QDialog):
         self.modifications_field = QTextEdit()
         
         # Set read-only based on mode
-        if not edit_mode:
+        if not edit_mode and not create_mode:
             self.name_field.setReadOnly(True)
             self.duration_field.setReadOnly(True)
             self.type_field.setReadOnly(True)
@@ -39,7 +46,7 @@ class pose_details_box(QDialog):
         form_layout.setSpacing(10)  # Add more spacing between rows
         
         # Add upload button only in edit mode
-        if edit_mode:
+        if edit_mode or create_mode:
             self.upload_button = QPushButton("Upload New Image")
             self.upload_button.clicked.connect(self.upload_image)
             form_layout.addRow("Image:", self.upload_button)
@@ -67,7 +74,7 @@ class pose_details_box(QDialog):
         main_layout.addWidget(scroll_area)
         
         # Add buttons below the scroll area
-        if edit_mode:
+        if edit_mode or create_mode:
             self.save_button = QPushButton("SAVE")
             self.cancel_button = QPushButton("CANCEL")
             main_layout.addWidget(self.save_button)
@@ -82,14 +89,24 @@ class pose_details_box(QDialog):
         self.setLayout(main_layout)
 
         # Populate fields
-        self.name_field.setText(pose_info["name"])
-        self.description_field.setText(pose_info["description"])
-        self.duration_field.setText(str(pose_info["default_duration"]))
-        self.muscles_field.setText(" , ".join(pose_info["muscle_groups"]))
-        self.type_field.setText(pose_info["type"])
-        self.instructions_field.setText(pose_info["instructions"])
-        self.modifications_field.setText(pose_info["modifications"])
-        self.difficulty_field.setText(str(pose_info["difficulty"]))
+        if create_mode:
+            self.name_field.setText("Name Your Pose")
+            self.description_field.setText("Describe this pose")
+            self.duration_field.setText(str(.5))
+            self.muscles_field.setText("i.e. abs, hamstrings")
+            self.type_field.setText("main, transition, set-up, preparation,rest")
+            self.instructions_field.setText("How to enter this pose")
+            self.modifications_field.setText("Optional: alternate forms of this pose")
+            self.difficulty_field.setText("1-5")
+        else:
+            self.name_field.setText(pose_info["name"])
+            self.description_field.setText(pose_info["description"])
+            self.duration_field.setText(str(pose_info["default_duration"]))
+            self.muscles_field.setText(" , ".join(pose_info["muscle_groups"]))
+            self.type_field.setText(pose_info["type"])
+            self.instructions_field.setText(pose_info["instructions"])
+            self.modifications_field.setText(pose_info["modifications"])
+            self.difficulty_field.setText(str(pose_info["difficulty"]))
 
     def upload_image(self):
         file_path, _ = QFileDialog.getOpenFileName(
@@ -98,3 +115,16 @@ class pose_details_box(QDialog):
         )
         if file_path:
             print(f"Selected image: {file_path}")
+
+        #grab pose name
+        new_filename = self.name_field.text().lower().replace(" ", "_").strip()+".png"
+        new_filepath = POSES_IMAGE_DIR/new_filename
+
+        image = Image.open(file_path)
+        image.save(new_filepath,"PNG")
+        self.pose_info["image_filename"] = new_filename
+
+        #refresh cache
+        cache = self.image_cache
+        new_pixmap = QPixmap(str(new_filepath))
+        cache[new_filename] = new_pixmap    
