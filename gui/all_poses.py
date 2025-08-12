@@ -38,10 +38,15 @@ class PosesWidget(QWidget):
         button_box = QHBoxLayout()
         header_label = QLabel(title)
         button_box.addWidget(header_label)
-        self.add_button = QPushButton("ADD")
-        self.add_button.setMaximumWidth(100)
-        button_box.addWidget(self.add_button)
-        self.add_button.clicked.connect(lambda: self.add_button_clicked())
+        self.add_pose_button = QPushButton("ADD A POSE")
+        self.add_pose_button.setMaximumWidth(150)
+        button_box.addWidget(self.add_pose_button)
+        self.add_pose_button.clicked.connect(lambda: self.add_pose_button_clicked())
+
+        self.add_flow_button = QPushButton("ADD A FLOW")
+        self.add_flow_button.setMaximumWidth(150)
+        button_box.addWidget(self.add_flow_button)
+        self.add_flow_button.clicked.connect(lambda: self.add_flow_button_clicked())
         
         main_layout.addLayout(button_box)
             
@@ -144,7 +149,7 @@ class PosesWidget(QWidget):
 
         # Invisible click button (overlay entire image)
         click_button = QPushButton(card_frame)
-        click_button.setGeometry(0, 0, 200, 200) 
+        click_button.setGeometry(0, 0, 400, 400) 
         click_button.setStyleSheet("background: transparent; border: none;")
         click_button.clicked.connect(lambda: self.display_flow_deets( flow_info))
 
@@ -316,7 +321,7 @@ class PosesWidget(QWidget):
         self.poses_scroll_area.setWidget(new_scroll_content)
         self.load_pose_images()
 
-    def add_button_clicked(self):
+    def add_pose_button_clicked(self):
         default_pose_info = {}
         main_window = self.parent().parent()  # Get main window reference
         dialog = pose_details_box(default_pose_info, edit_mode=False, create_mode=True)
@@ -325,6 +330,14 @@ class PosesWidget(QWidget):
 
         if result == QDialog.DialogCode.Accepted:
             self.add_new_pose(dialog)
+
+    def add_flow_button_clicked(self):
+        flow_info = {}
+        dialog = flow_details_box(flow_info, edit_mode=False, create_mode=True)
+        result = dialog.exec()
+
+        if result == QDialog.DialogCode.Accepted:
+            self.add_new_flow(dialog)
 
     def edit_flow(self, flow_info):
         dialog = flow_details_box(flow_info, edit_mode=True, create_mode=False)
@@ -338,9 +351,11 @@ class PosesWidget(QWidget):
         dialog.exec()
 
     def save_flow_changes(self,flow_info):
-        
-        pass
 
+        pass
+    
+    def add_new_flow(self,dialog):
+        pass
 
     def add_new_pose(self,dialog):
         new_data = {}

@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
         nav_menu.addSeparator()  # Visual separator line
         generate_action = nav_menu.addAction("⚡ Generate Sequence")
         favorites_action = nav_menu.addAction("❤️ Favorites")
-        poses_action = nav_menu.addAction("🧘 All Poses") 
+        poses_action = nav_menu.addAction("🧘 All Poses + Flows") 
         practice_action = nav_menu.addAction("🎯 Practice Mode")
 
         # Connect to click methods
@@ -53,14 +53,14 @@ class MainWindow(QMainWindow):
         practice_action.triggered.connect(self.practice_button_was_clicked)
 
         #Button 1 - Generate a sequence
-        self.generate_button = QPushButton("Generate a Sequence!")
+        self.generate_button = QPushButton("Generate a New Sequence")
         self.generate_button.clicked.connect(self.generate_button_was_clicked)
 
         #Button 2 - Favorite Sequences
-        self.favorites_button = QPushButton("View Favorites")
+        self.favorites_button = QPushButton("Favorited Sequences")
         self.favorites_button.clicked.connect(self.favorites_button_was_clicked)
         #Button 3 - See all poses
-        self.poses_button = QPushButton("All Poses!")
+        self.poses_button = QPushButton("Poses + Flows")
         self.poses_button.clicked.connect(self.poses_button_was_clicked)
 
          #Button 4 - Practice Mode
