@@ -7,7 +7,7 @@ ASSETS_DIR = pathlib.Path("assets")
 POSES_IMAGE_DIR = ASSETS_DIR / "images" / "poses"
 
 # File names
-SEQUENCES_FILE = APP_DATA_DIR / "sequences.json"
+FLOWS_FILE = APP_DATA_DIR / "flows.json"
 FAVORITES_FILE = APP_DATA_DIR / "user_favorites.json"
 SETTINGS_FILE = APP_DATA_DIR / "user_settings.json"
 POSES_FILE = APP_DATA_DIR / "all_poses.json"

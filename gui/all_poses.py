@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QMessageBox,QWidget, QDialog, QVBoxLayout, QLabel, QPushButton, QScrollArea,QTabWidget, QGridLayout, QFrame,QHBoxLayout
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
-from config import POSES_FILE
+from config import POSES_FILE,FLOWS_FILE
 from gui.dialogs.pose_details_dialog import pose_details_box
 import json
 
@@ -10,9 +10,10 @@ class PosesWidget(QWidget):
         super().__init__()
         self.pose_image_widgets = []
         self.pose_cards = {}
+        self.flow_cards={}
         tab_widget = QTabWidget()
         tab_widget.addTab(self.Poses_Tab(),"POSES")
-        tab_widget.addTab(self.Sequence_Tab(),"SEQUENCES")
+        tab_widget.addTab(self.flow_tab(),"FLOWS")
 
         
         main_layout = QVBoxLayout()
@@ -24,9 +25,9 @@ class PosesWidget(QWidget):
         poses_cards_layout = self.create_poses_grid()
         return self.tab_template("POSES",poses_cards_layout)
 
-    def Sequence_Tab(self):
-        sequence_cards_layout = self.create_sequences_list()
-        return self.tab_template("SEQUENCES",sequence_cards_layout)
+    def flow_tab(self):
+        flow_cards_layout = self.create_flows_list()
+        return self.tab_template("FLOWS", flow_cards_layout)
 
     def tab_template(self,title,cards_layout):
         widget = QWidget()
@@ -59,9 +60,100 @@ class PosesWidget(QWidget):
         widget.setLayout(main_layout)
         return widget
     
-    def create_sequences_list(self):
-        sequences_list = QVBoxLayout()
-        return sequences_list
+    def  create_flows_list(self):
+        flows_list = QVBoxLayout()
+        flows_list.setAlignment(Qt.AlignmentFlag.AlignCenter) 
+
+        with open(FLOWS_FILE, 'r') as f:
+            flows_data = json.load(f)
+
+        for  flow_key, flow_info in flows_data["flowing_sequences"].items():
+            flow_card = self.create_flow_card( flow_info, flow_key)
+            flows_list.addWidget(flow_card)
+
+            self.flow_cards[ flow_key] = flow_card
+
+
+        return flows_list
+    
+    def create_flow_card(self, flow_info, flow_key):
+        card_frame = QFrame()
+        card_frame.setObjectName("flowCard")
+        card_frame.setFrameStyle(QFrame.Shape.Box)
+        card_frame.setFixedSize(600,400) 
+
+        layout = QVBoxLayout()
+        card_frame.setLayout(layout)
+
+        flow_name =  flow_info["name"]
+        flow_name_label = QLabel(flow_name)
+        flow_name_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        #Add Duration to Card
+        flow_duration =  flow_info["duration"]
+        flow_duration_label = QLabel(f"Duration: {flow_duration} minutes")
+        flow_duration_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        #Add Category to Card
+        flow_category =  flow_info["category"]
+        flow_category_label = QLabel(f"Category: {flow_category}")
+        flow_category_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        #Add Styles to Card
+        flow_style = flow_info["style"]
+        flow_style_label = QLabel(f"Style: {', '.join(flow_style)}") 
+        flow_style_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        #Add Muscle Groups to Card
+        flow_muscles = flow_info["muscle_groups"]
+        flow_muscles_label = QLabel(f"Muscles: {', '.join(flow_muscles)}")
+        flow_muscles_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        #Add Difficulty to Card
+        flow_difficulty =  flow_info["difficulty"]
+        flow_difficulty_label = QLabel(f"Difficulty: {flow_difficulty}/5")
+        flow_difficulty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        #Add energy level to Card
+        flow_energy =  flow_info["energy_level"]
+        flow_energy_label = QLabel(f"Energy: {flow_energy}")
+        flow_energy_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        #Add Pose Count to Card
+        flow_count_label = QLabel(f"Poses: {len(flow_info['flow'])}")
+        flow_count_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+
+
+        self.edit_button = QPushButton("EDIT")
+        self.edit_button.setMaximumWidth(100)
+        self.edit_button.setStyleSheet("background-color: #a0522d; color: white; font-size: 12px; border-radius: 4px; padding: 4px 8px;")
+        self.edit_button.clicked.connect(lambda: self.edit_flow( flow_info))
+
+        #Add to layout
+        layout.addWidget(flow_name_label)
+        layout.addWidget(flow_duration_label) 
+        layout.addWidget(flow_category_label)
+        layout.addWidget(flow_style_label)
+        layout.addWidget(flow_muscles_label)
+        layout.addWidget(flow_difficulty_label)
+        layout.addWidget(flow_energy_label)
+        layout.addWidget(flow_count_label)
+        layout.addWidget(self.edit_button)
+        layout.addWidget(self.edit_button)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+
+        
+        # Invisible click button (overlay entire image)
+        click_button = QPushButton(card_frame)
+        click_button.setGeometry(0, 0, 200, 200) 
+        click_button.setStyleSheet("background: transparent; border: none;")
+        click_button.clicked.connect(lambda: self.display_flow_deets( flow_info))
+
+        card_frame. flow_key = flow_key
+
+        return card_frame
 
 
     def create_poses_grid(self):
@@ -133,6 +225,7 @@ class PosesWidget(QWidget):
         
         
         return card_frame        
+  
     def get_pose_image(self, pose_name):
         try:
             cache = self.parent().parent().image_cache
@@ -233,6 +326,13 @@ class PosesWidget(QWidget):
 
         if result == QDialog.DialogCode.Accepted:
             self.add_new_pose(dialog)
+
+    def edit_flow(self, flow_info):
+        pass
+
+
+    def display_flow_deets(self, flow_info):
+        pass
 
     def add_new_pose(self,dialog):
         new_data = {}
