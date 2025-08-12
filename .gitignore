@@ -23,5 +23,4 @@ Thumbs.db
 *.swp
 *.swo
 
-# App data (optional - you might want to include sample data)
-app_data/*.json
+
