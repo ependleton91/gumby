@@ -3,6 +3,7 @@ from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 from config import POSES_FILE,FLOWS_FILE
 from gui.dialogs.pose_details_dialog import pose_details_box
+from gui.dialogs.flow_details_dialog import flow_details_box
 import json
 
 class PosesWidget(QWidget):
@@ -123,8 +124,6 @@ class PosesWidget(QWidget):
         flow_count_label = QLabel(f"Poses: {len(flow_info['flow'])}")
         flow_count_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-
-
         self.edit_button = QPushButton("EDIT")
         self.edit_button.setMaximumWidth(100)
         self.edit_button.setStyleSheet("background-color: #a0522d; color: white; font-size: 12px; border-radius: 4px; padding: 4px 8px;")
@@ -139,17 +138,17 @@ class PosesWidget(QWidget):
         layout.addWidget(flow_difficulty_label)
         layout.addWidget(flow_energy_label)
         layout.addWidget(flow_count_label)
-        layout.addWidget(self.edit_button)
-        layout.addWidget(self.edit_button)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.edit_button)
 
 
-        
         # Invisible click button (overlay entire image)
         click_button = QPushButton(card_frame)
         click_button.setGeometry(0, 0, 200, 200) 
         click_button.setStyleSheet("background: transparent; border: none;")
         click_button.clicked.connect(lambda: self.display_flow_deets( flow_info))
+
+        self.edit_button.clicked.connect(lambda: self.edit_flow(flow_info))
 
         card_frame. flow_key = flow_key
 
@@ -328,11 +327,20 @@ class PosesWidget(QWidget):
             self.add_new_pose(dialog)
 
     def edit_flow(self, flow_info):
-        pass
+        dialog = flow_details_box(flow_info, edit_mode=True, create_mode=False)
+        result = dialog.exec()
 
+        if result == QDialog.DialogCode.Accepted:
+            self.save_flow_changes(dialog,flow_info)
 
     def display_flow_deets(self, flow_info):
+        dialog = flow_details_box(flow_info, edit_mode=False,create_mode=False)
+        dialog.exec()
+
+    def save_flow_changes(self,flow_info):
+        
         pass
+
 
     def add_new_pose(self,dialog):
         new_data = {}
