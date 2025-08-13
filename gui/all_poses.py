@@ -4,6 +4,8 @@ from PyQt6.QtCore import Qt
 from config import POSES_FILE,FLOWS_FILE
 from gui.dialogs.pose_details_dialog import pose_details_box
 from gui.dialogs.flow_details_dialog import flow_details_box
+from utils.ui_utils import show_error_message,show_save_success
+from utils.file_utils import load_flows_data, load_poses_data, save_poses_data, save_flows_data
 import json
 
 class PosesWidget(QWidget):
@@ -70,8 +72,7 @@ class PosesWidget(QWidget):
         flows_list = QVBoxLayout()
         flows_list.setAlignment(Qt.AlignmentFlag.AlignCenter) 
 
-        with open(FLOWS_FILE, 'r') as f:
-            flows_data = json.load(f)
+        flows_data = load_flows_data()
 
         for  flow_key, flow_info in flows_data["flowing_sequences"].items():
             flow_card = self.create_flow_card( flow_info, flow_key)
@@ -166,12 +167,9 @@ class PosesWidget(QWidget):
         card_grid.setContentsMargins(10, 10, 10, 10) 
         
         # Load poses data
-        try:
-            with open(POSES_FILE, 'r') as f:
-                poses_data = json.load(f)
-            poses = poses_data.get("poses", {})
-        except (FileNotFoundError, json.JSONDecodeError):
-            poses = {}  # Handle missing file gracefully
+        poses_data = load_poses_data()
+        poses = poses_data.get("poses", {})
+   
         
         # Create cards in 3-column grid
         for index, (pose_key, pose_info) in enumerate(poses.items()):
@@ -282,8 +280,7 @@ class PosesWidget(QWidget):
             print(f"Invalid difficulty value, keeping original: {original_pose_info['difficulty']}")
 
 
-        with open(POSES_FILE, 'r') as f:
-            poses_data = json.load(f)
+        poses_data = load_poses_data()
 
         # Single loop to update and capture pose_key
         found_pose_key = None
@@ -295,8 +292,13 @@ class PosesWidget(QWidget):
                 break
 
         # Save updated data
-        with open(POSES_FILE, 'w') as f:
-            json.dump(poses_data, f, indent=2)
+        poses_saved = save_poses_data(poses_data)
+        if not poses_saved:
+            show_error_message(self, "Failed to save pose changes. Please try again.")
+            return
+        else:
+            show_save_success(self, "Pose changes")
+
 
         # Update UI card
         if found_pose_key:
@@ -407,8 +409,7 @@ class PosesWidget(QWidget):
             return
 
         #Load existing poses JSON
-        with open(POSES_FILE, 'r') as f:
-            poses_data = json.load(f)
+        poses_data = load_poses_data()
 
         if pose_reference in poses_data["poses"]:
             QMessageBox.warning(self, "Duplicate Pose", f"A pose with the name '{new_data['name']}' already exists.")
@@ -418,8 +419,12 @@ class PosesWidget(QWidget):
         poses_data["poses"][pose_reference] = new_data
 
         #Save updated JSON
-        with open(POSES_FILE, 'w') as f:
-            json.dump(poses_data, f, indent=2)
+        poses_saved = save_poses_data(poses_data)
+        if not poses_saved:
+            show_error_message(self, "Failed to save pose changes. Please try again.")
+            return
+        else:
+            show_save_success(self, "Pose changes ")
         
         #Refresh the poses grid to show the new pose
         self.update_pose_grid()
