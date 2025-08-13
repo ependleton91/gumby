@@ -48,7 +48,7 @@ def generate_yoga_class(style, muscles, duration):
    return results_dictionary
 
 def load_sequences():
-    file_path = pathlib.Path("app_data/sequences.json")
+    file_path = pathlib.Path("app_data/flows.json")
     with open(file_path, 'r') as file:
         data = json.load(file)
     return data

@@ -746,7 +746,8 @@
         "Abs"
       ],
       "style": "VINYASA",
-      "created_date": "2025-07-25 01:37:41"
+      "created_date": "2025-07-25 01:37:41",
+      "practice_history": []
     },
     {
       "name": "VINYASA 17 MINUTE FLOW",
@@ -1012,7 +1013,8 @@
       },
       "muscles": [],
       "style": "VINYASA",
-      "created_date": "2025-07-27 22:23:20"
+      "created_date": "2025-07-27 22:23:20",
+      "practice_history": []
     },
     {
       "name": "HATHA 16 MINUTE FLOW",
@@ -1261,7 +1263,8 @@
         "All"
       ],
       "style": "HATHA",
-      "created_date": "2025-07-27 22:24:05"
+      "created_date": "2025-07-27 22:24:05",
+      "practice_history": []
     },
     {
       "name": "VINYASA 81 MINUTE FLOW",
@@ -2475,7 +2478,14 @@
         "Pelvic Floor"
       ],
       "style": "VINYASA",
-      "created_date": "2025-07-27 22:27:17"
+      "created_date": "2025-07-27 22:27:17",
+      "practice_history": [
+        {
+          "date": "2025-08-13 13:14:13",
+          "rating": 4,
+          "notes": "Thoughts on this practice? For your own reference!"
+        }
+      ]
     },
     {
       "name": "YIN 19 MINUTE FLOW",

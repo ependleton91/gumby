@@ -416,7 +416,7 @@ class flow_details_box(QDialog):
         return card_frame
 
     def scroll_left(self):
-        if self.scroll_offset >= 0:
+        if self.scroll_offset > 0:
             self.scroll_offset -= 1
             self.refresh_carousel()
 
