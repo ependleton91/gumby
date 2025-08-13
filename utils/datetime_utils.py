@@ -60,23 +60,23 @@ def format_duration_minutes(minutes: float, detailed: bool = False) -> str:
     if minutes <= 0:
         return "0s"
     
-    total_seconds = int(minutes * 60)
+    total_seconds = int(round(minutes * 60))
     hours = total_seconds // 3600
-    remaining_minutes = (total_seconds % 3600) // 60
+    minutes_part = (total_seconds % 3600) // 60
     seconds = total_seconds % 60
-    
-    parts = []
-    
+
     if hours > 0:
-        parts.append(f"{hours}h")
-    
-    if remaining_minutes > 0:
-        parts.append(f"{remaining_minutes}m")
-    
-    if seconds > 0 and (detailed or len(parts) == 0):
-        parts.append(f"{seconds}s")
-    
-    return " ".join(parts) if parts else "0s"
+        if minutes_part > 0:
+            return f"{hours}h {minutes_part}m"
+        else:
+            return f"{hours}h"
+    elif minutes_part > 0:
+        if seconds > 0:
+            return f"{minutes_part}m {seconds}s"
+        else:
+            return f"{minutes_part}m"
+    else:
+        return f"{seconds}s"
 
 
 def format_duration_seconds(seconds: int) -> str:
@@ -328,7 +328,7 @@ def is_recent_timestamp(timestamp_str: str, hours_threshold: int = 24) -> bool:
     return diff.total_seconds() < (hours_threshold * 3600)
 
 
-def get_practice_session_summary(sessions: List[Dict]) -> Dict[str, Any]:
+def get_practice_session_summary(sessions: list[dict]) -> dict[str, any]:
     #Generate summary statistics for practice sessions.
     
     #Args:

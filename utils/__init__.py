@@ -14,8 +14,7 @@ from .image_utils import (
 
 from .validation_utils import (
     validate_pose_name, validate_duration, validate_difficulty,
-    validate_muscle_groups, validate_sequence_name, validate_rating,
-    validate_new_pose_data
+    validate_muscle_groups, validate_sequence_name
 )
 
 from .ui_utils import (

@@ -6,6 +6,12 @@ from utils.image_utils import standardize_pose_name_to_filename, create_placehol
 from utils.validation_utils import validate_pose_name, validate_duration
 from utils.ui_utils import confirm_action
 from utils.datetime_utils import format_duration_minutes, parse_duration_input
+import sys
+from PySide6.QtWidgets import QApplication
+
+app = QApplication.instance()
+if app is None:
+    app = QApplication(sys.argv)
 
 class TestFileUtils:
     def test_safe_load_json_existing_file(self):
