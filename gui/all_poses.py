@@ -6,6 +6,7 @@ from gui.dialogs.pose_details_dialog import pose_details_box
 from gui.dialogs.flow_details_dialog import flow_details_box
 from utils.ui_utils import show_error_message,show_save_success
 from utils.file_utils import load_flows_data, load_poses_data, save_poses_data, save_flows_data
+from utils.validation_utils import validate_pose_name, validate_duration
 import json
 
 class PosesWidget(QWidget):
@@ -381,13 +382,15 @@ class PosesWidget(QWidget):
    
         new_data["name"]= dialog.name_field.text()
         #Generate unique pose key from the name (convert to snake_case)
+
+
         pose_reference = new_data["name"].lower().replace(" ", "_").strip()
         new_data["description"] = dialog.description_field.toPlainText()
         try:
-            new_data["default_duration"] = float(dialog.duration_field.text())
+            new_data["default_duration"] = str(dialog.duration_field.text())
         except:
-            print(f"Invalid duration value, keeping default: .5")
-            new_data["default_duration"] = float(.5)
+            print(f"Invalid duration value, keeping default: .2")
+            new_data["default_duration"] = str(.2)
         new_data["muscle_groups"] = [muscle.strip() for muscle in dialog.muscles_field.text().split(",")]
         new_data["type"] = dialog.type_field.text()
         new_data["instructions"] = dialog.instructions_field.toPlainText()
@@ -399,13 +402,21 @@ class PosesWidget(QWidget):
             new_data["difficulty"] =  int(2)
         new_data["image_filename"] = dialog.pose_info.get("image_filename", "no_image.png")
 
+        
+        valid, error_msg, duration = validate_duration(new_data["default_duration"])
+        if not valid:
+            show_error_message(self, "Validation Error", error_msg)
+            return
 
         if (new_data["name"] == "Name Your Pose" or 
-            new_data["name"].strip() == "" or
-            new_data["description"] == "Describe this pose" or
-            new_data["description"].strip() == ""):
-            
+            new_data["description"] == "Describe this pose"):
             QMessageBox.warning(self, "Invalid Input", "Please fill out the pose name and description with real values.")
+            return
+            #Can this return to the add a pose box instead?
+        
+        valid, error_msg = validate_pose_name(new_data["name"])
+        if not valid:
+            show_error_message(self, "Validation Error", error_msg)
             return
 
         #Load existing poses JSON
