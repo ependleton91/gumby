@@ -194,7 +194,6 @@ class PosesWidget(QWidget):
         layout = QVBoxLayout()
         card_frame.setLayout(layout)
 
-
         pose_name = pose_info["name"]
         pose_name_label = QLabel(pose_name)
         pose_name_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -333,23 +332,45 @@ class PosesWidget(QWidget):
 
     def add_flow_button_clicked(self):
         flow_info = {}
+        main_window = self.parent().parent()
         dialog = flow_details_box(flow_info, edit_mode=False, create_mode=True)
+        dialog.image_cache = main_window.image_cache  
         result = dialog.exec()
 
         if result == QDialog.DialogCode.Accepted:
             self.add_new_flow(dialog)
 
     def edit_flow(self, flow_info):
+        main_window = self.parent().parent()
         dialog = flow_details_box(flow_info, edit_mode=True, create_mode=False)
+        dialog.image_cache = main_window.image_cache  
         result = dialog.exec()
 
         if result == QDialog.DialogCode.Accepted:
             self.save_flow_changes(dialog,flow_info)
 
-    def display_flow_deets(self, flow_info):
-        dialog = flow_details_box(flow_info, edit_mode=False,create_mode=False)
+        ''' def display_flow_deets(self, flow_info):
+        print(f"display_flow_deets called with: {flow_info.get('name', 'No name')}")
+        main_window = self.parent().parent()
+        dialog = flow_details_box(flow_info, edit_mode=False)
+        dialog.image_cache = main_window.image_cache 
         dialog.exec()
+        '''
 
+
+    def display_flow_deets(self, flow_info):
+        print(f"display_flow_deets called with: {flow_info.get('name', 'No name')}")
+        try:
+            main_window = self.parent().parent()
+            print("Got main window")
+            dialog = flow_details_box(flow_info, edit_mode=False)
+            print("Dialog created")
+            dialog.image_cache = main_window.image_cache 
+            print("Cache assigned")
+            result = dialog.exec()
+            print(f"Dialog result: {result}")
+        except Exception as e:
+            print(f"Error in display_flow_deets: {e}")
     def save_flow_changes(self,flow_info):
 
         pass
