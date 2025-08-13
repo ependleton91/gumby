@@ -248,9 +248,9 @@ class SequenceGeneratorWidget(QWidget):
             print("Saving sequence to favorites file")
             saved_favorite = save_favorites_data(favorites_data)
             if saved_favorite:
-                show_success_message("Favorite ")
+                show_success_message(self,"Favorite Saved","Favorite saved successfully!")
             else:
-                show_error_message("Failed to save favorite. Please try again.")
+                show_error_message(self,"Save Failed","Failed to save favorite. Please try again.")
 
             main_window.favorites_widget.refresh_favorites()
 

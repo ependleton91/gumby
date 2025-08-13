@@ -152,9 +152,9 @@ class FavoritesWidget(QWidget):
             print(f"Deleted favorite: {favorite['name']}")
             # Show success message
             if favorites_saved:
-                show_success_message(f"Successfully deleted {favorite['name']} from favorites. File ")
+                show_success_message(self,"Favorite Deleted",f"Successfully deleted {favorite['name']} from favorites.")
             else:
-                show_error_message(f"Failed to delete {favorite['name']} from favorites. File not saved.")
+                show_error_message(self,"Deletion Failed",f"Failed to delete {favorite['name']} from favorites. File not saved.")
 
             # Refresh page
             self.layout().removeWidget(self.scroll_area)

@@ -2,7 +2,7 @@
   "poses": {
     "mountain_pose": {
       "name": "Mountain Pose",
-      "default_duration": 0.3,
+      "default_duration": 0.4,
       "type": "setup",
       "muscle_groups": [
         "core",
