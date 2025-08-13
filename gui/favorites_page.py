@@ -4,7 +4,7 @@ import os
 from config import FAVORITES_FILE
 from gui.dialogs.details_dialog import details_dialog_box
 from utils.file_utils import load_favorites_data,save_favorites_data
-from utils.ui_utils import show_error_message,show_success_message
+from utils.ui_utils import show_error_message,show_success_message,confirm_sequence_delete
 
 class FavoritesWidget(QWidget):
     def create_favorites_display(self):

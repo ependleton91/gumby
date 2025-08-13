@@ -5,7 +5,7 @@ from PyQt6.QtCore import Qt
 from services.build_sequence import generate_yoga_class
 from gui.dialogs.favorites_dialog import favorites_dialog_box
 from utils.file_utils import load_favorites_data, save_favorites_data
-from utils.ui_utils import show_success_message, show_error_message
+from utils.ui_utils import show_success_message, show_error_message, hide_widgets
 import os
 import json
 import datetime
@@ -98,7 +98,8 @@ class SequenceGeneratorWidget(QWidget):
     
         # Create dropdown
         self.style_dropdown = QComboBox()
-        self.style_dropdown.addItems(["YIN","HATHA","VINYASA"])
+        self.style_dropdown.addItems(["hatha", "vinyasa", "yin", "restorative", "ashtanga", "bikram", 
+        "hot", "power", "iyengar", "kundalini", "gentle", "beginner"])
         selected_style = self.style_dropdown.currentText()
 
         #Add dropdown to layout
@@ -112,7 +113,7 @@ class SequenceGeneratorWidget(QWidget):
         layout = QVBoxLayout()
 
         #add each muscle checkbox to layout
-        muscle_groups = ["Abs", "Arms", "Back", "Pelvic Floor","All"]
+        muscle_groups = ["Abs", "Arms", "Back", "All"]
         self.muscle_checkboxes = []
         for muscle in muscle_groups:
             checkbox = QCheckBox(muscle)
@@ -134,16 +135,8 @@ class SequenceGeneratorWidget(QWidget):
         print(f"Printing results")
 
         #Hide all option widgets/generate button
-        for widget in self.group_of_widgets:
-            widget.setVisible(False)
+        hide_widgets(self.group_of_widgets)
         self.generate_btn.setVisible(False)
-
-       #Map section to display name
-        section_display_names = {
-        "warm_up": "WARM UP",
-        "main_flow": "MAIN FLOW", 
-        "cool_down": "COOL DOWN"
-        }
 
         #Initialize results text
         results_title = QLabel("Your Generated Sequence")
@@ -154,7 +147,7 @@ class SequenceGeneratorWidget(QWidget):
         #Print sequence and headers with numbers
         counter = 1
         for section_key, sequence_list in results['sequences'].items():
-            results_string += f'=== {section_display_names[section_key]} ===\n'
+            results_string += f'=== {section_key.upper().replace("_", " ")} ===\n'
             for sequence in sequence_list:
                 results_string += str(counter) + '. ' + sequence['name'] + '\n'
             counter += 1
