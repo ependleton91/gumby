@@ -7,6 +7,7 @@ from gui.sequence_generator import SequenceGeneratorWidget
 from gui.favorites_page import FavoritesWidget
 from gui.all_poses import PosesWidget
 from gui.practice_mode import PracticeWidget
+from utils.file_utils import list_backup_files, safe_load_json, safe_save_json
 from config import POSES_IMAGE_DIR
 
 class MainWindow(QMainWindow):

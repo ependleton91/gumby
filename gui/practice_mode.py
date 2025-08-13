@@ -3,6 +3,8 @@ from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, QTimer
 from config import FAVORITES_FILE
 from gui.dialogs.completion_dialog import completion_dialog_box
+from utils.file_utils import load_favorites_data, save_favorites_data
+from utils.ui_utils import show_success_message, show_error_message
 from datetime import datetime
 import json
 
@@ -55,12 +57,9 @@ class PracticeWidget(QWidget):
             self.update_buttons_for_active_practice()
 
     def load_favorites(self):
-        try:
-            with open(FAVORITES_FILE, 'r') as f:
-                data = json.load(f)
-            return data.get("favorites", [])
-        except (FileNotFoundError, json.JSONDecodeError):
-            return []  
+        data = load_favorites_data()
+        return data.get("favorites", [])
+
         
     def on_favorite_selected(self, favorite):
         print(f"Sequence Selected: {favorite["name"]}")
@@ -416,8 +415,7 @@ class PracticeWidget(QWidget):
         except ValueError:
             rating_int = 3 
         
-        with open(FAVORITES_FILE, 'r') as f:
-            favorites_data = json.load(f)
+        favorites_data = load_favorites_data()
 
 
         for item in favorites_data["favorites"]:
@@ -427,5 +425,9 @@ class PracticeWidget(QWidget):
                item["practice_history"].append({"date": str(date), "rating": int(rating), "notes": notes})  
                break
 
-        with open(FAVORITES_FILE, 'w') as f:
-            json.dump(favorites_data, f, indent=2)
+        practice_saved = save_favorites_data(favorites_data)
+        if practice_saved:
+            show_success_message("Practice session ")
+        else:
+            show_error_message("Failed to save practice session. Please try again.")
+        

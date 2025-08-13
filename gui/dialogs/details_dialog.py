@@ -140,7 +140,7 @@ class General_Tab(QWidget):
             
             self.favorite["name"] = new_name
             self.favorite["description"] = new_description
-            self.Parent().setWindowTitle(f"Favorite Details: {self.favorite['name']}")
+            self.parent().setWindowTitle(f"Favorite Details: {self.favorite['name']}")
 
             with open(FAVORITES_FILE, 'w') as f:
                     json.dump(favorites_data, f, indent=2)
