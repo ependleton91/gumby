@@ -349,28 +349,21 @@ class PosesWidget(QWidget):
         if result == QDialog.DialogCode.Accepted:
             self.save_flow_changes(dialog,flow_info)
 
-        ''' def display_flow_deets(self, flow_info):
-        print(f"display_flow_deets called with: {flow_info.get('name', 'No name')}")
-        main_window = self.parent().parent()
-        dialog = flow_details_box(flow_info, edit_mode=False)
-        dialog.image_cache = main_window.image_cache 
-        dialog.exec()
-        '''
-
-
     def display_flow_deets(self, flow_info):
         print(f"display_flow_deets called with: {flow_info.get('name', 'No name')}")
         try:
             main_window = self.parent().parent()
-            print("Got main window")
-            dialog = flow_details_box(flow_info, edit_mode=False)
-            print("Dialog created")
-            dialog.image_cache = main_window.image_cache 
-            print("Cache assigned")
+            dialog = flow_details_box(flow_info, edit_mode=False, create_mode=False)
+            # Ensure cache is passed BEFORE exec()
+            if hasattr(main_window, 'image_cache'):
+                dialog.image_cache = main_window.image_cache
+                print(f"Cache passed to dialog with {len(dialog.image_cache)} images")
+            else:
+                print("Main window has no image_cache attribute")
             result = dialog.exec()
-            print(f"Dialog result: {result}")
         except Exception as e:
             print(f"Error in display_flow_deets: {e}")
+
     def save_flow_changes(self,flow_info):
 
         pass

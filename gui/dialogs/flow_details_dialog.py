@@ -4,12 +4,13 @@ from config import FLOWS_FILE
 import json
 
 class flow_details_box(QDialog):
-    def __init__(self, flow_info, edit_mode=False, create_mode=False, flow_key=None):
+    def __init__(self, flow_info, edit_mode=False, create_mode=False, flow_key=None, image_cache=None):
         super().__init__()
         self.flow_info = flow_info
         self.edit_mode = edit_mode
         self.create_mode = create_mode
         self.flow_key = flow_key
+        self.image_cache = image_cache  # Set cache BEFORE creating UI
         self.muscle_checkboxes = []
         self.pose_image_widgets = []
         self.scroll_offset = 0
@@ -40,7 +41,7 @@ class flow_details_box(QDialog):
     def create_fields(self):
         """Create all form fields"""
         self.name_field = QLineEdit()
-        self.name_field.setMinimumWidth(300)  # Make wider
+        self.name_field.setMinimumWidth(300)
         
         self.duration_field = QLineEdit()
         self.duration_field.setMinimumWidth(300)
@@ -88,7 +89,6 @@ class flow_details_box(QDialog):
             self.muscles_field.setReadOnly(True)
     
     def create_muscle_checkboxes(self):
-        """Create muscle group checkboxes for edit/create mode"""
         group_box = QGroupBox("Muscle Groups")
         layout = QVBoxLayout()
         
@@ -104,7 +104,6 @@ class flow_details_box(QDialog):
         return group_box
     
     def get_unique_muscles(self):
-
         try:
             with open(FLOWS_FILE, 'r') as f:
                 flows_data = json.load(f)
@@ -178,9 +177,6 @@ class flow_details_box(QDialog):
             main_layout.addWidget(self.ok_button)
             self.ok_button.clicked.connect(self.accept)
 
-
-
-        
         self.setLayout(main_layout)
         
     def populate_fields(self):
@@ -256,10 +252,12 @@ class flow_details_box(QDialog):
     def create_pose_display(self):
         display_widget = QWidget()
         display_layout = QVBoxLayout()
-        pose_carousel_widget=QWidget()
-        pose_carousel_layout = QGridLayout()
-        pose_carousel_layout.setSpacing(10)  # Reduce spacing between cards
-        pose_carousel_layout.setContentsMargins(10, 10, 10, 10) 
+        pose_carousel_widget = QWidget()
+        pose_carousel_layout = QHBoxLayout()  # Changed to HBoxLayout for better centering
+        pose_carousel_layout.setSpacing(5)  # Reduced spacing
+        pose_carousel_layout.setContentsMargins(10, 10, 10, 10)
+        pose_carousel_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Center the cards
+        
         list_of_pose_cards = self.build_pose_cards_list()
     
         # Calculate which cards to show (sliding window)
@@ -269,9 +267,9 @@ class flow_details_box(QDialog):
         
         visible_cards = list_of_pose_cards[start_index:end_index]
         
-        # Add visible cards to grid
+        # Add visible cards to layout
         for i, card in enumerate(visible_cards):
-            pose_carousel_layout.addWidget(card, 1, i)
+            pose_carousel_layout.addWidget(card)  # Just add widget, no grid positioning
             
             # Make center card focused (larger/no opacity)
             center_position = len(visible_cards) // 2
@@ -284,18 +282,24 @@ class flow_details_box(QDialog):
                 card.setFixedSize(100, 100)
                 card.setStyleSheet("opacity: 0.6;")
 
+        # Create info labels based on the center card
         if len(visible_cards) > 0:
             center_position = len(visible_cards) // 2
             focused_pose_index = start_index + center_position
             
-            if focused_pose_index < len(self.flow_info["flow"]):
+            if not self.create_mode and "flow" in self.flow_info and focused_pose_index < len(self.flow_info["flow"]):
                 focused_pose = self.flow_info["flow"][focused_pose_index]
                 self.current_pose_name = QLabel(focused_pose["name"])
                 self.current_pose_index = QLabel(f"{focused_pose_index + 1} of {len(self.flow_info['flow'])}")
                 self.current_pose_duration = QLabel(f"{focused_pose['duration']} min")
-
-        if self.create_mode or len(self.flow_info["flow"]) == 0:
+            else:
+                self.current_pose_name = QLabel("No poses yet")
+                self.current_pose_index = QLabel("")
+                self.current_pose_duration = QLabel("")
+        else:
             self.current_pose_name = QLabel("No poses yet")
+            self.current_pose_index = QLabel("")
+            self.current_pose_duration = QLabel("")
 
         self.current_pose_name.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.current_pose_index.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -320,9 +324,10 @@ class flow_details_box(QDialog):
             card_list.append(self.create_pose_card(dummy_pose))
         else:
             # Regular mode: add all poses in the flow
-            for pose in self.flow_info["flow"]:
-                pose_card = self.create_pose_card(pose)
-                card_list.append(pose_card)
+            if "flow" in self.flow_info:
+                for pose in self.flow_info["flow"]:
+                    pose_card = self.create_pose_card(pose)
+                    card_list.append(pose_card)
 
         # In edit mode, add the "+" card at the end
         if self.edit_mode:
@@ -332,58 +337,91 @@ class flow_details_box(QDialog):
 
     def refresh_carousel(self):
         # Remove old carousel
-        if self.carousel_container:
+        if hasattr(self, 'carousel_container') and self.carousel_container:
             self.layout().removeWidget(self.carousel_container)
             self.carousel_container.deleteLater()
         
         # Create new carousel
         self.carousel_container = self.create_pose_carousel()
-        self.layout().insertWidget(-1, self.carousel_container) 
+        # Insert before the buttons (at position -1 or -2 depending on edit mode)
+        if self.edit_mode or self.create_mode:
+            self.layout().insertWidget(self.layout().count() - 2, self.carousel_container)
+        else:
+            self.layout().insertWidget(self.layout().count() - 1, self.carousel_container)
 
-    def create_pose_card(self,pose_info):
+    def create_pose_card(self, pose_info):
         card_frame = QFrame()
         card_frame.setObjectName("poseCard")
         card_frame.setFrameStyle(QFrame.Shape.Box)
         layout = QVBoxLayout() 
+        layout.setContentsMargins(2, 2, 2, 2)  # Minimal margins
         card_frame.setLayout(layout)  
         
         pose_image_widget = QLabel()
-        expected_filename = pose_info["name"].lower().replace(" ", "_") + ".png"
+        
+        # Handle special case for "Add New Pose" dummy
+        if pose_info["name"] == "Add New Pose":
+            pose_image_widget.setText("+")
+            pose_image_widget.setStyleSheet("font-size: 48px; font-weight: bold; color: green;")
+        else:
+            expected_filename = pose_info["name"].lower().replace(" ", "_") + ".png"
 
-        try:
-            cache = self.image_cache
-            print(f"Cache exists: {cache is not None}")
-            print(f"Looking for: {expected_filename}")
-            print(f"Cache keys: {list(cache.keys())[:5]}")  # Show first 5 keys
-            pose_image = cache.get(expected_filename)
-            if pose_image:
-                scaled_image = pose_image.scaled(90, 90, Qt.AspectRatioMode.KeepAspectRatio)
+            
+            # Try cache first
+            if hasattr(self, 'image_cache') and self.image_cache and expected_filename in self.image_cache:
+                pose_image = self.image_cache[expected_filename]
+                # Scale to fill the widget better
+                scaled_image = pose_image.scaled(90, 90, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
                 pose_image_widget.setPixmap(scaled_image)
-            else:
-                pose_image_widget.setText("No Image")
-        except:
-            pose_image_widget.setText("Loading...")
 
+            else:
+                # Fallback: load directly from file
+
+                try:
+                    from config import POSES_IMAGE_DIR
+                    from PyQt6.QtGui import QPixmap
+                    
+                    image_path = POSES_IMAGE_DIR / expected_filename
+
+                    
+                    if image_path.exists():
+                        pixmap = QPixmap(str(image_path))
+                        if not pixmap.isNull():
+                            # Scale to fill the widget better
+                            scaled_image = pixmap.scaled(90, 90, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                            pose_image_widget.setPixmap(scaled_image)
+          
+                        else:
+                            pose_image_widget.setText("Invalid Image")
+                    else:
+                        # Try fallback image
+                        fallback_path = POSES_IMAGE_DIR / "no_image.png"
+                        if fallback_path.exists():
+                            pixmap = QPixmap(str(fallback_path))
+                            scaled_image = pixmap.scaled(90, 90, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                            pose_image_widget.setPixmap(scaled_image)
+                        else:
+                            pose_image_widget.setText("No Image")
+                            
+                except Exception as e:
+                    print(f"Error loading image directly: {e}")
+                    pose_image_widget.setText("Load Error")
 
         pose_image_widget.pose_name = pose_info["name"] 
         self.pose_image_widgets.append(pose_image_widget)
-  
-
-        card_frame.setFixedSize(140, 140)  # Larger
-        pose_image_widget.setFixedSize(130, 130)
-
-        
+        pose_image_widget.setFixedSize(95, 95)  # Slightly smaller for better fit
         pose_image_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
         layout.addWidget(pose_image_widget)
         return card_frame
 
     def scroll_left(self):
-        if self.scroll_offset > 0:
+        if self.scroll_offset >= 0:
             self.scroll_offset -= 1
             self.refresh_carousel()
 
     def scroll_right(self):
-        max_cards = len(self.build_pose_cards_list())
-        if self.scroll_offset + 5 < max_cards:  # 5 is cards_to_show
+        max_cards = len(self.build_pose_cards_list())    
+        if self.scroll_offset + 3 <= max_cards:  # 5 is cards_to_show
             self.scroll_offset += 1
             self.refresh_carousel()
