@@ -215,13 +215,9 @@ class SequenceGeneratorWidget(QWidget):
             description = dialog.description_field.toPlainText()
             duration = dialog.duration_field.text()
         # Save to favorites file
-            if os.path.exists(FAVORITES_FILE):
-                favorites_data = load_favorites_data()
-                main_window = self.parent().parent()  # Navigate to MainWindow
-                main_window.favorites_button_was_clicked()
-            else:
-                print(f"The path '{FAVORITES_FILE}' does not exist.")
-                favorites_data = {"favorites": []}
+            favorites_data = load_favorites_data()
+            main_window = self.parent().parent()  # Navigate to MainWindow
+            main_window.favorites_button_was_clicked()
 
             #initialize favorite json object for current sequence
             new_favorite = {
