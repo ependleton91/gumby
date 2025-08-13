@@ -3,6 +3,8 @@ import json
 import os
 from config import FAVORITES_FILE
 from gui.dialogs.details_dialog import details_dialog_box
+from utils.file_utils import load_favorites_data,save_favorites_data
+from utils.ui_utils import show_error_message,show_success_message
 
 class FavoritesWidget(QWidget):
     def create_favorites_display(self):
@@ -11,13 +13,10 @@ class FavoritesWidget(QWidget):
         scroll_content = QWidget()
         scroll_layout = QVBoxLayout()
 
-        if os.path.exists(FAVORITES_FILE):
-            print(f"Loading favorites from {FAVORITES_FILE}")
-            with open(FAVORITES_FILE, 'r') as f:
-                favorites_data = json.load(f)
-        else:
-            favorites_data = {"favorites": []}
-        
+        # Load favorites data
+        favorites_data = load_favorites_data()
+
+
         if len(favorites_data["favorites"]) == 0:
             empty_message = QLabel("No favorites saved yet. Generate a sequence and favorite it!")
             scroll_layout.addWidget(empty_message)
@@ -140,16 +139,23 @@ class FavoritesWidget(QWidget):
         if selection == QMessageBox.StandardButton.Yes:
             print(f"User selected 'YES'")
             # Remove from json
-            with open(FAVORITES_FILE, 'r') as f:
-                favorites_data = json.load(f)
+            favorites_data = load_favorites_data()
 
+
+            # Find and remove the favorite
             for item in favorites_data["favorites"]:
                 if item['name'] == favorite['name']:
                     favorites_data["favorites"].remove(item)
                     break
+            # Save updated favorites    
+            favorites_saved = save_favorites_data(favorites_data)
+            print(f"Deleted favorite: {favorite['name']}")
+            # Show success message
+            if favorites_saved:
+                show_success_message(f"Successfully deleted {favorite['name']} from favorites. File ")
+            else:
+                show_error_message(f"Failed to delete {favorite['name']} from favorites. File not saved.")
 
-            with open(FAVORITES_FILE, 'w') as f:
-                json.dump(favorites_data, f, indent=2)
             # Refresh page
             self.layout().removeWidget(self.scroll_area)
             self.scroll_area.deleteLater()
