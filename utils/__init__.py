@@ -1,10 +1,5 @@
-"""Utility functions for GUMBY yoga app.
-
-This package provides centralized utility functions for file operations,
-image handling, validation, UI helpers, and date/time formatting.
-"""
-
 # Import commonly used functions for easy access
+
 from .file_utils import (
     safe_load_json, safe_save_json, 
     load_flows_data, load_poses_data, load_favorites_data,
