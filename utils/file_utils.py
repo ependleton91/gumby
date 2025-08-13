@@ -1,9 +1,3 @@
-"""File operation utilities for GUMBY yoga app.
-
-This module provides safe, consistent file operations with proper error handling,
-backup creation, and atomic writes to prevent data corruption.
-"""
-
 import json
 import logging
 import shutil
@@ -16,19 +10,15 @@ logger = logging.getLogger(__name__)
 
 
 def safe_load_json(file_path: Union[str, Path], default_data: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Load JSON file with comprehensive error handling.
-    
-    Args:
-        file_path: Path to JSON file
-        default_data: Data to return if file can't be loaded
+    #Load JSON file with comprehensive error handling.
+    #Args:
+    #    file_path: Path to JSON file
+    #    default_data: Data to return if file can't be loaded
         
-    Returns:
-        Dict containing loaded data or default_data
+    #Returns: Dict containing loaded data or default_data
         
-    Example:
-        flows = safe_load_json("app_data/flows.json", {"flowing_sequences": {}})
-    """
+    #Example: flows = safe_load_json("app_data/flows.json", {"flowing_sequences": {}})
+
     file_path = Path(file_path)
     
     try:
@@ -57,22 +47,20 @@ def safe_load_json(file_path: Union[str, Path], default_data: Dict[str, Any]) ->
 
 
 def safe_save_json(file_path: Union[str, Path], data: Dict[str, Any], create_backup: bool = True) -> bool:
-    """
-    Save JSON file with atomic write and optional backup.
+    #Save JSON file with atomic write and optional backup.
     
-    Args:
-        file_path: Path where to save the file
-        data: Dictionary to save as JSON
-        create_backup: Whether to create backup before saving
+    #Args:
+    #    file_path: Path where to save the file
+    #    data: Dictionary to save as JSON
+    #    create_backup: Whether to create backup before saving
         
-    Returns:
-        True if successful, False otherwise
+    #Returns:
+    #    True if successful, False otherwise
         
-    Example:
-        success = safe_save_json("app_data/flows.json", flows_data)
-        if not success:
-            print("Failed to save file!")
-    """
+    #Example:
+    #    success = safe_save_json("app_data/flows.json", flows_data)
+    #    if not success:
+    #        print("Failed to save file!")
     file_path = Path(file_path)
     
     try:
@@ -85,13 +73,13 @@ def safe_save_json(file_path: Union[str, Path], data: Dict[str, Any], create_bac
             if not backup_success:
                 logger.warning(f"Failed to create backup for {file_path}")
         
-        # Write to temporary file first (atomic operation)
+        # Write to temporary file first 
         temp_path = file_path.with_suffix('.tmp')
         
         with open(temp_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         
-        # Move temp file to final location (atomic on most filesystems)
+        # Move temp file to final location 
         temp_path.replace(file_path)
         
         logger.info(f"Successfully saved {file_path}")
@@ -112,16 +100,15 @@ def safe_save_json(file_path: Union[str, Path], data: Dict[str, Any], create_bac
 
 
 def ensure_directory_exists(file_path: Union[str, Path]) -> None:
-    """
-    Ensure parent directory exists for given file path.
+    #Ensure parent directory exists for given file path.
     
-    Args:
-        file_path: File path whose parent directory should exist
+    #Args:
+    #    file_path: File path whose parent directory should exist
         
-    Example:
-        ensure_directory_exists("app_data/user_settings/preferences.json")
-        # Creates app_data/user_settings/ if it doesn't exist
-    """
+    #Example:
+    #    ensure_directory_exists("app_data/user_settings/preferences.json")
+    #    # Creates app_data/user_settings/ if it doesn't exist
+
     file_path = Path(file_path)
     parent_dir = file_path.parent
     
@@ -134,19 +121,18 @@ def ensure_directory_exists(file_path: Union[str, Path]) -> None:
 
 
 def create_backup_file(file_path: Union[str, Path]) -> bool:
-    """
-    Create backup copy of file with timestamp.
+    #Create backup copy of file with timestamp.
     
-    Args:
-        file_path: Path to file to backup
+    #Args:
+    #    file_path: Path to file to backup
         
-    Returns:
-        True if backup created successfully
+    #Returns:
+    #    True if backup created successfully
         
-    Example:
-        create_backup_file("app_data/flows.json")
-        # Creates app_data/flows.json.backup
-    """
+    #Example:
+    #    create_backup_file("app_data/flows.json")
+    #   Creates app_data/flows.json.backup
+
     file_path = Path(file_path)
     
     if not file_path.exists():
@@ -165,15 +151,14 @@ def create_backup_file(file_path: Union[str, Path]) -> bool:
 
 
 def backup_corrupted_file(file_path: Union[str, Path]) -> bool:
-    """
-    Backup a corrupted file for investigation.
+    #Backup a corrupted file for investigation.
     
-    Args:
-        file_path: Path to corrupted file
+    #Args:
+    #    file_path: Path to corrupted file
         
-    Returns:
-        True if backup created successfully
-    """
+    #Returns:
+    #    True if backup created successfully
+  
     file_path = Path(file_path)
     
     try:
@@ -188,15 +173,13 @@ def backup_corrupted_file(file_path: Union[str, Path]) -> bool:
 
 
 def list_backup_files(directory: Union[str, Path]) -> List[Path]:
-    """
-    List all backup files in a directory.
+   # List all backup files in a directory.
     
-    Args:
-        directory: Directory to search for backups
+    #Args:
+    #    directory: Directory to search for backups
         
-    Returns:
-        List of backup file paths
-    """
+    #Returns:
+    #    List of backup file paths
     directory = Path(directory)
     
     if not directory.exists():
@@ -211,13 +194,12 @@ def list_backup_files(directory: Union[str, Path]) -> List[Path]:
 
 
 def cleanup_old_backups(directory: Union[str, Path], keep_count: int = 5) -> None:
-    """
-    Remove old backup files, keeping only the most recent ones.
+   #Remove old backup files, keeping only the most recent ones.
     
-    Args:
-        directory: Directory containing backup files
-        keep_count: Number of recent backups to keep
-    """
+    #Args:
+    #    directory: Directory containing backup files
+    #    keep_count: Number of recent backups to keep
+    
     backup_files = list_backup_files(directory)
     
     if len(backup_files) <= keep_count:

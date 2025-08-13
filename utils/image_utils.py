@@ -1,9 +1,3 @@
-"""Image handling utilities for GUMBY yoga app.
-
-This module provides consistent image loading, caching, scaling, and fallback
-handling for pose images throughout the application.
-"""
-
 import logging
 from pathlib import Path
 from typing import Dict, Optional, Tuple, Union
@@ -14,18 +8,18 @@ logger = logging.getLogger(__name__)
 
 
 class ImageCache:
-    """Simple image cache to avoid reloading the same images."""
+    #Simple image cache to avoid reloading the same images.
     
     def __init__(self, max_size: int = 100):
         self._cache: Dict[str, QPixmap] = {}
         self.max_size = max_size
     
     def get(self, key: str) -> Optional[QPixmap]:
-        """Get image from cache."""
+        #Get image from cache.
         return self._cache.get(key)
     
     def put(self, key: str, pixmap: QPixmap) -> None:
-        """Store image in cache with size limit."""
+        #Store image in cache with size limit
         if len(self._cache) >= self.max_size:
             # Remove oldest entry (simple FIFO)
             oldest_key = next(iter(self._cache))
@@ -34,11 +28,11 @@ class ImageCache:
         self._cache[key] = pixmap
     
     def clear(self) -> None:
-        """Clear all cached images."""
+        #Clear all cached images.
         self._cache.clear()
     
     def size(self) -> int:
-        """Get number of cached images."""
+        #Get number of cached images.
         return len(self._cache)
 
 
@@ -47,19 +41,17 @@ _image_cache = ImageCache()
 
 
 def standardize_pose_name_to_filename(pose_name: str) -> str:
-    """
-    Convert pose name to standard filename format.
+    #Convert pose name to standard filename format.
     
-    Args:
-        pose_name: Human-readable pose name
+    #Args:
+    #    pose_name: Human-readable pose name
         
-    Returns:
-        Standardized filename with .png extension
+    #Returns:
+    #    Standardized filename with .png extension
         
-    Example:
-        standardize_pose_name_to_filename("Mountain Pose") -> "mountain_pose.png"
-        standardize_pose_name_to_filename("Child's Pose") -> "childs_pose.png"
-    """
+    #Example:
+    #    standardize_pose_name_to_filename("Mountain Pose") -> "mountain_pose.png"
+    #    standardize_pose_name_to_filename("Child's Pose") -> "childs_pose.png"
     if not pose_name:
         return "no_image.png"
     
@@ -88,20 +80,19 @@ def standardize_pose_name_to_filename(pose_name: str) -> str:
 
 def load_pose_image(pose_name: str, image_directory: Union[str, Path], 
                    use_cache: bool = True) -> QPixmap:
-    """
-    Load pose image with standardized naming and fallback handling.
+    #Load pose image with standardized naming and fallback handling.
     
-    Args:
-        pose_name: Name of the pose
-        image_directory: Directory containing pose images
-        use_cache: Whether to use image cache
+    #Args:
+    #    pose_name: Name of the pose
+    #    image_directory: Directory containing pose images
+    #    use_cache: Whether to use image cache
         
-    Returns:
-        QPixmap with the loaded image or fallback
+    #Returns:
+    #    QPixmap with the loaded image or fallback
         
-    Example:
-        pixmap = load_pose_image("Mountain Pose", "assets/images/poses")
-    """
+    #Example:
+    #    pixmap = load_pose_image("Mountain Pose", "assets/images/poses")
+    
     if not pose_name:
         return create_placeholder_image("No Pose")
     
@@ -144,15 +135,13 @@ def load_pose_image(pose_name: str, image_directory: Union[str, Path],
 
 
 def load_image_from_path(image_path: Union[str, Path]) -> QPixmap:
-    """
-    Load image from specific file path.
+    #Load image from specific file path.
     
-    Args:
-        image_path: Full path to image file
+    #Args:
+    #    image_path: Full path to image file
         
-    Returns:
-        QPixmap (may be null if loading failed)
-    """
+    #Returns:
+    #    QPixmap (may be null if loading failed)
     image_path = Path(image_path)
     
     if not image_path.exists():
@@ -178,21 +167,19 @@ def load_image_from_path(image_path: Union[str, Path]) -> QPixmap:
 
 def scale_image_for_display(pixmap: QPixmap, max_width: int, max_height: int, 
                            smooth: bool = True) -> QPixmap:
-    """
-    Scale image maintaining aspect ratio within given dimensions.
+    #Scale image maintaining aspect ratio within given dimensions.
     
-    Args:
-        pixmap: Original image
-        max_width: Maximum width
-        max_height: Maximum height
-        smooth: Use smooth scaling (slower but better quality)
+    #Args:
+    #    pixmap: Original image
+    #    max_width: Maximum width
+    #    max_height: Maximum height
+    #    smooth: Use smooth scaling (slower but better quality)
         
-    Returns:
-        Scaled QPixmap
+    #Returns:
+    #    Scaled QPixmap
         
-    Example:
-        scaled = scale_image_for_display(original_image, 300, 200)
-    """
+    #Example:
+    #    scaled = scale_image_for_display(original_image, 300, 200)
     if pixmap.isNull():
         return pixmap
     
@@ -210,18 +197,17 @@ def scale_image_for_display(pixmap: QPixmap, max_width: int, max_height: int,
 
 def create_placeholder_image(pose_name: str, width: int = 200, height: int = 150, 
                            background_color: QColor = None) -> QPixmap:
-    """
-    Create a placeholder image with pose name text.
+    #Create a placeholder image with pose name text.
     
-    Args:
-        pose_name: Text to display on placeholder
-        width: Image width
-        height: Image height
-        background_color: Background color (default: light gray)
+    #Args:
+    #    pose_name: Text to display on placeholder
+    #    width: Image width
+    #    height: Image height
+    #    background_color: Background color (default: light gray)
         
-    Returns:
-        QPixmap with placeholder
-    """
+    #Returns:
+    #    QPixmap with placeholder
+    
     if background_color is None:
         background_color = QColor(220, 220, 220)  # Light gray
     
@@ -251,15 +237,15 @@ def create_placeholder_image(pose_name: str, width: int = 200, height: int = 150
 
 
 def validate_image_file(file_path: Union[str, Path]) -> bool:
-    """
-    Check if file is a valid image format.
+
+    #Check if file is a valid image format.
     
-    Args:
-        file_path: Path to image file
+    #Args:
+    #    file_path: Path to image file
         
-    Returns:
-        True if file appears to be a valid image
-    """
+    #Returns:
+    #    True if file appears to be a valid image
+
     file_path = Path(file_path)
     
     if not file_path.exists():
@@ -287,15 +273,14 @@ def validate_image_file(file_path: Union[str, Path]) -> bool:
 
 
 def get_image_info(pixmap: QPixmap) -> Dict[str, Union[int, str]]:
-    """
-    Get information about a loaded image.
+    #Get information about a loaded image.
     
-    Args:
-        pixmap: QPixmap to analyze
+    #Args:
+    #    pixmap: QPixmap to analyze
         
-    Returns:
-        Dictionary with image information
-    """
+    #Returns:
+    #    Dictionary with image information
+
     if pixmap.isNull():
         return {"width": 0, "height": 0, "depth": 0, "format": "null"}
     

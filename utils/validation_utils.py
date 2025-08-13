@@ -1,9 +1,3 @@
-"""Data validation utilities for GUMBY yoga app.
-
-This module provides comprehensive validation functions for user input,
-pose data, sequence data, and other application data with clear error messages.
-"""
-
 import re
 import logging
 from typing import List, Dict, Any, Tuple, Optional, Union
@@ -13,20 +7,18 @@ logger = logging.getLogger(__name__)
 
 
 def validate_pose_name(name: str) -> Tuple[bool, str]:
-    """
-    Validate pose name format and content.
+    #Validate pose name format and content.
     
-    Args:
-        name: Pose name to validate
+    #Args:
+    #    name: Pose name to validate
         
-    Returns:
-        Tuple of (is_valid, error_message)
+    #Returns:
+    #    Tuple of (is_valid, error_message)
         
-    Example:
-        valid, error = validate_pose_name("Mountain Pose")
-        if not valid:
-            print(f"Error: {error}")
-    """
+    #Example:
+    #    valid, error = validate_pose_name("Mountain Pose")
+    #    if not valid:
+    #        print(f"Error: {error}")
     if not name or not name.strip():
         return False, "Pose name cannot be empty"
     
@@ -53,22 +45,20 @@ def validate_pose_name(name: str) -> Tuple[bool, str]:
 
 
 def validate_duration(duration_str: str, min_duration: float = 0.1, max_duration: float = 600.0) -> Tuple[bool, str, float]:
-    """
-    Validate duration input and convert to float.
+    #Validate duration input and convert to float.
     
-    Args:
-        duration_str: Duration as string
-        min_duration: Minimum allowed duration in minutes
-        max_duration: Maximum allowed duration in minutes
+    #Args:
+    #    duration_str: Duration as string
+    #    min_duration: Minimum allowed duration in minutes
+    #    max_duration: Maximum allowed duration in minutes
         
-    Returns:
-        Tuple of (is_valid, error_message, converted_duration)
+    #Returns:
+    #    Tuple of (is_valid, error_message, converted_duration)
         
-    Example:
-        valid, error, duration = validate_duration("5.5")
-        if valid:
-            print(f"Duration: {duration} minutes")
-    """
+    #Example:
+    #    valid, error, duration = validate_duration("5.5")
+    #    if valid:
+    #        print(f"Duration: {duration} minutes")
     if not duration_str or not duration_str.strip():
         return False, "Duration cannot be empty", 0.0
     
@@ -91,22 +81,20 @@ def validate_duration(duration_str: str, min_duration: float = 0.1, max_duration
 
 
 def validate_difficulty(difficulty_str: str, min_level: int = 1, max_level: int = 5) -> Tuple[bool, str, int]:
-    """
-    Validate difficulty level input.
+    #Validate difficulty level input.
     
-    Args:
-        difficulty_str: Difficulty as string
-        min_level: Minimum difficulty level
-        max_level: Maximum difficulty level
+    #Args:
+    #    difficulty_str: Difficulty as string
+    #    min_level: Minimum difficulty level
+    #    max_level: Maximum difficulty level
         
-    Returns:
-        Tuple of (is_valid, error_message, converted_difficulty)
+    #Returns:
+    #    Tuple of (is_valid, error_message, converted_difficulty)
         
-    Example:
-        valid, error, difficulty = validate_difficulty("3")
-        if valid:
-            print(f"Difficulty level: {difficulty}")
-    """
+    #Example:
+    #    valid, error, difficulty = validate_difficulty("3")
+    #    if valid:
+    #        print(f"Difficulty level: {difficulty}")
     if not difficulty_str or not difficulty_str.strip():
         return False, "Difficulty level cannot be empty", min_level
     
@@ -123,20 +111,19 @@ def validate_difficulty(difficulty_str: str, min_level: int = 1, max_level: int 
 
 
 def validate_muscle_groups(muscle_list: List[str]) -> Tuple[bool, str]:
-    """
-    Validate muscle group selections.
+    #Validate muscle group selections.
     
-    Args:
-        muscle_list: List of muscle group names
+    #Args:
+    #    muscle_list: List of muscle group names
         
-    Returns:
-        Tuple of (is_valid, error_message)
+    #Returns:
+    #    Tuple of (is_valid, error_message)
         
-    Example:
-        valid, error = validate_muscle_groups(["core", "arms"])
-        if not valid:
-            print(f"Invalid muscle groups: {error}")
-    """
+    #Example:
+    #    valid, error = validate_muscle_groups(["core", "arms"])
+    #    if not valid:
+    #        print(f"Invalid muscle groups: {error}")
+
     # Define valid muscle groups for yoga poses
     valid_muscles = {
         "core", "abs", "arms", "shoulders", "back", "legs", "thighs", "calves",
@@ -166,15 +153,14 @@ def validate_muscle_groups(muscle_list: List[str]) -> Tuple[bool, str]:
 
 
 def validate_sequence_name(name: str) -> Tuple[bool, str]:
-    """
-    Validate yoga sequence name.
+    #Validate yoga sequence name.
     
-    Args:
-        name: Sequence name to validate
+    #Args:
+    #    name: Sequence name to validate
         
-    Returns:
-        Tuple of (is_valid, error_message)
-    """
+    #Returns:
+    #    Tuple of (is_valid, error_message)
+
     if not name or not name.strip():
         return False, "Sequence name cannot be empty"
     
@@ -194,20 +180,19 @@ def validate_sequence_name(name: str) -> Tuple[bool, str]:
 
 
 def validate_yoga_style(style: str) -> Tuple[bool, str]:
-    """
-    Validate yoga style selection.
+    #Validate yoga style selection.
     
-    Args:
-        style: Yoga style name
+    #Args:
+    #    style: Yoga style name
         
-    Returns:
-        Tuple of (is_valid, error_message)
-    """
+    #Returns:
+    #    Tuple of (is_valid, error_message)
+    
     valid_styles = {
         "hatha", "vinyasa", "yin", "restorative", "ashtanga", "bikram", 
         "hot", "power", "iyengar", "kundalini", "gentle", "beginner"
     }
     
-    if not style or not style.strip():
+    if style not in valid_styles or style.strip() not in valid_styles:
         return False, "Yoga style must be selected"
     
