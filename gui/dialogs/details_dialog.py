@@ -1,6 +1,8 @@
 from PyQt6.QtWidgets import QDialog, QMessageBox,QPushButton,QLineEdit,QTabWidget,QScrollArea,QLabel,QVBoxLayout,QHBoxLayout,QTextEdit, QDialogButtonBox,QWidget
 from config import FAVORITES_FILE
-import json
+from utils.file_utils import load_favorites_data, save_favorites_data
+from utils.ui_utils import show_error_message, show_success_message
+from utils.validation_utils import validate_sequence_name, validate_yoga_style
 
 class details_dialog_box(QDialog):
         def __init__(self,favorite):
@@ -122,15 +124,15 @@ class General_Tab(QWidget):
 
     def save_changes(self):
         try:
-            with open(FAVORITES_FILE, 'r') as f:
-                    favorites_data = json.load(f)
+            favorites_data = load_favorites_data()
 
             new_name = self.name_edit.text().strip()
             new_description = self.description_content.toPlainText().strip()
 
-            if len(new_name) == 0:
-                QMessageBox.warning(self, "Invalid Name", "Name cannot be empty!")
-                return 
+            is_valid_name, name_error = validate_sequence_name(new_name)
+            if not is_valid_name:
+                show_error_message("Invalid Name", name_error)
+                return  
 
             for favorite in favorites_data["favorites"]:
                     if favorite["created_date"] == self.favorite["created_date"]:
@@ -142,8 +144,11 @@ class General_Tab(QWidget):
             self.favorite["description"] = new_description
             self.parent().setWindowTitle(f"Favorite Details: {self.favorite['name']}")
 
-            with open(FAVORITES_FILE, 'w') as f:
-                    json.dump(favorites_data, f, indent=2)
+            favorite_saved = save_favorites_data(favorites_data)
+            if favorite_saved:
+                show_success_message(self,"Favorite Saved", f"Successfully saved '{new_name}' to favorites.")
+            else:
+                show_error_message(self,"Save Failed", "Failed to save favorite."," please try again.")
 
             self.exit_edit_mode()
         except Exception as e:

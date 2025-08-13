@@ -1,12 +1,11 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QMessageBox, QComboBox, QStyle,QHBoxLayout, QDialog
-from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, QTimer
-from config import FAVORITES_FILE
+from config import POSES_IMAGE_DIR
 from gui.dialogs.completion_dialog import completion_dialog_box
 from utils.file_utils import load_favorites_data, save_favorites_data
 from utils.ui_utils import show_success_message, show_error_message
+from utils.image_utils import load_preview_image
 from datetime import datetime
-import json
 
 class PracticeWidget(QWidget):
     def __init__(self):
@@ -262,26 +261,8 @@ class PracticeWidget(QWidget):
         self.update_view()
 
     def load_pose_image(self,pose_name):
-        #grab first pose name
-
         print(f"Grabbing image for Pose: [{pose_name}]")
-
-        expected_file_name = ("_".join(pose_name.lower().split(" ")))+".png"
-
-        # Access the cache
-        cache = self.parent().parent().image_cache
-            
-        # Check cache first
-        if expected_file_name in cache:
-                return cache[expected_file_name]
-            
-            # Fallback to no_image if available
-        elif "no_image.png" in cache:
-                return cache["no_image.png"]
-            
-        # No image available
-        else:
-            return None
+        return load_preview_image(pose_name, POSES_IMAGE_DIR)
     
     def on_cancel_clicked(self):
         print(f"Cancel button clicked.")
