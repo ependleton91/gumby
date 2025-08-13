@@ -4,6 +4,8 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
 from PyQt6.QtCore import Qt
 from services.build_sequence import generate_yoga_class
 from gui.dialogs.favorites_dialog import favorites_dialog_box
+from utils.file_utils import load_favorites_data, save_favorites_data
+from utils.ui_utils import show_success_message, show_error_message
 import os
 import json
 import datetime
@@ -221,9 +223,7 @@ class SequenceGeneratorWidget(QWidget):
             duration = dialog.duration_field.text()
         # Save to favorites file
             if os.path.exists(FAVORITES_FILE):
-                print(f"The path '{FAVORITES_FILE}' exists.")
-                with open(FAVORITES_FILE, 'r') as f:
-                    favorites_data = json.load(f)
+                favorites_data = load_favorites_data()
                 main_window = self.parent().parent()  # Navigate to MainWindow
                 main_window.favorites_button_was_clicked()
             else:
@@ -246,8 +246,11 @@ class SequenceGeneratorWidget(QWidget):
             
             #Write to favorites file
             print("Saving sequence to favorites file")
-            with open(FAVORITES_FILE, 'w') as f:
-                json.dump(favorites_data, f, indent=2)
+            saved_favorite = save_favorites_data(favorites_data)
+            if saved_favorite:
+                show_success_message("Favorite ")
+            else:
+                show_error_message("Failed to save favorite. Please try again.")
 
             main_window.favorites_widget.refresh_favorites()
 
