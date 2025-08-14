@@ -7,7 +7,7 @@ filtering flows by criteria, and selecting optimal flow combinations.
 import logging
 from typing import List, Dict, Any, Set, Tuple
 from utils.file_utils import safe_load_json
-from config import SEQUENCES_FILE
+from config import FLOWS_FILE
 
 logger = logging.getLogger(__name__)
 
@@ -241,13 +241,17 @@ def load_class_template(style: str) -> Dict[str, Any]:
     Raises:
         KeyError: If style not found in templates
     """
-    sequences_data = safe_load_json(SEQUENCES_FILE, {"class_structure_templates": {}})
-    templates = sequences_data.get("class_structure_templates", {})
+    # First, load the templates data
+    from config import CLASS_TEMPLATES_FILE
+    templates_data = safe_load_json(CLASS_TEMPLATES_FILE, {"class_structure_templates": {}})
+    templates = templates_data.get("class_structure_templates", {})
     
+    # Check if style exists
     if style.lower() not in templates:
         available_styles = list(templates.keys())
         raise KeyError(f"Style '{style}' not found. Available styles: {available_styles}")
     
+    # Return the template for the style
     return templates[style.lower()]
 
 
@@ -338,7 +342,8 @@ def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str
         flows = select_flows_for_sequence(preferences)
     """
     # Load sequences data
-    sequences_data = safe_load_json(SEQUENCES_FILE, {"flowing_sequences": {}})
+    from utils.file_utils import load_flows_data
+    sequences_data = load_flows_data()
     all_flows = list(sequences_data.get("flowing_sequences", {}).values())
     
     if not all_flows:

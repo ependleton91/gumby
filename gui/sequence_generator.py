@@ -6,8 +6,8 @@ from services.build_sequence import generate_yoga_class
 from gui.dialogs.favorites_dialog import favorites_dialog_box
 from utils.file_utils import load_favorites_data, save_favorites_data
 from utils.ui_utils import show_success_message, show_error_message, hide_widgets
-import os
-import json
+from services.sequence_builder import SequenceBuilder
+from utils.display_utils import format_list_for_display
 import datetime
 from config import FAVORITES_FILE
 
@@ -95,14 +95,21 @@ class SequenceGeneratorWidget(QWidget):
     def create_style_section(self):
         group = QGroupBox("Yoga Style")
         layout = QVBoxLayout()
-    
-        # Create dropdown
+
+        # Create dropdown FIRST
         self.style_dropdown = QComboBox()
-        self.style_dropdown.addItems(["hatha", "vinyasa", "yin", "restorative", "ashtanga", "bikram", 
-        "hot", "power", "iyengar", "kundalini", "gentle", "beginner"])
+        
+        # THEN get the dynamic data and add items
+        from services.sequence_builder import SequenceBuilder
+        from utils.display_utils import format_list_for_display
+        
+        builder = SequenceBuilder()
+        available_styles = format_list_for_display(builder.available_styles)
+        self.style_dropdown.addItems(available_styles)
+        
         selected_style = self.style_dropdown.currentText()
 
-        #Add dropdown to layout
+        # Add dropdown to layout
         layout.addWidget(self.style_dropdown)
         group.setLayout(layout)
         return group
@@ -113,7 +120,11 @@ class SequenceGeneratorWidget(QWidget):
         layout = QVBoxLayout()
 
         #add each muscle checkbox to layout
-        muscle_groups = ["Abs", "Arms", "Back", "All"]
+        builder = SequenceBuilder()
+        available_muscles = format_list_for_display(builder.available_muscles)
+        muscle_groups = available_muscles 
+
+        
         self.muscle_checkboxes = []
         for muscle in muscle_groups:
             checkbox = QCheckBox(muscle)
@@ -242,14 +253,35 @@ class SequenceGeneratorWidget(QWidget):
                 show_error_message(self,"Save Failed","Failed to save favorite. Please try again.")
 
             main_window.favorites_widget.refresh_favorites()
-
-    def generate_sequence(self):
         
-        class_type = self.style_dropdown.currentText()
-        current_duration = current_duration = self.duration_slider.value()
-        selected_muscles = [] 
+    def generate_sequence(self):
+        from services.sequence_builder import SequenceBuilder, SequenceRequest
+        from utils.display_utils import format_for_internal
+        
+        # Convert UI display values to internal format for processing
+        style = self.style_dropdown.currentText()  # "Vinyasa" 
+        duration = self.duration_slider.value()
+        
+        selected_muscles = []
         for checkbox in self.muscle_checkboxes:
             if checkbox.isChecked():
-                selected_muscles.append(checkbox.text())
-        results = generate_yoga_class(class_type, selected_muscles, current_duration)
-        self.show_results(results) 
+                selected_muscles.append(checkbox.text())  # ["Core", "Arms"]
+        
+        # Generate sequence using new builder
+        builder = SequenceBuilder()
+        request = SequenceRequest(
+            style=style,
+            target_muscles=selected_muscles,
+            duration=duration
+        )
+        
+        result = builder.generate_sequence(request)
+        
+        # Convert to format expected by existing show_results method
+        ui_result = {
+            'sequences': result.sequences,
+            'duration': result.total_duration,
+            'muscles': result.muscles_covered  # Already in display format
+        }
+        
+        self.show_results(ui_result)  
