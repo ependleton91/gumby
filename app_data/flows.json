@@ -3,6 +3,7 @@
     "sun_salutation_flow": {
       "name": "Sun Salutation Flow",
       "duration": 3,
+      "tags": [],
       "flow": [
         {"name": "Mountain Pose", "duration": 0.3, "type": "setup"},
         {"name": "Upward Salute", "duration": 0.25, "type": "main"},
@@ -20,10 +21,10 @@
       "difficulty": 2,
       "energy_level": "building"
     },
-
     "warrior_standing_flow": {
       "name": "Warrior Standing Flow",
       "duration": 5,
+      "tags": [],
       "flow": [
         {"name": "Mountain Pose", "duration": 0.25, "type": "setup"},
         {"name": "Forward Fold", "duration": 0.3, "type": "transition"},
@@ -43,10 +44,10 @@
       "difficulty": 3,
       "energy_level": "peak"
     },
-
     "seated_twist_flow": {
       "name": "Seated Twist Flow",
       "duration": 4,
+      "tags": [],
       "flow": [
         {"name": "Easy Pose", "duration": 0.3, "type": "setup"},
         {"name": "Gentle Neck Rolls", "duration": 0.3, "type": "preparation"},
@@ -62,10 +63,10 @@
       "difficulty": 1,
       "energy_level": "calming"
     },
-
     "hip_opening_flow": {
       "name": "Hip Opening Flow",
       "duration": 6,
+      "tags": [],
       "flow": [
         {"name": "Child's Pose", "duration": 0.5, "type": "setup"},
         {"name": "Table Top", "duration": 0.25, "type": "preparation"},
@@ -86,10 +87,10 @@
       "difficulty": 2,
       "energy_level": "releasing"
     },
-
     "simple_backbend_flow": {
       "name": "Simple Backbend Flow",
       "duration": 4.5,
+      "tags": [],
       "flow": [
         {"name": "Child's Pose", "duration": 0.5, "type": "setup"},
         {"name": "Cat-Cow Stretches", "duration": 0.75, "type": "preparation"},
@@ -107,10 +108,10 @@
       "difficulty": 2,
       "energy_level": "energizing"
     },
-
     "gentle_cooldown_flow": {
       "name": "Gentle Cool-down Flow",
       "duration": 5,
+      "tags": [],
       "flow": [
         {"name": "Seated Forward Fold", "duration": 1, "type": "main"},
         {"name": "Supine Knee to Chest", "duration": 0.5, "type": "main"},
@@ -125,27 +126,6 @@
       "muscle_groups": ["full_body"],
       "difficulty": 1,
       "energy_level": "deeply_relaxing"
-    }
-  },
-
-  "sequence_categories": {
-    "warm_up": ["sun_salutation_flow"],
-    "main_flow": ["warrior_standing_flow", "seated_twist_flow", "hip_opening_flow", "simple_backbend_flow"],
-    "cool_down": ["gentle_cooldown_flow"]
-  },
-
-  "class_structure_templates": {
-    "vinyasa": {
-      "structure": ["warm_up", "main_flow", "main_flow", "cool_down"],
-      "ratios": [0.2, 0.4, 0.3, 0.1]
-    },
-    "hatha": {
-      "structure": ["warm_up", "main_flow", "cool_down"],
-      "ratios": [0.25, 0.5, 0.25]
-    },
-    "yin": {
-      "structure": ["warm_up", "main_flow", "cool_down"],
-      "ratios": [0.15, 0.7, 0.15]
     }
   }
 }

@@ -1,13 +1,10 @@
 from PyQt6.QtWidgets import QMessageBox,QWidget, QDialog, QVBoxLayout, QLabel, QPushButton, QScrollArea,QTabWidget, QGridLayout, QFrame,QHBoxLayout
-from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
-from config import POSES_FILE,FLOWS_FILE
 from gui.dialogs.pose_details_dialog import pose_details_box
 from gui.dialogs.flow_details_dialog import flow_details_box
 from utils.ui_utils import show_error_message,show_save_success
-from utils.file_utils import load_flows_data, load_poses_data, save_poses_data, save_flows_data
+from utils.file_utils import load_flows_data, load_poses_data, save_poses_data
 from utils.validation_utils import validate_pose_name, validate_duration, validate_difficulty,validate_muscle_groups
-import json
 
 class PosesWidget(QWidget):
     def __init__(self):

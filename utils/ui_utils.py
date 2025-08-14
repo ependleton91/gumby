@@ -199,16 +199,15 @@ def confirm_action(parent: QWidget, title: str, message: str,
 
 def confirm_destructive_action(parent: QWidget, title: str, message: str, 
                              item_name: str = "") -> bool:
-    #Show confirmation dialog for destructive actions with enhanced warning.
-    
-    #Args:
-    #    parent: Parent widget for dialog
-    #    title: Dialog title
-    #    message: Warning message
-    #    item_name: Name of item being affected
-        
-    #Returns:
-    #    True if user confirmed, False otherwise
+    #Show confirmation dialog for destructive actions with enhanced warning. 
+        #Args:
+        #    parent: Parent widget for dialog
+        #    title: Dialog title
+        #    message: Warning message
+        #    item_name: Name of item being affected
+            
+        #Returns:
+        #    True if user confirmed, False otherwise
     
     full_message = message
     if item_name:

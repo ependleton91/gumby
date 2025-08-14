@@ -8,6 +8,7 @@ POSES_IMAGE_DIR = ASSETS_DIR / "images" / "poses"
 
 # File names
 FLOWS_FILE = APP_DATA_DIR / "flows.json"
+CLASS_TEMPLATES_FILE = APP_DATA_DIR / "class_templates.json"
 FAVORITES_FILE = APP_DATA_DIR / "user_favorites.json"
 SETTINGS_FILE = APP_DATA_DIR / "user_settings.json"
 POSES_FILE = APP_DATA_DIR / "all_poses.json"

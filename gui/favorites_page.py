@@ -1,7 +1,4 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QLabel, QPushButton, QHBoxLayout, QMessageBox
-import json
-import os
-from config import FAVORITES_FILE
 from gui.dialogs.details_dialog import details_dialog_box
 from utils.file_utils import load_favorites_data,save_favorites_data
 from utils.ui_utils import show_error_message,show_success_message,confirm_sequence_delete
@@ -126,35 +123,30 @@ class FavoritesWidget(QWidget):
             sequences_widget.setVisible(True)
             button.setText("▼ Hide Sequence")
 
-    def delete_favorite(self,favorite):
-        #Confirm Deletion
-        selection = QMessageBox.question(
-            self, 
-            "Delete Favorite", 
-            f"Are you sure you want to delete {favorite['name']}?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.Yes
-            )
-
-        if selection == QMessageBox.StandardButton.Yes:
+    def delete_favorite(self, favorite):
+        # Confirm Deletion
+        print(f"Attempting to delete favorite: {favorite['name']}")
+        
+        if confirm_sequence_delete(self, favorite['name']):
             print(f"User selected 'YES'")
             # Remove from json
             favorites_data = load_favorites_data()
-
 
             # Find and remove the favorite
             for item in favorites_data["favorites"]:
                 if item['name'] == favorite['name']:
                     favorites_data["favorites"].remove(item)
                     break
+                    
             # Save updated favorites    
             favorites_saved = save_favorites_data(favorites_data)
             print(f"Deleted favorite: {favorite['name']}")
+            
             # Show success message
             if favorites_saved:
-                show_success_message(self,"Favorite Deleted",f"Successfully deleted {favorite['name']} from favorites.")
+                show_success_message(self, "Favorite Deleted", f"Successfully deleted {favorite['name']} from favorites.")
             else:
-                show_error_message(self,"Deletion Failed",f"Failed to delete {favorite['name']} from favorites. File not saved.")
+                show_error_message(self, "Deletion Failed", f"Failed to delete {favorite['name']} from favorites. File not saved.")
 
             # Refresh page
             self.layout().removeWidget(self.scroll_area)
@@ -162,11 +154,8 @@ class FavoritesWidget(QWidget):
             new_scroll_area = self.create_favorites_display()
             self.layout().addWidget(new_scroll_area)
             self.scroll_area = new_scroll_area
-            
         else:
             print(f"User selected 'NO'")
-        # User clicked No, so return early
-        return
     
     def show_details(self,favorite):
         dialog = details_dialog_box(favorite)
