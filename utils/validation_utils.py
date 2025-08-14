@@ -20,28 +20,31 @@ def validate_pose_name(name: str) -> Tuple[bool, str]:
     #    if not valid:
     #        print(f"Error: {error}")
     if not name or not name.strip():
-        return False, "Pose name cannot be empty"
+        return False, "Pose name cannot be empty",""
     
     name = name.strip()
     
     if len(name) < 2:
-        return False, "Pose name must be at least 2 characters long"
+        return False, "Pose name must be at least 2 characters long",""
     
     if len(name) > 100:
-        return False, "Pose name is too long (maximum 100 characters)"
+        return False, "Pose name is too long (maximum 100 characters)",""
     
     # Check for invalid characters (allow letters, numbers, spaces, apostrophes, hyphens)
     if not re.match(r"^[A-Za-z0-9\s\-\']+$", name):
-        return False, "Pose name contains invalid characters. Only letters, numbers, spaces, hyphens, and apostrophes are allowed"
+        return False, "Pose name contains invalid characters. Only letters, numbers, spaces, hyphens, and apostrophes are allowed",""
     
     # Check for reasonable format (not all numbers or all spaces)
     if name.isdigit():
-        return False, "Pose name cannot be only numbers"
+        return False, "Pose name cannot be only numbers",""
     
     if not re.search(r'[A-Za-z]', name):
-        return False, "Pose name must contain at least one letter"
+        return False, "Pose name must contain at least one letter", ""
     
-    return True, ""
+    if name == "Name Your Pose":
+        return False, "Pose name cannot be the default placeholder 'Name Your Pose'", ""
+    
+    return True, "", name
 
 
 def validate_duration(duration_str: str, min_duration: float = 0.1, max_duration: float = 600.0) -> Tuple[bool, str, float]:
@@ -142,14 +145,14 @@ def validate_muscle_groups(muscle_list: List[str]) -> Tuple[bool, str]:
             cleaned_muscles.append(muscle.strip().lower())
     
     if not cleaned_muscles:
-        return False, "At least one valid muscle group must be selected"
+        return False, "At least one valid muscle group must be selected",""
     
     # Check for invalid muscle groups
     invalid_muscles = [m for m in cleaned_muscles if m not in valid_muscles]
     if invalid_muscles:
-        return False, f"Invalid muscle groups: {', '.join(invalid_muscles)}. Valid options include: {', '.join(sorted(valid_muscles))}"
+        return False, f"Invalid muscle groups: {', '.join(invalid_muscles)}. Valid options include: {', '.join(sorted(valid_muscles))}",""
     
-    return True, ""
+    return True, "",cleaned_muscles
 
 
 def validate_sequence_name(name: str) -> Tuple[bool, str]:

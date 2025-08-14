@@ -6,7 +6,7 @@ from gui.dialogs.pose_details_dialog import pose_details_box
 from gui.dialogs.flow_details_dialog import flow_details_box
 from utils.ui_utils import show_error_message,show_save_success
 from utils.file_utils import load_flows_data, load_poses_data, save_poses_data, save_flows_data
-from utils.validation_utils import validate_pose_name, validate_duration
+from utils.validation_utils import validate_pose_name, validate_duration, validate_difficulty,validate_muscle_groups
 import json
 
 class PosesWidget(QWidget):
@@ -266,20 +266,44 @@ class PosesWidget(QWidget):
         # Extract edited data and save to poses.json
         new_data = {}
         new_data["name"]= dialog.name_field.text()
+
+        #Validate pose name
+        is_valid, error, new_data["name"] = validate_pose_name(dialog.name_field.text())
+        if not is_valid:
+            show_error_message(self, "Invalid Name", error)
+            return
+
+        #Validate description
         new_data["description"] = dialog.description_field.toPlainText()
-        try:
-            new_data["default_duration"] = float(dialog.duration_field.text())
-        except:
-            print(f"Invalid duration value, keeping original: {original_pose_info['default_duration']}")
-        new_data["muscle_groups"] = [muscle.strip() for muscle in dialog.muscles_field.text().split(",")]
+        if not new_data["description"] or new_data["description"].strip() == "":
+            show_error_message(self, "Invalid Description", "Description cannot be empty")
+            return
+        
+        #validate duration
+        is_valid, error, new_data["default_duration"] = validate_duration(dialog.duration_field.text())
+        if not is_valid:
+            show_error_message(self, "Invalid Duration", error)
+            return
+
+        #Validate muscle groups
+
+        valid, error, new_data["muscle_groups"] = validate_muscle_groups([muscle.strip() for muscle in dialog.muscles_field.text().split(",")])
+        if not valid:
+            show_error_message(self, "Invalid Muscle Groups", error)
+            return
+
+        #Add type
         new_data["type"] = dialog.type_field.text()
+
+        #Add instructions and modifications
         new_data["instructions"] = dialog.instructions_field.toPlainText()
         new_data["modifications"] = dialog.modifications_field.toPlainText()
-        try: 
-            new_data["difficulty"] =  int(dialog.difficulty_field.text())
-        except:
-            print(f"Invalid difficulty value, keeping original: {original_pose_info['difficulty']}")
-
+        
+        #Validate difficulty
+        is_valid, error, new_data["difficulty"] = validate_difficulty(dialog.difficulty_field.text())
+        if not is_valid:
+            show_error_message(self, "Invalid Difficulty", error)
+            return
 
         poses_data = load_poses_data()
 

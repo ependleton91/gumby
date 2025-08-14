@@ -1,6 +1,5 @@
 from PyQt6.QtWidgets import QDialog, QLineEdit, QTextEdit, QPushButton, QFormLayout, QLabel, QFileDialog, QScrollArea, QWidget, QVBoxLayout
 from PIL import Image 
-from utils.validation_utils import validate_pose_name, validate_duration
 from utils.ui_utils import show_error_message
 from config import POSES_IMAGE_DIR 
 from PyQt6.QtGui import QPixmap
