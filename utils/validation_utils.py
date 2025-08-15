@@ -181,21 +181,116 @@ def validate_sequence_name(name: str) -> Tuple[bool, str]:
     
     return True, ""
 
-
 def validate_yoga_style(style: str) -> Tuple[bool, str]:
-    #Validate yoga style selection.
+    """Validate yoga style selection.
     
-    #Args:
-    #    style: Yoga style name
+    Args:
+        style: Yoga style name
         
-    #Returns:
-    #    Tuple of (is_valid, error_message)
-    
+    Returns:
+        Tuple of (is_valid, error_message)
+    """
     valid_styles = {
         "hatha", "vinyasa", "yin", "restorative", "ashtanga", "bikram", 
         "hot", "power", "iyengar", "kundalini", "gentle", "beginner"
     }
     
-    if style not in valid_styles or style.strip() not in valid_styles:
+    if not style or not style.strip():
         return False, "Yoga style must be selected"
     
+    style_lower = style.strip().lower()
+    if style_lower not in valid_styles:
+        return False, f"Invalid yoga style. Valid options: {', '.join(sorted(valid_styles))}"
+    
+    return True, ""
+
+
+def validate_sequence_data(sequence_data: Dict[str, Any]) -> Tuple[bool, str]:
+    """Validate complete sequence data structure.
+    
+    Args:
+        sequence_data: Dictionary containing sequence information
+        
+    Returns:
+        Tuple of (is_valid, error_message)
+        
+    Example:
+        valid, error = validate_sequence_data({
+            "name": "Morning Flow",
+            "duration": 30,
+            "flow": [{"name": "Mountain Pose", "duration": 1}]
+        })
+    """
+    required_fields = ["name", "duration", "flow"]
+    
+    # Check required fields exist
+    for field in required_fields:
+        if field not in sequence_data:
+            return False, f"Missing required field: {field}"
+    
+    # Validate sequence name
+    name_valid, name_error = validate_sequence_name(sequence_data["name"])
+    if not name_valid:
+        return False, f"Invalid sequence name: {name_error}"
+    
+    # Validate duration
+    duration_valid, duration_error, _ = validate_duration(str(sequence_data["duration"]))
+    if not duration_valid:
+        return False, f"Invalid sequence duration: {duration_error}"
+    
+    # Validate flow is not empty
+    flow = sequence_data.get("flow", [])
+    if not flow or len(flow) == 0:
+        return False, "Sequence must contain at least one pose"
+    
+    # Validate each pose in the flow
+    for i, pose in enumerate(flow):
+        if not isinstance(pose, dict):
+            return False, f"Pose {i+1} must be a dictionary"
+        
+        if "name" not in pose:
+            return False, f"Pose {i+1} missing required 'name' field"
+        
+        pose_name_valid, pose_name_error, _ = validate_pose_name(pose["name"])
+        if not pose_name_valid:
+            return False, f"Pose {i+1} has invalid name: {pose_name_error}"
+    
+    return True, ""
+
+
+def validate_new_pose_data(pose_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """Validate all data for creating a new pose.
+    
+    Args:
+        pose_data: Dictionary with pose information
+        
+    Returns:
+        Tuple of (is_valid, list_of_errors)
+    """
+    errors = []
+    
+    # Validate name
+    name_valid, name_error, _ = validate_pose_name(pose_data.get("name", ""))
+    if not name_valid:
+        errors.append(name_error)
+    
+    # Validate duration
+    duration_valid, duration_error, _ = validate_duration(str(pose_data.get("default_duration", "")))
+    if not duration_valid:
+        errors.append(f"Duration: {duration_error}")
+    
+    # Validate difficulty
+    difficulty_valid, difficulty_error, _ = validate_difficulty(str(pose_data.get("difficulty", "")))
+    if not difficulty_valid:
+        errors.append(f"Difficulty: {difficulty_error}")
+    
+    # Validate muscle groups
+    muscles = pose_data.get("muscle_groups", [])
+    if isinstance(muscles, str):
+        muscles = [m.strip() for m in muscles.split(",") if m.strip()]
+    
+    muscles_valid, muscles_error, _ = validate_muscle_groups(muscles)
+    if not muscles_valid:
+        errors.append(f"Muscle groups: {muscles_error}")
+    
+    return len(errors) == 0, errors
