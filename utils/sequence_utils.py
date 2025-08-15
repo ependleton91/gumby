@@ -171,55 +171,42 @@ def calculate_flow_compatibility_score(flow: Dict[str, Any], criteria: Dict[str,
     return score / max_score if max_score > 0 else 0.0
 
 
-def select_best_flows_for_time(flows: List[Dict[str, Any]], target_time: float, 
-                              tolerance: float = 0.1) -> List[Dict[str, Any]]:
-    """Select combination of flows that best fits target time."""
-    print(f"\n🎯 select_best_flows_for_time: target={target_time}, tolerance={tolerance}")
-    print(f"Available flows: {[f.get('name') + f' ({f.get('duration')}min)' for f in flows]}")
-    
+import itertools
+
+def select_best_flows_for_time(flows, target_time, tolerance=0.1):
     if not flows:
-        print("❌ No flows provided")
         return []
-    
     min_time = target_time * (1 - tolerance)
     max_time = target_time * (1 + tolerance)
-    print(f"Time range: {min_time:.1f} - {max_time:.1f} minutes")
-    
-    # Sort flows by duration for easier selection
-    sorted_flows = sorted(flows, key=lambda f: f.get("duration", 0))
-    
-    best_combination = []
-    best_total_time = 0
-    best_score = float('inf')  # Lower is better (distance from target)
-    
-    # Try different combinations (simple greedy approach)
-    for start_flow in sorted_flows:
-        current_combination = [start_flow]
-        current_time = start_flow.get("duration", 0)
-        
-        # Add more flows until we're close to target
-        remaining_flows = [f for f in sorted_flows if f != start_flow]
-        
-        for next_flow in remaining_flows:
-            next_duration = next_flow.get("duration", 0)
-            if current_time + next_duration <= max_time:
-                current_combination.append(next_flow)
-                current_time += next_duration
-                remaining_flows.remove(next_flow)
-        
-        # Score this combination
-        if min_time <= current_time <= max_time:
-            score = abs(current_time - target_time)
-            if score < best_score:
-                best_score = score
-                best_combination = current_combination
-                best_total_time = current_time
-    
-    logger.info(f"Selected {len(best_combination)} flows totaling {best_total_time:.1f} minutes "
-               f"(target: {target_time:.1f})")
-    
-    return best_combination
+    best_combo = []
+    best_total = 0
 
+    # Try all combinations up to the number of flows (no repeats)
+    for r in range(1, len(flows) + 1):
+        for combo in itertools.combinations(flows, r):
+            total = sum(f.get("duration", 0) for f in combo)
+            if min_time <= total <= max_time and total > best_total:
+                best_combo = list(combo)
+                best_total = total
+                if best_total == max_time:
+                    break
+
+    # If best combo is still short, repeat flows to fill the gap
+    selected = list(best_combo)
+    total_time = sum(f.get("duration", 0) for f in selected)
+    flows_sorted = sorted(flows, key=lambda f: f.get("duration", 0), reverse=True)
+    while total_time < min_time:
+        for flow in flows_sorted:
+            dur = flow.get("duration", 0)
+            if total_time + dur <= max_time:
+                selected.append(flow)
+                total_time += dur
+                if total_time >= min_time:
+                    break
+        else:
+            # If nothing fits, break to avoid infinite loop
+            break
+    return selected
 
 def load_class_template(style: str) -> Dict[str, Any]:
     """Load class structure template for given style.
@@ -371,6 +358,8 @@ def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str
         section_flows = []
         for category in target_categories:
             section_flows.extend(flows_by_category.get(category, []))
+
+        print(f"Section '{section_name}' candidate flows: {[f.get('name') for f in section_flows]}")
         
         if section_flows:
             # Select best flows for this section's time allocation

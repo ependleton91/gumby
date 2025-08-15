@@ -27,9 +27,9 @@
       "time_tolerance": 0.15
     },
     "yin": {
-      "warm_up_percentage": 0.15,
-      "main_flow_percentage": 0.7,
-      "cool_down_percentage": 0.15,
+      "warm_up_percentage": 0.1,
+      "main_flow_percentage": 0.8,
+      "cool_down_percentage": 0.1,
       "energy_progression": "gentle_release",
       "max_difficulty_jump": 1,
       "requires_counter_poses": false,
