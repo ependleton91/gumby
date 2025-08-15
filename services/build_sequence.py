@@ -19,7 +19,6 @@ def generate_yoga_class(style, muscles, duration):
     
     result = builder.generate_sequence(request)
     
-    print(f"DEBUG: Result sequences: {result.sequences}")
     print(f"DEBUG: Total duration: {result.total_duration}")
     
     # Return in format expected by existing UI

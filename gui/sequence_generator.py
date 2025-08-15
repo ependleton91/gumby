@@ -9,8 +9,14 @@ from utils.ui_utils import show_success_message, show_error_message, hide_widget
 from services.sequence_builder import SequenceBuilder
 from utils.display_utils import format_list_for_display
 import datetime
-from config import FAVORITES_FILE
 
+
+print("Starting sequence generator import...")
+try:
+    from services.sequence_builder import SequenceBuilder, SequenceRequest
+    print("✅ Successfully imported SequenceBuilder")
+except ImportError as e:
+    print(f"❌ Failed to import SequenceBuilder: {e}")
 
 class SequenceGeneratorWidget(QWidget):
     def __init__(self):
@@ -117,7 +123,7 @@ class SequenceGeneratorWidget(QWidget):
     def create_muscle_groups_section(self):
         #Build muscle group checkboxes
         group = QGroupBox("Select Targeted Muscled Groups")
-        layout = QVBoxLayout()
+        layout = QGridLayout()
 
         #add each muscle checkbox to layout
         builder = SequenceBuilder()
@@ -129,7 +135,7 @@ class SequenceGeneratorWidget(QWidget):
         for muscle in muscle_groups:
             checkbox = QCheckBox(muscle)
             self.muscle_checkboxes.append(checkbox)  
-            layout.addWidget(checkbox)
+            layout.addWidget(checkbox, len(self.muscle_checkboxes) // 3, len(self.muscle_checkboxes) % 3)
         
         #store selected muscles
         selected_muscles = []
@@ -255,33 +261,29 @@ class SequenceGeneratorWidget(QWidget):
             main_window.favorites_widget.refresh_favorites()
         
     def generate_sequence(self):
-        from services.sequence_builder import SequenceBuilder, SequenceRequest
-        from utils.display_utils import format_for_internal
+        print("=== GENERATE SEQUENCE CALLED ===")
         
-        # Convert UI display values to internal format for processing
-        style = self.style_dropdown.currentText()  # "Vinyasa" 
+        # Get inputs
+        style = self.style_dropdown.currentText()
         duration = self.duration_slider.value()
         
         selected_muscles = []
         for checkbox in self.muscle_checkboxes:
             if checkbox.isChecked():
-                selected_muscles.append(checkbox.text())  # ["Core", "Arms"]
+                selected_muscles.append(checkbox.text())
         
-        # Generate sequence using new builder
-        builder = SequenceBuilder()
-        request = SequenceRequest(
-            style=style,
-            target_muscles=selected_muscles,
-            duration=duration
-        )
+        print(f"Style: {style}")
+        print(f"Duration: {duration}")
+        print(f"Selected muscles: {selected_muscles}")
         
-        result = builder.generate_sequence(request)
-        
-        # Convert to format expected by existing show_results method
-        ui_result = {
-            'sequences': result.sequences,
-            'duration': result.total_duration,
-            'muscles': result.muscles_covered  # Already in display format
-        }
-        
-        self.show_results(ui_result)  
+        from services.build_sequence import generate_yoga_class
+    
+        try:
+            result = generate_yoga_class(style, selected_muscles, duration)
+            self.show_results(result)
+            
+        except Exception as e:
+            print(f"❌ Error generating sequence: {e}")
+            import traceback
+            traceback.print_exc()
+     

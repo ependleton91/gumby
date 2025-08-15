@@ -60,56 +60,56 @@ def filter_flows_by_criteria(flows: List[Dict[str, Any]], criteria: Dict[str, An
     filtered_flows = []
     
     for flow in flows:
-        matches_all_criteria = True
+        matches_category_criteria = True
+        matches_energy_criteria = True
+        matches_muscle_criteria = True
+        matches_tags_criteria = True
         
         # Check style matching
         if "style" in criteria:
             flow_styles = flow.get("style", [])
             required_styles = criteria["style"]
             if not any(style in flow_styles for style in required_styles):
-                matches_all_criteria = False
-                continue
-        
-        # Check difficulty range
-        if "difficulty_min" in criteria:
-            if flow.get("difficulty", 0) < criteria["difficulty_min"]:
-                matches_all_criteria = False
-                continue
-                
-        if "difficulty_max" in criteria:
-            if flow.get("difficulty", 5) > criteria["difficulty_max"]:
-                matches_all_criteria = False
+                matches_style_criteria = False
                 continue
         
         # Check category matching
         if "category" in criteria:
             if flow.get("category") not in criteria["category"]:
-                matches_all_criteria = False
+                matches_category_criteria = False
                 continue
+            else:
+                matches_category_criteria = True
         
         # Check energy level matching
         if "energy_level" in criteria:
             if flow.get("energy_level") not in criteria["energy_level"]:
-                matches_all_criteria = False
+                matches_energy_criteria = False
                 continue
+            else:
+                matches_energy_criteria = True
         
         # Check muscle group overlap
-        if "muscle_groups" in criteria:
+        if "muscle_groups" in criteria and criteria["muscle_groups"]:  # Add the second condition
             flow_muscles = flow.get("muscle_groups", [])
             required_muscles = criteria["muscle_groups"]
             if not any(muscle in flow_muscles for muscle in required_muscles):
-                matches_all_criteria = False
+                matches_muscle_criteria = False
                 continue
+            else:
+                matches_muscle_criteria = True
         
         # Check tags overlap
         if "tags" in criteria:
             flow_tags = flow.get("tags", [])
             required_tags = criteria["tags"]
             if not any(tag in flow_tags for tag in required_tags):
-                matches_all_criteria = False
+                matches_tags_criteria = False
                 continue
+            else:
+                matches_tags_criteria = True
         
-        if matches_all_criteria:
+        if matches_category_criteria or matches_energy_criteria or matches_muscle_criteria or matches_tags_criteria:
             filtered_flows.append(flow)
     
     return filtered_flows
@@ -166,32 +166,24 @@ def calculate_flow_compatibility_score(flow: Dict[str, Any], criteria: Dict[str,
         if target_duration > 0:
             duration_ratio = min(flow_duration / target_duration, target_duration / flow_duration)
             score += duration_ratio * 0.1  # 10% weight
-        max_score += 0.1
+        max_score += 0.5
     
     return score / max_score if max_score > 0 else 0.0
 
 
 def select_best_flows_for_time(flows: List[Dict[str, Any]], target_time: float, 
                               tolerance: float = 0.1) -> List[Dict[str, Any]]:
-    """Select combination of flows that best fits target time.
+    """Select combination of flows that best fits target time."""
+    print(f"\n🎯 select_best_flows_for_time: target={target_time}, tolerance={tolerance}")
+    print(f"Available flows: {[f.get('name') + f' ({f.get('duration')}min)' for f in flows]}")
     
-    Args:
-        flows: Available flows to choose from
-        target_time: Target total duration in minutes
-        tolerance: Acceptable deviation from target (as percentage)
-        
-    Returns:
-        List of selected flows that best fit the time requirement
-        
-    Example:
-        select_best_flows_for_time(flows, 15.0, 0.1)
-        # Returns flows totaling ~15 minutes ±10%
-    """
     if not flows:
+        print("❌ No flows provided")
         return []
     
     min_time = target_time * (1 - tolerance)
     max_time = target_time * (1 + tolerance)
+    print(f"Time range: {min_time:.1f} - {max_time:.1f} minutes")
     
     # Sort flows by duration for easier selection
     sorted_flows = sorted(flows, key=lambda f: f.get("duration", 0))
@@ -261,36 +253,19 @@ def get_available_styles() -> List[str]:
     Returns:
         Sorted list of available style names
     """
-    sequences_data = safe_load_json(SEQUENCES_FILE, {"class_structure_templates": {}})
+    sequences_data = safe_load_json(FLOWS_FILE, {"flowing_sequences": {}})
     return sorted(sequences_data.get("class_structure_templates", {}).keys())
 
 
 def calculate_section_durations(total_duration: float, template: Dict[str, Any]) -> Dict[str, float]:
-    """Calculate duration for each class section based on template percentages.
+    """Calculate duration for each class section based on template percentages."""
     
-    Args:
-        total_duration: Total class duration in minutes
-        template: Class template with structure and ratios
-        
-    Returns:
-        Dictionary mapping section names to durations
-        
-    Example:
-        template = {"structure": ["warm_up", "main_flow", "cool_down"], 
-                   "ratios": [0.2, 0.6, 0.2]}
-        calculate_section_durations(60, template)
-        # Returns: {"warm_up": 12.0, "main_flow": 36.0, "cool_down": 12.0}
-    """
-    structure = template.get("structure", [])
-    ratios = template.get("ratios", [])
-    
-    if len(structure) != len(ratios):
-        logger.warning(f"Structure and ratios length mismatch: {len(structure)} vs {len(ratios)}")
-        return {}
-    
-    section_durations = {}
-    for section, ratio in zip(structure, ratios):
-        section_durations[section] = total_duration * ratio
+    # Your templates use individual percentage fields, not structure/ratios
+    section_durations = {
+        "warm_up": total_duration * template.get("warm_up_percentage", 0.25),
+        "main_flow": total_duration * template.get("main_flow_percentage", 0.5), 
+        "cool_down": total_duration * template.get("cool_down_percentage", 0.25)
+    }
     
     return section_durations
 
@@ -321,17 +296,14 @@ def group_flows_by_category(flows: List[Dict[str, Any]]) -> Dict[str, List[Dict[
 
 def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Main function to select flows for a complete yoga sequence.
-    
     Args:
         user_preferences: Dictionary with user's requirements
             - duration: Total class duration in minutes
             - style: Yoga style (vinyasa, hatha, yin)
             - muscle_groups: List of target muscle groups
-            - difficulty: Preferred difficulty level (1-5)
-            
+            - difficulty: Preferred difficulty level (1-5) 
     Returns:
         List of selected flows forming a complete sequence
-        
     Example:
         preferences = {
             "duration": 60,
@@ -368,10 +340,14 @@ def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str
     }
     
     suitable_flows = filter_flows_by_criteria(all_flows, filter_criteria)
-    
-    if not suitable_flows:
-        logger.warning("No flows match the specified criteria")
-        return []
+
+    print(f"❗ Filtering result: {len(suitable_flows)} flows")
+
+    # Group flows by category
+    flows_by_category = group_flows_by_category(suitable_flows)
+    print(f"🔍 Grouped by category: {list(flows_by_category.keys())}")
+    for category, flows in flows_by_category.items():
+        print(f"  {category}: {len(flows)} flows")
     
     # Group flows by category
     flows_by_category = group_flows_by_category(suitable_flows)
@@ -383,7 +359,7 @@ def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str
         # Map section names to flow categories
         category_mapping = {
             "warm_up": "warm_up",
-            "main_flow": ["standing_flow", "seated_flow", "hip_opener", "backbend_flow"],
+            "main_flow": ["standing_flow", "seated_flow", "hip_opener", "backbend_flow","main_flow","energizing_flow","therapeutic","arm_balance","twist_flow","inversion",],
             "cool_down": "cool_down"
         }
         
@@ -398,7 +374,7 @@ def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str
         
         if section_flows:
             # Select best flows for this section's time allocation
-            section_selected = select_best_flows_for_time(section_flows, section_duration)
+            section_selected = select_best_flows_for_time(section_flows, section_duration, tolerance=0.5)  # 50% tolerance instead of 10%
             selected_flows.extend(section_selected)
         else:
             logger.warning(f"No flows available for section: {section_name}")
@@ -408,20 +384,6 @@ def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str
 
 
 def validate_sequence_structure(flows: List[Dict[str, Any]], template: Dict[str, Any]) -> Tuple[bool, List[str]]:
-    """Validate that a sequence follows proper class structure.
-    
-    Args:
-        flows: List of flows in the sequence
-        template: Class template with required structure
-        
-    Returns:
-        Tuple of (is_valid, list_of_issues)
-        
-    Example:
-        valid, issues = validate_sequence_structure(flows, template)
-        if not valid:
-            print("Issues found:", issues)
-    """
     issues = []
     
     if not flows:

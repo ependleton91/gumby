@@ -18,7 +18,6 @@ app = QApplication.instance()
 if app is None:
     app = QApplication([])
 
-# Import only the functions that actually exist
 from utils.file_utils import (
     safe_load_json, safe_save_json, ensure_directory_exists,
     create_backup_file, load_flows_data, load_poses_data
@@ -217,7 +216,7 @@ class TestValidationUtils:
         """Test empty muscle groups."""
         valid, error, muscles = validate_muscle_groups([])
         assert not valid
-        assert "at least one" in error
+        assert "At least one" in error
     
     def test_validate_sequence_name_valid(self):
         """Test valid sequence name."""

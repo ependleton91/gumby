@@ -16,7 +16,7 @@
         {"name": "Mountain Pose", "duration": 0.25, "type": "closing"}
       ],
       "category": "warm_up",
-      "style": ["vinyasa", "hatha"],
+      "style": ["vinyasa", "hatha","yin"],
       "muscle_groups": ["full_body", "arms", "back"],
       "difficulty": 2,
       "energy_level": "building"
@@ -126,6 +126,280 @@
       "muscle_groups": ["full_body"],
       "difficulty": 1,
       "energy_level": "deeply_relaxing"
+    },
+    "sun_salutation_b_flow": {
+      "name": "Sun Salutation B Flow",
+      "duration": 6,
+      "tags": [],
+      "flow": [
+        {"name": "Mountain Pose", "duration": 0.3, "type": "setup"},
+        {"name": "Chair Pose", "duration": 0.5, "type": "main"},
+        {"name": "Forward Fold", "duration": 0.4, "type": "main"},
+        {"name": "Halfway Lift", "duration": 0.25, "type": "main"},
+        {"name": "Low Push-Up", "duration": 0.25, "type": "main"},
+        {"name": "Upward Dog", "duration": 0.3, "type": "main"},
+        {"name": "Downward Dog", "duration": 0.5, "type": "main"},
+        {"name": "Warrior I Right", "duration": 0.75, "type": "right_side"},
+        {"name": "Low Push-Up", "duration": 0.25, "type": "transition"},
+        {"name": "Upward Dog", "duration": 0.3, "type": "transition"},
+        {"name": "Downward Dog", "duration": 0.5, "type": "transition"},
+        {"name": "Warrior I Left", "duration": 0.75, "type": "left_side"},
+        {"name": "Low Push-Up", "duration": 0.25, "type": "transition"},
+        {"name": "Upward Dog", "duration": 0.3, "type": "transition"},
+        {"name": "Downward Dog", "duration": 0.5, "type": "transition"},
+        {"name": "Forward Fold", "duration": 0.4, "type": "main"},
+        {"name": "Chair Pose", "duration": 0.5, "type": "main"},
+        {"name": "Mountain Pose", "duration": 0.3, "type": "closing"}
+      ],
+      "category": "warm_up",
+      "style": ["vinyasa", "ashtanga"],
+      "muscle_groups": ["full_body", "legs", "arms"],
+      "difficulty": 3,
+      "energy_level": "building"
+    },
+    "triangle_sequence": {
+      "name": "Triangle Sequence",
+      "duration": 7,
+      "tags": [],
+      "flow": [
+        {"name": "Mountain Pose", "duration": 0.5, "type": "setup"},
+        {"name": "Wide Legged Forward Fold", "duration": 0.75, "type": "preparation"},
+        {"name": "Triangle Pose Right", "duration": 1.5, "type": "right_side"},
+        {"name": "Wide Legged Forward Fold", "duration": 0.5, "type": "transition"},
+        {"name": "Triangle Pose Left", "duration": 1.5, "type": "left_side"},
+        {"name": "Wide Legged Forward Fold", "duration": 0.5, "type": "transition"},
+        {"name": "Revolved Triangle Right", "duration": 1.0, "type": "right_side"},
+        {"name": "Revolved Triangle Left", "duration": 1.0, "type": "left_side"},
+        {"name": "Mountain Pose", "duration": 0.25, "type": "closing"}
+      ],
+      "category": "standing_flow",
+      "style": ["hatha", "vinyasa"],
+      "muscle_groups": ["legs", "side_body", "core"],
+      "difficulty": 3,
+      "energy_level": "peak"
+    },
+    "balance_flow": {
+      "name": "Balance Flow",
+      "duration": 5,
+      "tags": [],
+      "flow": [
+        {"name": "Mountain Pose", "duration": 0.5, "type": "setup"},
+        {"name": "Tree Pose Right", "duration": 1, "type": "right_side"},
+        {"name": "Tree Pose Left", "duration": 1, "type": "left_side"},
+        {"name": "Eagle Pose Right", "duration": 0.75, "type": "right_side"},
+        {"name": "Eagle Pose Left", "duration": 0.75, "type": "left_side"},
+        {"name": "Dancer Pose Right", "duration": 0.5, "type": "right_side"},
+        {"name": "Dancer Pose Left", "duration": 0.5, "type": "left_side"}
+      ],
+      "category": "standing_flow",
+      "style": ["hatha", "vinyasa"],
+      "muscle_groups": ["legs", "core", "balance"],
+      "difficulty": 3,
+      "energy_level": "building"
+    },
+    "core_strengthening_flow": {
+      "name": "Core Strengthening Flow",
+      "duration": 4,
+      "tags": [],
+      "flow": [
+        {"name": "Plank Pose", "duration": 0.75, "type": "main"},
+        {"name": "Boat Pose", "duration": 0.75, "type": "main"},
+        {"name": "Bicycle Pose", "duration": 0.5, "type": "main"},
+        {"name": "Side Plank Right", "duration": 0.5, "type": "right_side"},
+        {"name": "Side Plank Left", "duration": 0.5, "type": "left_side"},
+        {"name": "Hollow Body Hold", "duration": 0.5, "type": "main"},
+        {"name": "Knees to Chest", "duration": 0.5, "type": "counter"}
+      ],
+      "category": "main_flow",
+      "style": ["power", "vinyasa"],
+      "muscle_groups": ["core", "abs"],
+      "difficulty": 4,
+      "energy_level": "peak"
+    },
+    "heart_opening_sequence": {
+      "name": "Heart Opening Sequence",
+      "duration": 8,
+      "tags": [],
+      "flow": [
+        {"name": "Cat-Cow Stretches", "duration": 1, "type": "preparation"},
+        {"name": "Low Cobra", "duration": 0.75, "type": "preparation"},
+        {"name": "Cobra Pose", "duration": 1, "type": "main"},
+        {"name": "Child's Pose", "duration": 0.5, "type": "counter"},
+        {"name": "Camel Pose", "duration": 1.25, "type": "main"},
+        {"name": "Child's Pose", "duration": 0.75, "type": "counter"},
+        {"name": "Bridge Pose", "duration": 1, "type": "main"},
+        {"name": "Fish Pose", "duration": 1, "type": "main"},
+        {"name": "Supine Spinal Twist", "duration": 0.75, "type": "closing"}
+      ],
+      "category": "backbend_flow",
+      "style": ["hatha", "vinyasa"],
+      "muscle_groups": ["chest", "shoulders", "back"],
+      "difficulty": 3,
+      "energy_level": "energizing"
+    },
+    "morning_energizer_flow": {
+      "name": "Morning Energizer Flow",
+      "duration": 6,
+      "tags": [],
+      "flow": [
+        {"name": "Child's Pose", "duration": 0.5, "type": "setup"},
+        {"name": "Cat-Cow Stretches", "duration": 0.75, "type": "preparation"},
+        {"name": "Downward Dog", "duration": 0.5, "type": "preparation"},
+        {"name": "Standing Forward Fold", "duration": 0.5, "type": "main"},
+        {"name": "Chair Pose", "duration": 0.75, "type": "main"},
+        {"name": "Warrior I Right", "duration": 0.75, "type": "right_side"},
+        {"name": "Warrior I Left", "duration": 0.75, "type": "left_side"},
+        {"name": "Tree Pose Right", "duration": 0.5, "type": "right_side"},
+        {"name": "Tree Pose Left", "duration": 0.5, "type": "left_side"},
+        {"name": "Mountain Pose", "duration": 0.5, "type": "closing"}
+      ],
+      "category": "energizing_flow",
+      "style": ["vinyasa", "hatha"],
+      "muscle_groups": ["full_body", "legs", "core"],
+      "difficulty": 2,
+      "energy_level": "energizing"
+    },
+    "yin_flow_hips": {
+      "name": "Yin Flow for Hips",
+      "duration": 12,
+      "tags": [],
+      "flow": [
+        {"name": "Child's Pose", "duration": 2, "type": "setup"},
+        {"name": "Butterfly Pose", "duration": 3, "type": "main"},
+        {"name": "Dragon Pose Right", "duration": 2.5, "type": "right_side"},
+        {"name": "Dragon Pose Left", "duration": 2.5, "type": "left_side"},
+        {"name": "Supported Fish Pose", "duration": 2, "type": "main"}
+      ],
+      "category": "hip_opener",
+      "style": ["yin"],
+      "muscle_groups": ["hips", "back", "chest"],
+      "difficulty": 1,
+      "energy_level": "deeply_relaxing"
+    },
+    "power_flow_sequence": {
+      "name": "Power Flow Sequence",
+      "duration": 7,
+      "tags": [],
+      "flow": [
+        {"name": "Mountain Pose", "duration": 0.25, "type": "setup"},
+        {"name": "Chair Pose", "duration": 0.5, "type": "main"},
+        {"name": "Eagle Pose Right", "duration": 0.5, "type": "right_side"},
+        {"name": "Eagle Pose Left", "duration": 0.5, "type": "left_side"},
+        {"name": "Warrior III Right", "duration": 0.75, "type": "right_side"},
+        {"name": "Warrior III Left", "duration": 0.75, "type": "left_side"},
+        {"name": "Crow Pose", "duration": 0.5, "type": "peak"},
+        {"name": "Plank Pose", "duration": 0.75, "type": "main"},
+        {"name": "Side Plank Right", "duration": 0.5, "type": "right_side"},
+        {"name": "Side Plank Left", "duration": 0.5, "type": "left_side"},
+        {"name": "Child's Pose", "duration": 1.5, "type": "closing"}
+      ],
+      "category": "main_flow",
+      "style": ["power", "vinyasa"],
+      "muscle_groups": ["full_body", "core", "arms"],
+      "difficulty": 4,
+      "energy_level": "peak"
+    },
+    "therapeutic_back_sequence": {
+      "name": "Therapeutic Back Sequence",
+      "duration": 10,
+      "tags": [],
+      "flow": [
+        {"name": "Knees to Chest", "duration": 1.5, "type": "setup"},
+        {"name": "Happy Baby Pose", "duration": 2, "type": "main"},
+        {"name": "Supine Spinal Twist Right", "duration": 2, "type": "right_side"},
+        {"name": "Supine Spinal Twist Left", "duration": 2, "type": "left_side"},
+        {"name": "Bridge Pose", "duration": 1, "type": "main"},
+        {"name": "Legs Up Wall", "duration": 1.5, "type": "closing"}
+      ],
+      "category": "therapeutic",
+      "style": ["yin", "hatha"],
+      "muscle_groups": ["back", "hips"],
+      "difficulty": 1,
+      "energy_level": "releasing"
+    },
+    "arm_balance_flow": {
+      "name": "Arm Balance Flow",
+      "duration": 5,
+      "tags": [],
+      "flow": [
+        {"name": "Plank Pose", "duration": 0.75, "type": "preparation"},
+        {"name": "Low Push-Up", "duration": 0.5, "type": "preparation"},
+        {"name": "Crow Pose", "duration": 1, "type": "main"},
+        {"name": "Child's Pose", "duration": 0.5, "type": "counter"},
+        {"name": "Side Crow Right", "duration": 0.75, "type": "right_side"},
+        {"name": "Side Crow Left", "duration": 0.75, "type": "left_side"},
+        {"name": "Child's Pose", "duration": 0.75, "type": "closing"}
+      ],
+      "category": "arm_balance",
+      "style": ["power", "vinyasa"],
+      "muscle_groups": ["arms", "core", "shoulders"],
+      "difficulty": 4,
+      "energy_level": "peak"
+    },
+    "twisting_flow": {
+      "name": "Twisting Flow",
+      "duration": 6,
+      "tags": [],
+      "flow": [
+        {"name": "Easy Pose", "duration": 0.5, "type": "setup"},
+        {"name": "Seated Spinal Twist Right", "duration": 1, "type": "right_side"},
+        {"name": "Seated Spinal Twist Left", "duration": 1, "type": "left_side"},
+        {"name": "Revolved Triangle Right", "duration": 1, "type": "right_side"},
+        {"name": "Revolved Triangle Left", "duration": 1, "type": "left_side"},
+        {"name": "Supine Spinal Twist Right", "duration": 0.75, "type": "right_side"},
+        {"name": "Supine Spinal Twist Left", "duration": 0.75, "type": "left_side"}
+      ],
+      "category": "twist_flow",
+      "style": ["hatha", "vinyasa","yin"],
+      "muscle_groups": ["spine", "core", "back"],
+      "difficulty": 2,
+      "energy_level": "releasing"
+    },
+    "inversion_flow": {
+      "name": "Inversion Flow",
+      "duration": 7,
+      "tags": [],
+      "flow": [
+        {"name": "Downward Dog", "duration": 1, "type": "preparation"},
+        {"name": "Dolphin Pose", "duration": 0.75, "type": "preparation"},
+        {"name": "Headstand Prep", "duration": 1.5, "type": "main"},
+        {"name": "Child's Pose", "duration": 1, "type": "counter"},
+        {"name": "Shoulder Stand", "duration": 2, "type": "main"},
+        {"name": "Fish Pose", "duration": 0.75, "type": "counter"}
+      ],
+      "category": "inversion",
+      "style": ["hatha", "vinyasa"],
+      "muscle_groups": ["shoulders", "core", "neck"],
+      "difficulty": 4,
+      "energy_level": "peak"
+    },
+    "flowing_vinyasa": {
+      "name": "Flowing Vinyasa",
+      "duration": 8,
+      "tags": [],
+      "flow": [
+        {"name": "Mountain Pose", "duration": 0.25, "type": "setup"},
+        {"name": "Forward Fold", "duration": 0.5, "type": "main"},
+        {"name": "Halfway Lift", "duration": 0.25, "type": "main"},
+        {"name": "Low Push-Up", "duration": 0.25, "type": "main"},
+        {"name": "Upward Dog", "duration": 0.25, "type": "main"},
+        {"name": "Downward Dog", "duration": 1, "type": "main"},
+        {"name": "Warrior I Right", "duration": 1, "type": "right_side"},
+        {"name": "Low Push-Up", "duration": 0.25, "type": "transition"},
+        {"name": "Upward Dog", "duration": 0.25, "type": "transition"},
+        {"name": "Downward Dog", "duration": 0.5, "type": "transition"},
+        {"name": "Warrior I Left", "duration": 1, "type": "left_side"},
+        {"name": "Low Push-Up", "duration": 0.25, "type": "transition"},
+        {"name": "Upward Dog", "duration": 0.25, "type": "transition"},
+        {"name": "Downward Dog", "duration": 0.5, "type": "transition"},
+        {"name": "Forward Fold", "duration": 0.5, "type": "main"},
+        {"name": "Mountain Pose", "duration": 1, "type": "closing"}
+      ],
+      "category": "main_flow",
+      "style": ["vinyasa"],
+      "muscle_groups": ["full_body", "arms", "legs"],
+      "difficulty": 3,
+      "energy_level": "peak"
     }
   }
 }

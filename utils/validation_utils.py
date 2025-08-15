@@ -136,7 +136,7 @@ def validate_muscle_groups(muscle_list: List[str]) -> Tuple[bool, str]:
     }
     
     if not muscle_list:
-        return False, "At least one muscle group must be selected"
+        return False, "At least one muscle group must be selected",""
     
     # Check for empty or invalid entries
     cleaned_muscles = []
@@ -293,4 +293,4 @@ def validate_new_pose_data(pose_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     if not muscles_valid:
         errors.append(f"Muscle groups: {muscles_error}")
     
-    return len(errors) == 0, errors
+    return len(errors) == 0, errors, muscles
