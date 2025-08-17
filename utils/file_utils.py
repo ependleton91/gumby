@@ -250,3 +250,112 @@ def save_favorites_data(data: Dict[str, Any]) -> bool:
     """Save favorites data."""
     from config import FAVORITES_FILE
     return safe_save_json(FAVORITES_FILE, data)
+
+
+# Add to the end of utils/file_utils.py
+
+def update_favorites_after_pose_change(original_name: str, new_name: str, new_pose_data: Dict[str, Any]) -> bool:
+    """Update any favorited content that contains the changed pose."""
+    favorites_data = load_favorites_data()
+    favorites_updated = False
+    
+    for favorite in favorites_data.get("favorites", []):
+        # Check if this favorite has flows that contain the updated pose
+        if "flow" in favorite:
+            for pose in favorite["flow"]:
+                if pose.get("name") == original_name:
+                    pose["name"] = new_name
+                    favorites_updated = True
+                    logger.info(f"Updated pose '{original_name}' to '{new_name}' in favorite '{favorite.get('name', 'Unknown')}'")
+        
+        # If this favorite IS the pose itself
+        elif favorite.get("type") == "pose" and favorite.get("name") == original_name:
+            favorite["name"] = new_name
+            for key, value in new_pose_data.items():
+                if key != "image_filename":
+                    favorite[key] = value
+            favorites_updated = True
+            logger.info(f"Updated favorited pose '{original_name}' to '{new_name}'")
+    
+    if favorites_updated:
+        return save_favorites_data(favorites_data)
+    return True
+
+
+def update_favorites_after_flow_change(original_name: str, new_flow_data: Dict[str, Any]) -> bool:
+    """Update any favorited content that contains the changed flow."""
+    favorites_data = load_favorites_data()
+    favorites_updated = False
+    
+    for favorite in favorites_data.get("favorites", []):
+        if favorite.get("name") == original_name and favorite.get("type") == "flow":
+            for key, value in new_flow_data.items():
+                favorite[key] = value
+            favorites_updated = True
+            logger.info(f"Updated favorited flow '{original_name}'")
+            break
+        
+        elif "flows" in favorite:
+            for i, flow_ref in enumerate(favorite["flows"]):
+                if flow_ref.get("name") == original_name:
+                    favorite["flows"][i] = new_flow_data.copy()
+                    favorites_updated = True
+                    logger.info(f"Updated flow '{original_name}' in favorite sequence '{favorite.get('name', 'Unknown')}'")
+    
+    if favorites_updated:
+        return save_favorites_data(favorites_data)
+    return True
+
+
+def remove_pose_from_favorites(pose_name: str) -> bool:
+    """Remove a deleted pose from all favorites."""
+    favorites_data = load_favorites_data()
+    favorites_updated = False
+    
+    # Remove pose from sequences
+    for favorite in favorites_data.get("favorites", []):
+        if "flow" in favorite:
+            original_count = len(favorite["flow"])
+            favorite["flow"] = [pose for pose in favorite["flow"] if pose.get("name") != pose_name]
+            if len(favorite["flow"]) < original_count:
+                favorites_updated = True
+    
+    # Remove direct pose favorites
+    original_count = len(favorites_data.get("favorites", []))
+    favorites_data["favorites"] = [
+        fav for fav in favorites_data.get("favorites", [])
+        if not (fav.get("type") == "pose" and fav.get("name") == pose_name)
+    ]
+    if len(favorites_data["favorites"]) < original_count:
+        favorites_updated = True
+    
+    if favorites_updated:
+        return save_favorites_data(favorites_data)
+    return True
+
+
+def remove_flow_from_favorites(flow_name: str) -> bool:
+    """Remove a deleted flow from all favorites."""
+    favorites_data = load_favorites_data()
+    favorites_updated = False
+    
+    # Remove flow from custom sequences
+    for favorite in favorites_data.get("favorites", []):
+        if "flows" in favorite:
+            original_count = len(favorite["flows"])
+            favorite["flows"] = [flow for flow in favorite["flows"] if flow.get("name") != flow_name]
+            if len(favorite["flows"]) < original_count:
+                favorites_updated = True
+    
+    # Remove direct flow favorites
+    original_count = len(favorites_data.get("favorites", []))
+    favorites_data["favorites"] = [
+        fav for fav in favorites_data.get("favorites", [])
+        if not (fav.get("type") == "flow" and fav.get("name") == flow_name)
+    ]
+    if len(favorites_data["favorites"]) < original_count:
+        favorites_updated = True
+    
+    if favorites_updated:
+        return save_favorites_data(favorites_data)
+    return True

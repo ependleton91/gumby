@@ -6,7 +6,7 @@ from utils.ui_utils import show_error_message,show_save_success,show_pose_valida
 from utils.image_utils import load_pose_image, scale_image_for_display
 from utils.validation_utils import validate_new_pose_data,validate_sequence_data
 from config import POSES_IMAGE_DIR
-from utils.file_utils import load_flows_data, load_poses_data,save_poses_data, save_flows_data
+from utils.file_utils import load_flows_data, load_poses_data,save_poses_data, save_flows_data,update_favorites_after_pose_change, update_favorites_after_flow_change
 #The all poses page has two tabs: one for poses and one for flows.
 #Each tab has a header with a title and buttons to add new poses or flows.
 #The poses tab displays a grid of pose cards, each with an image, name, and edit button.
@@ -24,7 +24,6 @@ class PosesWidget(QWidget):
         self.pose_cards = {}
         self.flow_cards={}
         tab_widget = QTabWidget()
-        self.load_pose_images() 
         tab_widget.addTab(self.Poses_Tab(),"POSES")
         tab_widget.addTab(self.flow_tab(),"FLOWS")
 
@@ -33,6 +32,8 @@ class PosesWidget(QWidget):
         main_layout.addWidget(tab_widget)
         self.setLayout(main_layout)
         self.setWindowTitle(f"TITLE")
+        self.load_pose_images() 
+
         
     def Poses_Tab(self):
         poses_cards_layout = self.create_poses_grid()
@@ -331,6 +332,14 @@ class PosesWidget(QWidget):
         else:
             show_save_success(self, "Pose changes")
 
+        favorites_success = update_favorites_after_pose_change(original_name, new_name, new_data)
+        if not favorites_success:
+            show_error_message(self, "Warning", "Pose updated but failed to update some favorites.")
+
+
+        from utils.image_utils import clear_image_cache
+        clear_image_cache()
+
         # Update UI
         if found_pose_key:
             self.update_pose_grid()
@@ -347,10 +356,19 @@ class PosesWidget(QWidget):
         new_scroll_content = QWidget()
         new_scroll_content.setLayout(new_grid)
         
-        # Replace the content in existing scroll area
-        self.poses_scroll_area.setWidget(new_scroll_content)
-        self.load_pose_images()
-
+        # Find the poses tab and its scroll area
+        tab_widget = self.findChild(QTabWidget)
+        if tab_widget:
+            poses_tab = tab_widget.widget(0)  # First tab is poses
+            if poses_tab:
+                scroll_area = poses_tab.findChild(QScrollArea)
+                if scroll_area:
+                    scroll_area.setWidget(new_scroll_content)
+                    self.load_pose_images()
+                    return
+        
+        # Fallback - this shouldn't happen but prevents crashes
+        print("Warning: Could not find poses scroll area for update")
     def add_pose_button_clicked(self):
         #Add a new pose dialog
         default_pose_info = {}
@@ -461,9 +479,9 @@ class PosesWidget(QWidget):
         new_data["tags"] = original_flow_info.get("tags", [])  # Keep existing tags
         
         # Validate the data
-        valid, errors = validate_sequence_data(new_data)
+        valid, error = validate_sequence_data(new_data)
         if not valid:
-            show_pose_validation_errors(self, errors)
+            show_pose_validation_errors(self, [error])
             return
         
         # Convert data types
@@ -500,6 +518,11 @@ class PosesWidget(QWidget):
         if save_flows_data(flows_data):
             show_save_success(self, "Flow changes", new_data["name"])
             self.update_flows_list()
+
+            favorites_success = update_favorites_after_flow_change(original_name, new_data)
+            if not favorites_success:
+                show_error_message(self, "Warning", "Flow updated but failed to update some favorites.")
+     
         else:
             show_error_message(self, "Save Failed", "Failed to save flow changes. Please try again.")
 
@@ -534,9 +557,9 @@ class PosesWidget(QWidget):
             return
         
         # Validate the data
-        valid, errors = validate_sequence_data(new_data)
+        valid, error = validate_sequence_data(new_data)
         if not valid:
-            show_pose_validation_errors(self, errors)
+            show_pose_validation_errors(self, [error])  # ← Wrap in list
             return
         
         # Convert data types and calculate duration

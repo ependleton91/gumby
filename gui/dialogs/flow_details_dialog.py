@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QDialog, QListWidget,QLineEdit,QHBoxLayout,QComboBox, QCheckBox, QGroupBox, QPushButton, QFormLayout, QLabel, QScrollArea, QWidget, QVBoxLayout
+from PyQt6.QtWidgets import QDialog, QGridLayout,QListWidget,QLineEdit,QHBoxLayout,QComboBox, QCheckBox, QGroupBox, QPushButton, QFormLayout, QLabel, QScrollArea, QWidget, QVBoxLayout
 from PyQt6.QtCore import Qt
 from utils.file_utils import load_flows_data,load_poses_data
 
@@ -13,7 +13,7 @@ class flow_details_box(QDialog):
         self.muscle_checkboxes = []
         self.scroll_offset = 0
         
-        self.resize(600, 800)
+        self.resize(800,800)
         
         # Set window title
         if edit_mode:
@@ -88,19 +88,26 @@ class flow_details_box(QDialog):
     
     def create_muscle_checkboxes(self):
         group_box = QGroupBox("Muscle Groups")
-        layout = QVBoxLayout()
+        
+        # Use QGridLayout instead of QVBoxLayout for 4-column grid
+        layout = QGridLayout()
+        layout.setSpacing(5)  # Tighter spacing
         
         # Load unique muscle groups from flows file
         muscle_groups = self.get_unique_muscles()
         
-        for muscle in muscle_groups:
+        # Calculate grid positions for 4 columns
+        for index, muscle in enumerate(muscle_groups):
+            row = index // 4  # Integer division for row
+            column = index % 4  # Remainder for column
+            
             checkbox = QCheckBox(muscle)
             self.muscle_checkboxes.append(checkbox)
-            layout.addWidget(checkbox)
+            layout.addWidget(checkbox, row, column)
         
         group_box.setLayout(layout)
         return group_box
-    
+        
     def get_unique_muscles(self):
         try:
             flows_data = load_flows_data()
@@ -255,7 +262,7 @@ class flow_details_box(QDialog):
         
         # Editable list widget
         self.poses_list = QListWidget()
-        self.poses_list.setMaximumHeight(200)
+        self.poses_list.setMaximumHeight(400)
         self.poses_list.setDragDropMode(QListWidget.DragDropMode.InternalMove)  # Enable drag-drop reordering
         
         # Populate list
@@ -290,7 +297,24 @@ class flow_details_box(QDialog):
 
     def populate_poses_list(self):
         """Fill the list with current poses"""
+        if not hasattr(self, 'poses_list'):
+            return
+            
         self.poses_list.clear()
+        
+        # Initialize flow if it doesn't exist (for create mode)
+        if "flow" not in self.flow_info:
+            self.flow_info["flow"] = []
+        
+        # Only add placeholder if there are NO poses
+        if not self.flow_info["flow"]:  # If flow list is empty
+            self.poses_list.addItem("No poses yet - click 'Add Pose' to start")
+        else:
+            # Add actual poses
+            for i, pose in enumerate(self.flow_info["flow"]):
+                duration_text = f"{pose.get('duration', 0.5)} min"
+                list_item = f"{pose['name']} ({duration_text})"
+                self.poses_list.addItem(list_item)
         
         if not self.create_mode and "flow" in self.flow_info:
             for i, pose in enumerate(self.flow_info["flow"]):
@@ -308,6 +332,12 @@ class flow_details_box(QDialog):
         # Get available poses
         poses_data = load_poses_data()
         available_poses = list(poses_data.get("poses", {}).keys())
+        
+        if not available_poses:
+            from utils.ui_utils import show_error_message
+            show_error_message(self, "No Poses Available", "No poses found. Please add some poses first.")
+            return
+            
         pose_names = [poses_data["poses"][key]["name"] for key in available_poses]
         
         # Let user select a pose
@@ -322,20 +352,26 @@ class flow_details_box(QDialog):
             )
             
             if ok:
+                # Initialize flow if needed
+                if "flow" not in self.flow_info:
+                    self.flow_info["flow"] = []
+                
+                # Remove placeholder if this is the first real pose
+                if (self.poses_list.count() == 1 and 
+                    self.poses_list.item(0) and 
+                    "No poses yet" in self.poses_list.item(0).text()):
+                    self.poses_list.clear()
+                
                 # Add to the list display
                 list_item = f"{pose_name} ({duration} min)"
                 self.poses_list.addItem(list_item)
                 
-                # Update the flow_info data
-                if "flow" not in self.flow_info:
-                    self.flow_info["flow"] = []
-                
+                # Add to flow_info data
                 self.flow_info["flow"].append({
                     "name": pose_name,
                     "duration": duration,
-                    "type": "main"  # Default type
+                    "type": "main"
                 })
-
     def remove_pose_from_flow(self):
         """Remove selected pose from flow"""
         current_row = self.poses_list.currentRow()
@@ -346,6 +382,10 @@ class flow_details_box(QDialog):
             # Remove from flow_info data
             if "flow" in self.flow_info and current_row < len(self.flow_info["flow"]):
                 del self.flow_info["flow"][current_row]
+            
+            # If no poses left, add placeholder
+            if not self.flow_info.get("flow", []):
+                self.poses_list.addItem("No poses yet - click 'Add Pose' to start")
 
     def move_pose_up(self):
         """Move selected pose up in the list"""

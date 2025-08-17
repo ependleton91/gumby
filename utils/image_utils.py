@@ -119,7 +119,6 @@ def load_pose_image(pose_name: str, image_directory: Union[str, Path],
             fallback_path = image_directory / fallback_name
             pixmap = load_image_from_path(fallback_path)
             if not pixmap.isNull():
-                logger.info(f"Used fallback image {fallback_name} for {pose_name}")
                 break
     
     if pixmap.isNull():

@@ -5,7 +5,8 @@ from .file_utils import (
     ensure_directory_exists, create_backup_file, backup_corrupted_file,
     list_backup_files, cleanup_old_backups,
     load_flows_data, load_poses_data, load_favorites_data,
-    save_flows_data, save_poses_data, save_favorites_data
+    save_flows_data, save_poses_data, save_favorites_data, update_favorites_after_pose_change, update_favorites_after_flow_change,
+    remove_pose_from_favorites, remove_flow_from_favorites
 )
 
 from .image_utils import (
@@ -19,7 +20,7 @@ from .image_utils import (
 from .validation_utils import (
     validate_pose_name, validate_duration, validate_difficulty,
     validate_muscle_groups, validate_sequence_name, validate_yoga_style,
-    validate_sequence_data, validate_new_pose_data
+    validate_sequence_data, validate_new_pose_data, validate_favorites_integrity
 )
 
 from .ui_utils import (
@@ -63,7 +64,8 @@ __all__ = [
     'ensure_directory_exists', 'create_backup_file', 'backup_corrupted_file',
     'list_backup_files', 'cleanup_old_backups',
     'load_flows_data', 'load_poses_data', 'load_favorites_data',
-    'save_flows_data', 'save_poses_data', 'save_favorites_data',
+    'save_flows_data', 'save_poses_data', 'save_favorites_data','update_favorites_after_pose_change', 'update_favorites_after_flow_change',
+    'remove_pose_from_favorites', 'remove_flow_from_favorites'
     
     # Image operations  
     'ImageCache',
@@ -75,7 +77,7 @@ __all__ = [
     # Validation
     'validate_pose_name', 'validate_duration', 'validate_difficulty',
     'validate_muscle_groups', 'validate_sequence_name', 'validate_yoga_style',
-    'validate_sequence_data', 'validate_new_pose_data',
+    'validate_sequence_data', 'validate_new_pose_data', 'validate_favorites_integrity'
     
     # UI helpers
     'hide_widgets', 'show_widgets', 'enable_widgets', 'disable_widgets',

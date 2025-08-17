@@ -293,4 +293,52 @@ def validate_new_pose_data(pose_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     if not muscles_valid:
         errors.append(f"Muscle groups: {muscles_error}")
     
-    return len(errors) == 0, errors, muscles
+    return len(errors) == 0, errors
+
+# Add to the end of utils/validation_utils.py
+
+def validate_favorites_integrity() -> Tuple[bool, List[str]]:
+    """Check favorites for broken references to poses/flows.
+    
+    Returns:
+        Tuple of (is_valid, list_of_issues)
+    """
+    from utils.file_utils import load_favorites_data, load_poses_data, load_flows_data
+    
+    issues = []
+    favorites_data = load_favorites_data()
+    poses_data = load_poses_data()
+    flows_data = load_flows_data()
+    
+    # Get valid names
+    valid_pose_names = {pose["name"] for pose in poses_data.get("poses", {}).values()}
+    valid_flow_names = {flow["name"] for flow in flows_data.get("flowing_sequences", {}).values()}
+    
+    for i, favorite in enumerate(favorites_data.get("favorites", [])):
+        favorite_name = favorite.get("name", f"Favorite #{i+1}")
+        
+        # Check poses in flows
+        if "flow" in favorite:
+            for pose in favorite["flow"]:
+                pose_name = pose.get("name")
+                if pose_name and pose_name not in valid_pose_names:
+                    issues.append(f"Favorite '{favorite_name}' references non-existent pose: '{pose_name}'")
+        
+        # Check flows in custom sequences
+        if "flows" in favorite:
+            for flow in favorite["flows"]:
+                flow_name = flow.get("name")
+                if flow_name and flow_name not in valid_flow_names:
+                    issues.append(f"Favorite '{favorite_name}' references non-existent flow: '{flow_name}'")
+        
+        # Check direct favorites
+        if favorite.get("type") == "pose":
+            pose_name = favorite.get("name")
+            if pose_name and pose_name not in valid_pose_names:
+                issues.append(f"Favorited pose no longer exists: '{pose_name}'")
+        elif favorite.get("type") == "flow":
+            flow_name = favorite.get("name")
+            if flow_name and flow_name not in valid_flow_names:
+                issues.append(f"Favorited flow no longer exists: '{flow_name}'")
+    
+    return len(issues) == 0, issues

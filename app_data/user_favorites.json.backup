@@ -31,7 +31,7 @@
                 "type": "main"
               },
               {
-                "name": "Low Push-Up",
+                "name": "Chaturanga",
                 "duration": 0.25,
                 "type": "main"
               },
@@ -94,7 +94,7 @@
                 "type": "main"
               },
               {
-                "name": "Low Push-Up",
+                "name": "Chaturanga",
                 "duration": 0.25,
                 "type": "main"
               },
@@ -157,7 +157,7 @@
                 "type": "main"
               },
               {
-                "name": "Low Push-Up",
+                "name": "Chaturanga",
                 "duration": 0.25,
                 "type": "main"
               },
@@ -717,7 +717,7 @@
                 "type": "main"
               },
               {
-                "name": "Low Push-Up",
+                "name": "Chaturanga",
                 "duration": 0.25,
                 "type": "main"
               },
@@ -781,7 +781,7 @@
                 "type": "main"
               },
               {
-                "name": "Low Push-Up",
+                "name": "Chaturanga",
                 "duration": 0.25,
                 "type": "main"
               },
@@ -801,7 +801,7 @@
                 "type": "right_side"
               },
               {
-                "name": "Low Push-Up",
+                "name": "Chaturanga",
                 "duration": 0.25,
                 "type": "transition"
               },
@@ -821,7 +821,7 @@
                 "type": "left_side"
               },
               {
-                "name": "Low Push-Up",
+                "name": "Chaturanga",
                 "duration": 0.25,
                 "type": "transition"
               },
@@ -1215,7 +1215,7 @@
                 "type": "main"
               },
               {
-                "name": "Low Push-Up",
+                "name": "Chaturanga",
                 "duration": 0.25,
                 "type": "main"
               },

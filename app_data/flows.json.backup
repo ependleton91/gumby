@@ -2,7 +2,7 @@
   "flowing_sequences": {
     "sun_salutation_flow": {
       "name": "Sun Salutation Flow",
-      "duration": 2.9,
+      "duration": 3,
       "tags": [],
       "flow": [
         {
@@ -53,13 +53,14 @@
       ],
       "category": "warm_up",
       "style": [
-        "vinyasa"
+        "vinyasa",
+        "hatha",
+        "yin"
       ],
       "muscle_groups": [
-        "arms",
-        "back",
         "full_body",
-        "shoulders"
+        "arms",
+        "back"
       ],
       "difficulty": 2,
       "energy_level": "building"
