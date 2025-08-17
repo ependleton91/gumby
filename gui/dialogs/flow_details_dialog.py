@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QDialog, QGridLayout,QListWidget,QLineEdit,QHBoxLayout,QComboBox, QCheckBox, QGroupBox, QPushButton, QFormLayout, QLabel, QScrollArea, QWidget, QVBoxLayout
 from PyQt6.QtCore import Qt
 from utils.file_utils import load_flows_data,load_poses_data
+from utils.datetime_utils import format_duration_minutes
 
 class flow_details_box(QDialog):
     def __init__(self, flow_info, edit_mode=False, create_mode=False, flow_key=None, image_cache=None):
@@ -197,7 +198,7 @@ class flow_details_box(QDialog):
         else:
             # Populate with actual flow data
             self.name_field.setText(self.flow_info["name"])
-            self.duration_field.setText(str(self.flow_info["duration"]))
+            self.duration_field.setText(format_duration_minutes((self.flow_info["duration"])))
             self.difficulty_field.setText(str(self.flow_info["difficulty"]))
             
             # Handle style field (different for edit vs view mode)
@@ -262,7 +263,7 @@ class flow_details_box(QDialog):
         
         # Editable list widget
         self.poses_list = QListWidget()
-        self.poses_list.setMaximumHeight(400)
+        self.poses_list.setMinimumHeight(300)
         self.poses_list.setDragDropMode(QListWidget.DragDropMode.InternalMove)  # Enable drag-drop reordering
         
         # Populate list
@@ -274,8 +275,8 @@ class flow_details_box(QDialog):
             
             self.add_pose_btn = QPushButton("Add Pose")
             self.remove_pose_btn = QPushButton("Delete")
-            self.move_up_btn = QPushButton("^")
-            self.move_down_btn = QPushButton("v")
+            self.move_up_btn = QPushButton("Move Up")
+            self.move_down_btn = QPushButton("Move Down")
             
             buttons_layout.addWidget(self.add_pose_btn)
             buttons_layout.addWidget(self.remove_pose_btn)
@@ -312,13 +313,13 @@ class flow_details_box(QDialog):
         else:
             # Add actual poses
             for i, pose in enumerate(self.flow_info["flow"]):
-                duration_text = f"{pose.get('duration', 0.5)} min"
+                duration_text = format_duration_minutes(pose.get("duration", 0.5))
                 list_item = f"{pose['name']} ({duration_text})"
                 self.poses_list.addItem(list_item)
         
         if not self.create_mode and "flow" in self.flow_info:
             for i, pose in enumerate(self.flow_info["flow"]):
-                duration_text = f"{pose.get('duration', 0.5)} min"
+                duration_text = format_duration_minutes(pose.get("duration", 0.5))
                 list_item = f"{pose['name']} ({duration_text})"
                 self.poses_list.addItem(list_item)
         

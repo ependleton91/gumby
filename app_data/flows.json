@@ -7,7 +7,7 @@
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.3,
+          "duration": 0.15,
           "type": "setup"
         },
         {
@@ -17,12 +17,12 @@
         },
         {
           "name": "Forward Fold",
-          "duration": 0.4,
+          "duration": 0.2,
           "type": "main"
         },
         {
           "name": "Halfway Lift",
-          "duration": 0.25,
+          "duration": 0.1,
           "type": "main"
         },
         {
@@ -42,12 +42,12 @@
         },
         {
           "name": "Forward Fold",
-          "duration": 0.4,
+          "duration": 0.2,
           "type": "main"
         },
         {
           "name": "Mountain Pose",
-          "duration": 0.25,
+          "duration": 0.15,
           "type": "closing"
         }
       ],
@@ -71,7 +71,7 @@
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.25,
+          "duration": 0.15,
           "type": "setup"
         },
         {
@@ -121,7 +121,7 @@
         },
         {
           "name": "Mountain Pose",
-          "duration": 0.25,
+          "duration": 0.15,
           "type": "closing"
         }
       ],
@@ -159,7 +159,7 @@
         },
         {
           "name": "Seated Twist Right",
-          "duration": 1,
+          "duration": 0.5,
           "type": "right_side"
         },
         {
@@ -169,7 +169,7 @@
         },
         {
           "name": "Seated Twist Left",
-          "duration": 1,
+          "duration":0.5,
           "type": "left_side"
         },
         {
@@ -218,12 +218,12 @@
         },
         {
           "name": "Lizard Pose Right",
-          "duration": 1,
+          "duration":0.5,
           "type": "right_side"
         },
         {
           "name": "Half Pigeon Right",
-          "duration": 1.25,
+          "duration":0.5,
           "type": "right_side"
         },
         {
@@ -243,12 +243,12 @@
         },
         {
           "name": "Lizard Pose Left",
-          "duration": 1,
+          "duration":0.5,
           "type": "left_side"
         },
         {
           "name": "Half Pigeon Left",
-          "duration": 1.25,
+          "duration":0.5,
           "type": "left_side"
         },
         {
@@ -341,7 +341,7 @@
       "flow": [
         {
           "name": "Seated Forward Fold",
-          "duration": 1,
+          "duration":0.5,
           "type": "main"
         },
         {
@@ -356,7 +356,7 @@
         },
         {
           "name": "Supine Spinal Twist Right",
-          "duration": 1,
+          "duration":0.5,
           "type": "right_side"
         },
         {
@@ -366,7 +366,7 @@
         },
         {
           "name": "Supine Spinal Twist Left",
-          "duration": 1,
+          "duration":0.5,
           "type": "left_side"
         },
         {
@@ -394,7 +394,7 @@
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.3,
+          "duration": 0.15,
           "type": "setup"
         },
         {
@@ -404,7 +404,7 @@
         },
         {
           "name": "Forward Fold",
-          "duration": 0.4,
+          "duration": 0.2,
           "type": "main"
         },
         {
@@ -469,7 +469,7 @@
         },
         {
           "name": "Forward Fold",
-          "duration": 0.4,
+          "duration": 0.2,
           "type": "main"
         },
         {
@@ -479,7 +479,7 @@
         },
         {
           "name": "Mountain Pose",
-          "duration": 0.3,
+          "duration": 0.15,
           "type": "closing"
         }
       ],
@@ -503,7 +503,7 @@
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.5,
+          "duration": 0.2,
           "type": "setup"
         },
         {
@@ -513,7 +513,7 @@
         },
         {
           "name": "Triangle Pose Right",
-          "duration": 1.5,
+          "duration": 0.5,
           "type": "right_side"
         },
         {
@@ -523,7 +523,7 @@
         },
         {
           "name": "Triangle Pose Left",
-          "duration": 1.5,
+          "duration": 0.5,
           "type": "left_side"
         },
         {
@@ -533,17 +533,17 @@
         },
         {
           "name": "Revolved Triangle Right",
-          "duration": 1.0,
+          "duration": 0.5,
           "type": "right_side"
         },
         {
           "name": "Revolved Triangle Left",
-          "duration": 1.0,
+          "duration": 0.5,
           "type": "left_side"
         },
         {
           "name": "Mountain Pose",
-          "duration": 0.25,
+          "duration": 0.15,
           "type": "closing"
         }
       ],
@@ -567,17 +567,17 @@
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.5,
+          "duration": 0.2,
           "type": "setup"
         },
         {
           "name": "Tree Pose Right",
-          "duration": 1,
+          "duration":0.5,
           "type": "right_side"
         },
         {
           "name": "Tree Pose Left",
-          "duration": 1,
+          "duration":0.5,
           "type": "left_side"
         },
         {
@@ -674,17 +674,17 @@
       "flow": [
         {
           "name": "Cat-Cow Stretches",
-          "duration": 1,
-          "type": "preparation"
-        },
-        {
-          "name": "Low Cobra",
           "duration": 0.75,
           "type": "preparation"
         },
         {
+          "name": "Low Cobra",
+          "duration": 0.25,
+          "type": "preparation"
+        },
+        {
           "name": "Cobra Pose",
-          "duration": 1,
+          "duration": 0.25,
           "type": "main"
         },
         {
@@ -694,7 +694,7 @@
         },
         {
           "name": "Camel Pose",
-          "duration": 1.25,
+          "duration":0.5,
           "type": "main"
         },
         {
@@ -783,7 +783,7 @@
         },
         {
           "name": "Mountain Pose",
-          "duration": 0.5,
+          "duration": 0.15,
           "type": "closing"
         }
       ],
@@ -850,7 +850,7 @@
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.25,
+          "duration": 0.15,
           "type": "setup"
         },
         {
@@ -900,7 +900,7 @@
         },
         {
           "name": "Child's Pose",
-          "duration": 1.5,
+          "duration": 1,
           "type": "closing"
         }
       ],
@@ -924,7 +924,7 @@
       "flow": [
         {
           "name": "Knees to Chest",
-          "duration": 1.5,
+          "duration": 1,
           "type": "setup"
         },
         {
@@ -949,7 +949,7 @@
         },
         {
           "name": "Legs Up Wall",
-          "duration": 1.5,
+          "duration": 1,
           "type": "closing"
         }
       ],
@@ -1030,22 +1030,22 @@
         },
         {
           "name": "Seated Spinal Twist Right",
-          "duration": 1,
+          "duration":0.5,
           "type": "right_side"
         },
         {
           "name": "Seated Spinal Twist Left",
-          "duration": 1,
+          "duration":0.5,
           "type": "left_side"
         },
         {
           "name": "Revolved Triangle Right",
-          "duration": 1,
+          "duration":0.5,
           "type": "right_side"
         },
         {
           "name": "Revolved Triangle Left",
-          "duration": 1,
+          "duration":0.5,
           "type": "left_side"
         },
         {
@@ -1080,7 +1080,7 @@
       "flow": [
         {
           "name": "Downward Dog",
-          "duration": 1,
+          "duration":0.5,
           "type": "preparation"
         },
         {
@@ -1129,17 +1129,17 @@
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.25,
+          "duration": 0.2,
           "type": "setup"
         },
         {
           "name": "Forward Fold",
-          "duration": 0.5,
+          "duration": 0.2,
           "type": "main"
         },
         {
           "name": "Halfway Lift",
-          "duration": 0.25,
+          "duration": 0.1,
           "type": "main"
         },
         {
@@ -1154,12 +1154,12 @@
         },
         {
           "name": "Downward Dog",
-          "duration": 1,
+          "duration":0.5,
           "type": "main"
         },
         {
           "name": "Warrior I Right",
-          "duration": 1,
+          "duration":0.5,
           "type": "right_side"
         },
         {
@@ -1179,7 +1179,7 @@
         },
         {
           "name": "Warrior I Left",
-          "duration": 1,
+          "duration":0.5,
           "type": "left_side"
         },
         {
@@ -1199,12 +1199,12 @@
         },
         {
           "name": "Forward Fold",
-          "duration": 0.5,
+          "duration": 0.3,
           "type": "main"
         },
         {
           "name": "Mountain Pose",
-          "duration": 1,
+          "duration": 0.5,
           "type": "closing"
         }
       ],

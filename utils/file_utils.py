@@ -48,26 +48,11 @@ def safe_load_json(file_path: Union[str, Path], default_data: Dict[str, Any]) ->
 
 def safe_save_json(file_path: Union[str, Path], data: Dict[str, Any], create_backup: bool = True) -> bool:
     #Save JSON file with atomic write and optional backup.
-    
-    #Args:
-    #    file_path: Path where to save the file
-    #    data: Dictionary to save as JSON
-    #    create_backup: Whether to create backup before saving
-        
-    #Returns:
-    #    True if successful, False otherwise
-        
-    #Example:
-    #    success = safe_save_json("app_data/flows.json", flows_data)
-    #    if not success:
-    #        print("Failed to save file!")
     file_path = Path(file_path)
     
     try:
-        # Ensure parent directory exists
         ensure_directory_exists(file_path)
         
-        # Create backup if file exists and backup is requested
         if create_backup and file_path.exists():
             backup_success = create_backup_file(file_path)
             if not backup_success:
@@ -93,6 +78,7 @@ def safe_save_json(file_path: Union[str, Path], data: Dict[str, Any], create_bac
         if temp_path.exists():
             try:
                 temp_path.unlink()
+                cleanup_old_backups(temp_path)
             except:
                 pass
                 
@@ -194,12 +180,6 @@ def list_backup_files(directory: Union[str, Path]) -> List[Path]:
 
 
 def cleanup_old_backups(directory: Union[str, Path], keep_count: int = 5) -> None:
-   #Remove old backup files, keeping only the most recent ones.
-    
-    #Args:
-    #    directory: Directory containing backup files
-    #    keep_count: Number of recent backups to keep
-    
     backup_files = list_backup_files(directory)
     
     if len(backup_files) <= keep_count:

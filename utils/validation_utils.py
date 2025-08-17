@@ -181,6 +181,7 @@ def validate_sequence_name(name: str) -> Tuple[bool, str]:
     
     return True, ""
 
+
 def validate_yoga_style(style: str) -> Tuple[bool, str]:
     """Validate yoga style selection.
     
@@ -295,7 +296,6 @@ def validate_new_pose_data(pose_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     
     return len(errors) == 0, errors
 
-# Add to the end of utils/validation_utils.py
 
 def validate_favorites_integrity() -> Tuple[bool, List[str]]:
     """Check favorites for broken references to poses/flows.

@@ -1,9 +1,3 @@
-"""Display formatting utilities for GUMBY yoga app.
-
-This module provides consistent text formatting between internal data format
-and user-friendly display format without changing the underlying words.
-"""
-
 from typing import List
 
 
