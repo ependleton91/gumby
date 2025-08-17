@@ -141,7 +141,6 @@ class PosesWidget(QWidget):
         self.edit_button = QPushButton("EDIT")
         self.edit_button.setMaximumWidth(100)
         self.edit_button.setStyleSheet("background-color: #a0522d; color: white; font-size: 12px; border-radius: 4px; padding: 4px 8px;")
-        self.edit_button.clicked.connect(lambda: self.edit_flow( flow_info))
 
         #Add to layout
         layout.addWidget(flow_name_label)
@@ -159,12 +158,11 @@ class PosesWidget(QWidget):
 
         # Invisible click button (overlay entire image)
         click_button = QPushButton(card_frame)
-        click_button.setGeometry(0, 0, 300, 400) 
+        click_button.setGeometry(0, 0, 600, 350) 
         click_button.setStyleSheet("background: transparent; border: none;")
 
         # Connect click to display flow details
-        click_button.clicked.connect(lambda: self.display_flow_deets( flow_info))
-        # Connect edit button to edit flow
+        click_button.clicked.connect(lambda: self.display_flow_deets(flow_info))
         self.edit_button.clicked.connect(lambda: self.edit_flow(flow_info))
 
         # Store flow key in the card frame for reference

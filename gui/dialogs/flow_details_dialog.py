@@ -1,8 +1,6 @@
 from PyQt6.QtWidgets import QDialog, QListWidget,QLineEdit,QHBoxLayout,QComboBox, QCheckBox, QGroupBox, QPushButton, QFormLayout, QLabel, QScrollArea, QWidget, QVBoxLayout
 from PyQt6.QtCore import Qt
-from config import FLOWS_FILE
 from utils.file_utils import load_flows_data,load_poses_data
-import json
 
 class flow_details_box(QDialog):
     def __init__(self, flow_info, edit_mode=False, create_mode=False, flow_key=None, image_cache=None):
@@ -105,7 +103,7 @@ class flow_details_box(QDialog):
     
     def get_unique_muscles(self):
         try:
-            flows_data = load_flows_data(FLOWS_FILE)
+            flows_data = load_flows_data()
             
             all_muscles = set()
             for flow in flows_data["flowing_sequences"].values():
@@ -119,7 +117,7 @@ class flow_details_box(QDialog):
         if not (self.edit_mode or self.create_mode):
             return
             
-        flows_data = load_flows_data(FLOWS_FILE)
+        flows_data = load_flows_data()
 
         self.all_categories = set()
         self.all_energies = set()
@@ -228,7 +226,7 @@ class flow_details_box(QDialog):
                 self.muscles_field.setText(", ".join(self.flow_info["muscle_groups"]))
 
     def sync_poses_to_data(self):
-        #call it before saving to ensure everything is synced
+        #all it before saving to ensure everything is synced
         
         if not hasattr(self, 'poses_list'):
             return  # No editable list (view mode)
