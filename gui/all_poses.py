@@ -3,11 +3,22 @@ from PyQt6.QtCore import Qt
 from gui.dialogs.pose_details_dialog import pose_details_box
 from gui.dialogs.flow_details_dialog import flow_details_box
 from utils.ui_utils import show_error_message,show_save_success
-from utils.file_utils import load_flows_data, load_poses_data, save_poses_data
-from utils.validation_utils import validate_pose_name, validate_duration, validate_difficulty,validate_muscle_groups
+from utils.image_utils import load_pose_image, scale_image_for_display
+from config import POSES_IMAGE_DIR
+from utils.file_utils import load_flows_data, load_poses_data, save_poses_data, save_flows_data
+from utils.validation_utils import validate_new_pose_data, show_pose_validation_errors,validate_new_sequence_data
+#The all poses page has two tabs: one for poses and one for flows.
+#Each tab has a header with a title and buttons to add new poses or flows.
+#The poses tab displays a grid of pose cards, each with an image, name, and edit button.
+#The flows tab displays a list of flow cards, each with details like duration, category, style, muscle groups, difficulty, energy level, and a button to edit the flow.
+#The poses dialog allows users to view and edit pose details, including name, description, duration, muscle groups, type, instructions, modifications, and difficulty.
+#The flows dialog allows users to view and edit flow details, including name, duration, category, style, muscle groups, difficulty, energy level, and the list of poses in the flow.
+#The add buttons in each tab open dialogs to create new poses or flows.
+
 
 class PosesWidget(QWidget):
     def __init__(self):
+        # Initialize the base QWidget
         super().__init__()
         self.pose_image_widgets = []
         self.pose_cards = {}
@@ -24,11 +35,11 @@ class PosesWidget(QWidget):
         
     def Poses_Tab(self):
         poses_cards_layout = self.create_poses_grid()
-        return self.tab_template("POSES",poses_cards_layout)
+        return self.tab_template("POSES: Click on any pose to see the details. Click edit to update the pose.",poses_cards_layout)
 
     def flow_tab(self):
         flow_cards_layout = self.create_flows_list()
-        return self.tab_template("FLOWS", flow_cards_layout)
+        return self.tab_template("FLOWS: Click on a flow to see the details. Click edit to update the flow.", flow_cards_layout)
 
     def tab_template(self,title,cards_layout):
         widget = QWidget()
@@ -57,7 +68,7 @@ class PosesWidget(QWidget):
         else:
             scroll_area = QScrollArea()
         scroll_content = QWidget()
-        scroll_content.setLayout(cards_layout)  # Use the passed layout
+        scroll_content.setLayout(cards_layout) 
         
         scroll_area.setWidget(scroll_content)
         scroll_area.setWidgetResizable(True)
@@ -71,16 +82,14 @@ class PosesWidget(QWidget):
         flows_list.setAlignment(Qt.AlignmentFlag.AlignCenter) 
 
         flows_data = load_flows_data()
-
+        #Add each flow card to the layout
         for  flow_key, flow_info in flows_data["flowing_sequences"].items():
             flow_card = self.create_flow_card( flow_info, flow_key)
             flows_list.addWidget(flow_card)
-
             self.flow_cards[ flow_key] = flow_card
-
-
         return flows_list
     
+    # Create a flow card with details like name, duration, category, style, muscle groups, difficulty, energy level, and edit button
     def create_flow_card(self, flow_info, flow_key):
         card_frame = QFrame()
         card_frame.setObjectName("flowCard")
@@ -89,7 +98,7 @@ class PosesWidget(QWidget):
 
         layout = QVBoxLayout()
         card_frame.setLayout(layout)
-
+        #Add Name to Card
         flow_name =  flow_info["name"]
         flow_name_label = QLabel(flow_name)
         flow_name_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -142,24 +151,29 @@ class PosesWidget(QWidget):
         layout.addWidget(flow_difficulty_label)
         layout.addWidget(flow_energy_label)
         layout.addWidget(flow_count_label)
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.edit_button)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
 
 
         # Invisible click button (overlay entire image)
         click_button = QPushButton(card_frame)
         click_button.setGeometry(0, 0, 400, 400) 
         click_button.setStyleSheet("background: transparent; border: none;")
-        click_button.clicked.connect(lambda: self.display_flow_deets( flow_info))
 
+        # Connect click to display flow details
+        click_button.clicked.connect(lambda: self.display_flow_deets( flow_info))
+        # Connect edit button to edit flow
         self.edit_button.clicked.connect(lambda: self.edit_flow(flow_info))
 
-        card_frame. flow_key = flow_key
-
+        # Store flow key in the card frame for reference
+        card_frame.flow_key = flow_key
+        # Add the card frame to the layout
         return card_frame
 
 
     def create_poses_grid(self):
+        # Create a grid layout for pose cards
         card_grid = QGridLayout()
         card_grid.setSpacing(10)  # Reduce spacing between cards
         card_grid.setContentsMargins(10, 10, 10, 10) 
@@ -182,14 +196,16 @@ class PosesWidget(QWidget):
         return card_grid
     
     def create_pose_card(self,pose_info,pose_key):
+        # Create a card for each pose with its image, name, and edit button
         card_frame = QFrame()
         card_frame.setObjectName("poseCard")
         card_frame.setFrameStyle(QFrame.Shape.Box)
-        card_frame.setFixedSize(350,300)  # Consistent card size
+        card_frame.setFixedSize(350,300)
 
         layout = QVBoxLayout()
         card_frame.setLayout(layout)
 
+        # Add Name to Card
         pose_name = pose_info["name"]
         pose_name_label = QLabel(pose_name)
         pose_name_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -200,9 +216,11 @@ class PosesWidget(QWidget):
 
         pose_image_widget.setFixedSize(275, 190)
         pose_image_widget.pose_name = pose_info["name"] 
+        # Get the pose image from cache
         self.pose_image_widgets.append(pose_image_widget)
         pose_image_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        
+
+        #Add edit button to Card
         self.edit_button = QPushButton("EDIT")
         self.edit_button.setMaximumWidth(100)
         self.edit_button.setStyleSheet("background-color: #a0522d; color: white; font-size: 12px; border-radius: 4px; padding: 4px 8px;")
@@ -219,101 +237,94 @@ class PosesWidget(QWidget):
         click_button.setGeometry(0, 0, 200, 200) 
         click_button.setStyleSheet("background: transparent; border: none;")
         click_button.clicked.connect(lambda: self.display_pose_deets(pose_info))
-
+        # Connect edit button to edit pose
         card_frame.pose_key = pose_key
-        
-        
+    
         return card_frame        
   
     def get_pose_image(self, pose_name):
-        try:
-            cache = self.parent().parent().image_cache
-            expected_filename = ("_".join(pose_name.lower().split(" "))) + ".png"
-            return cache.get(expected_filename, cache.get("no_image.png"))
-        except (AttributeError, TypeError):
-            print("Image cache not accessible")
-            return None
+        # Attempt to retrieve the pose image from the cache
+        return load_pose_image(pose_name, POSES_IMAGE_DIR)
+
         
     def load_pose_images(self):
-        """Load images for all pose cards when page is accessed"""
         for image_widget in self.pose_image_widgets:
             pose_name = image_widget.pose_name
-            pose_image = self.get_pose_image(pose_name)
-            
-            if pose_image is not None:
-                scaled_image = pose_image.scaled(275, 250, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                image_widget.setPixmap(scaled_image)
-            else:
-                image_widget.setText("No Image")
+        
+        #load the image from the cache or directory
+        pose_image = load_pose_image(pose_name, POSES_IMAGE_DIR)
+        #scale the image for display
+        scaled_image = scale_image_for_display(pose_image, 275, 250)
+        #add the scaled image to the widget
+        image_widget.setPixmap(scaled_image)
 
     def display_pose_deets(self,pose_info):
+        # Display pose details in a dialog
         dialog = pose_details_box(pose_info, edit_mode=False,create_mode=False)
         dialog.exec()
 
     def edit_pose(self, pose_info):
+        # Open the pose details dialog in edit mode
         main_window = self.parent().parent() 
         dialog = pose_details_box(pose_info, edit_mode=True, create_mode=False)
         dialog.image_cache = main_window.image_cache 
         result = dialog.exec()
 
+        # If the dialog was accepted, save the changes
         if result == QDialog.DialogCode.Accepted:
             self.save_pose_changes(dialog,pose_info)
 
     def save_pose_changes(self, dialog, original_pose_info):
-        # Extract edited data and save to poses.json
-        new_data = {}
-        new_data["name"]= dialog.name_field.text()
-
-        #Validate pose name
-        is_valid, error, new_data["name"] = validate_pose_name(dialog.name_field.text())
-        if not is_valid:
-            show_error_message(self, "Invalid Name", error)
-            return
-
-        #Validate description
-        new_data["description"] = dialog.description_field.toPlainText()
-        if not new_data["description"] or new_data["description"].strip() == "":
-            show_error_message(self, "Invalid Description", "Description cannot be empty")
-            return
+        # Extract edited data from dialog
+        new_data = {
+            "name": dialog.name_field.text(),
+            "description": dialog.description_field.toPlainText(),
+            "default_duration": dialog.duration_field.text(),
+            "muscle_groups": [muscle.strip() for muscle in dialog.muscles_field.text().split(",")],
+            "type": dialog.type_field.text(),
+            "instructions": dialog.instructions_field.toPlainText(),
+            "modifications": dialog.modifications_field.toPlainText(),
+            "difficulty": dialog.difficulty_field.text()
+        }
         
-        #validate duration
-        is_valid, error, new_data["default_duration"] = validate_duration(dialog.duration_field.text())
-        if not is_valid:
-            show_error_message(self, "Invalid Duration", error)
-            return
-
-        #Validate muscle groups
-
-        valid, error, new_data["muscle_groups"] = validate_muscle_groups([muscle.strip() for muscle in dialog.muscles_field.text().split(",")])
+        # Use comprehensive validation utility
+        valid, errors = validate_new_pose_data(new_data)
         if not valid:
-            show_error_message(self, "Invalid Muscle Groups", error)
+            show_pose_validation_errors(self, errors)
             return
-
-        #Add type
-        new_data["type"] = dialog.type_field.text()
-
-        #Add instructions and modifications
-        new_data["instructions"] = dialog.instructions_field.toPlainText()
-        new_data["modifications"] = dialog.modifications_field.toPlainText()
         
-        #Validate difficulty
-        is_valid, error, new_data["difficulty"] = validate_difficulty(dialog.difficulty_field.text())
-        if not is_valid:
-            show_error_message(self, "Invalid Difficulty", error)
-            return
-
+        # Store original name for flow updates
+        original_name = original_pose_info["name"]
+        new_name = new_data["name"]
+        
+        # Update poses data
         poses_data = load_poses_data()
-
-        # Single loop to update and capture pose_key
         found_pose_key = None
         for pose_key, pose_data in poses_data["poses"].items():
-            if pose_data["name"] == original_pose_info["name"]:
+            if pose_data["name"] == original_name:
                 for key, value in new_data.items():
                     pose_data[key] = value
-                found_pose_key = pose_key  # Capture the key
+                found_pose_key = pose_key  
                 break
+        
+        # Update flows data if pose name changed
+        if original_name != new_name:
+            flows_data = load_flows_data()
+            updated_flows = False
+            
+            for flow_id, flow_data in flows_data.get("flowing_sequences", {}).items():
+                for pose in flow_data.get("flow", []):
+                    if pose.get("name") == original_name:
+                        pose["name"] = new_name
+                        updated_flows = True
+                        print(f"Updated pose name in flow '{flow_data['name']}'")
+            
+            if updated_flows:
+                if not save_flows_data(flows_data):
+                    show_error_message(self, "Warning", "Pose updated but failed to update some sequences. Some flows may still reference the old pose name.")
+                    return
 
-        # Save updated data
+        # Save poses data
         poses_saved = save_poses_data(poses_data)
         if not poses_saved:
             show_error_message(self, "Failed to save pose changes. Please try again.")
@@ -321,11 +332,8 @@ class PosesWidget(QWidget):
         else:
             show_save_success(self, "Pose changes")
 
-
-        # Update UI card
+        # Update UI
         if found_pose_key:
-            # Get the updated pose data for UI refresh
-            updated_pose_data = poses_data["poses"][found_pose_key]
             self.update_pose_grid()
 
     def update_pose_grid(self):
@@ -345,118 +353,246 @@ class PosesWidget(QWidget):
         self.load_pose_images()
 
     def add_pose_button_clicked(self):
+        #Add a new pose dialog
         default_pose_info = {}
         main_window = self.parent().parent()  # Get main window reference
         dialog = pose_details_box(default_pose_info, edit_mode=False, create_mode=True)
         dialog.image_cache = main_window.image_cache  # Pass cache directly
         result = dialog.exec()
 
+        # If the dialog was accepted, add the new pose
         if result == QDialog.DialogCode.Accepted:
             self.add_new_pose(dialog)
 
     def add_flow_button_clicked(self):
+        # Add a new flow dialog
         flow_info = {}
         main_window = self.parent().parent()
         dialog = flow_details_box(flow_info, edit_mode=False, create_mode=True)
         dialog.image_cache = main_window.image_cache  
         result = dialog.exec()
-
+        # If the dialog was accepted, add the new flow
         if result == QDialog.DialogCode.Accepted:
             self.add_new_flow(dialog)
 
     def edit_flow(self, flow_info):
+        # Open the flow details dialog in edit mode
         main_window = self.parent().parent()
         dialog = flow_details_box(flow_info, edit_mode=True, create_mode=False)
         dialog.image_cache = main_window.image_cache  
         result = dialog.exec()
 
+        # If the dialog was accepted, save the changes
         if result == QDialog.DialogCode.Accepted:
             self.save_flow_changes(dialog,flow_info)
 
     def display_flow_deets(self, flow_info):
-        print(f"display_flow_deets called with: {flow_info.get('name', 'No name')}")
+        # Display flow details in a dialog
         try:
-            main_window = self.parent().parent()
             dialog = flow_details_box(flow_info, edit_mode=False, create_mode=False)
-            # Ensure cache is passed BEFORE exec()
-            if hasattr(main_window, 'image_cache'):
-                dialog.image_cache = main_window.image_cache
-                print(f"Cache passed to dialog with {len(dialog.image_cache)} images")
-            else:
-                print("Main window has no image_cache attribute")
-            result = dialog.exec()
+            dialog.exec()
+            
         except Exception as e:
-            print(f"Error in display_flow_deets: {e}")
-
-    def save_flow_changes(self,flow_info):
-
-        pass
-    
-    def add_new_flow(self,dialog):
-        pass
-
-    def add_new_pose(self,dialog):
-        new_data = {}
+            from utils.ui_utils import show_error_message
+            show_error_message(self, "Error", f"Could not open flow details: {str(e)}")
+     
+    def add_new_pose(self, dialog):
+    # Extract data from dialog fields
+        new_data = {
+            "name": dialog.name_field.text(),
+            "description": dialog.description_field.toPlainText(),
+            "default_duration": dialog.duration_field.text(),
+            "muscle_groups": [muscle.strip() for muscle in dialog.muscles_field.text().split(",")],
+            "type": dialog.type_field.text(),
+            "instructions": dialog.instructions_field.toPlainText(),
+            "modifications": dialog.modifications_field.toPlainText(),
+            "difficulty": dialog.difficulty_field.text(),
+            "image_filename": dialog.pose_info.get("image_filename", "no_image.png")
+        }
         
-        #Extract data from dialog fields
-        #Create pose dictionary structure matching your JSON format
-   
-        new_data["name"]= dialog.name_field.text()
-        #Generate unique pose key from the name (convert to snake_case)
-
-
-        pose_reference = new_data["name"].lower().replace(" ", "_").strip()
-        new_data["description"] = dialog.description_field.toPlainText()
-        try:
-            new_data["default_duration"] = str(dialog.duration_field.text())
-        except:
-            print(f"Invalid duration value, keeping default: .2")
-            new_data["default_duration"] = str(.2)
-        new_data["muscle_groups"] = [muscle.strip() for muscle in dialog.muscles_field.text().split(",")]
-        new_data["type"] = dialog.type_field.text()
-        new_data["instructions"] = dialog.instructions_field.toPlainText()
-        new_data["modifications"] = dialog.modifications_field.toPlainText()
-        try: 
-            new_data["difficulty"] =  int(dialog.difficulty_field.text())
-        except:
-            print(f"Invalid difficulty value, keeping default: 2")
-            new_data["difficulty"] =  int(2)
-        new_data["image_filename"] = dialog.pose_info.get("image_filename", "no_image.png")
-
-        
-        valid, error_msg, duration = validate_duration(new_data["default_duration"])
+        # Validate all data at once
+        valid, errors = validate_new_pose_data(new_data)
         if not valid:
-            show_error_message(self, "Validation Error", error_msg)
+            show_pose_validation_errors(self, errors)
             return
-
-        if (new_data["name"] == "Name Your Pose" or 
-            new_data["description"] == "Describe this pose"):
-            QMessageBox.warning(self, "Invalid Input", "Please fill out the pose name and description with real values.")
-            return
-            #Can this return to the add a pose box instead?
         
-        valid, error_msg = validate_pose_name(new_data["name"])
-        if not valid:
-            show_error_message(self, "Validation Error", error_msg)
-            return
-
-        #Load existing poses JSON
+        # Generate unique pose key (using your existing logic)
+        from utils.image_utils import standardize_pose_name_to_filename
+        pose_reference = standardize_pose_name_to_filename(new_data["name"]).replace(".png", "")
+        
+        # Load existing poses and check for duplicates
         poses_data = load_poses_data()
-
         if pose_reference in poses_data["poses"]:
-            QMessageBox.warning(self, "Duplicate Pose", f"A pose with the name '{new_data['name']}' already exists.")
+            show_error_message(self, "Duplicate Pose", f"A pose with the name '{new_data['name']}' already exists.")
             return
-
-        #Add new pose to the structure
-        poses_data["poses"][pose_reference] = new_data
-
-        #Save updated JSON
-        poses_saved = save_poses_data(poses_data)
-        if not poses_saved:
-            show_error_message(self, "Failed to save pose changes. Please try again.")
-            return
-        else:
-            show_save_success(self, "Pose changes ")
         
-        #Refresh the poses grid to show the new pose
-        self.update_pose_grid()
+        # Add new pose and save
+        poses_data["poses"][pose_reference] = new_data
+        
+        if save_poses_data(poses_data):
+            show_save_success(self, "New pose", new_data["name"])
+            self.update_pose_grid()
+        else:
+            show_error_message(self, "Save Failed", "Failed to save new pose. Please try again.")
+
+    def save_flow_changes(self, dialog, original_flow_info):
+        # Extract edited data from dialog
+        new_data = {
+            "name": dialog.name_field.text(),
+            "duration": dialog.duration_field.text(),
+            "difficulty": dialog.difficulty_field.text(),
+            "category": dialog.category_field.currentText() if hasattr(dialog.category_field, 'currentText') else dialog.category_field.text(),
+            "energy_level": dialog.energy_field.currentText() if hasattr(dialog.energy_field, 'currentText') else dialog.energy_field.text(),
+        }
+        
+        # Handle style field (could be ComboBox or text)
+        if hasattr(dialog.style_field, 'currentText'):
+            new_data["style"] = [dialog.style_field.currentText()]  # Convert to list
+        else:
+            new_data["style"] = [style.strip() for style in dialog.style_field.text().split(",")]
+        
+        # Handle muscle groups (checkboxes or text)
+        if hasattr(dialog, 'muscle_checkboxes'):
+            new_data["muscle_groups"] = [cb.text() for cb in dialog.muscle_checkboxes if cb.isChecked()]
+        else:
+            new_data["muscle_groups"] = [muscle.strip() for muscle in dialog.muscles_field.text().split(",")]
+        
+        # ✨ NEW: Get updated flow/poses from the dialog
+        new_data["flow"] = dialog.flow_info.get("flow", [])  # This contains the updated poses
+        new_data["tags"] = original_flow_info.get("tags", [])  # Keep existing tags
+        
+        # Validate the data
+        valid, errors = validate_new_sequence_data(new_data)
+        if not valid:
+            show_pose_validation_errors(self, errors)
+            return
+        
+        # Convert data types
+        try:
+            new_data["duration"] = float(new_data["duration"])
+            new_data["difficulty"] = int(new_data["difficulty"])
+        except ValueError:
+            show_error_message(self, "Invalid Input", "Duration must be a number and difficulty must be 1-5.")
+            return
+        
+        # Recalculate total duration based on poses
+        if new_data["flow"]:
+            calculated_duration = sum(pose.get("duration", 0.5) for pose in new_data["flow"])
+            new_data["duration"] = round(calculated_duration, 2)
+        
+        # Load flows data and find the flow to update
+        flows_data = load_flows_data()
+        original_name = original_flow_info["name"]
+        found_flow_key = None
+        
+        for flow_key, flow_data in flows_data.get("flowing_sequences", {}).items():
+            if flow_data["name"] == original_name:
+                # Update all fields including the updated poses
+                for key, value in new_data.items():
+                    flow_data[key] = value
+                found_flow_key = flow_key
+                break
+        
+        if not found_flow_key:
+            show_error_message(self, "Error", "Could not find flow to update.")
+            return
+        
+        # Save updated flows data
+        if save_flows_data(flows_data):
+            show_save_success(self, "Flow changes", new_data["name"])
+            self.update_flows_list()
+        else:
+            show_error_message(self, "Save Failed", "Failed to save flow changes. Please try again.")
+
+    def add_new_flow(self, dialog):
+        # Extract data from dialog fields
+        new_data = {
+            "name": dialog.name_field.text(),
+            "duration": dialog.duration_field.text(),
+            "difficulty": dialog.difficulty_field.text(),
+            "category": dialog.category_field.currentText() if hasattr(dialog.category_field, 'currentText') else dialog.category_field.text(),
+            "energy_level": dialog.energy_field.currentText() if hasattr(dialog.energy_field, 'currentText') else dialog.energy_field.text(),
+            "flow": dialog.flow_info.get("flow", []),  # ✨ Get poses from dialog
+            "tags": []
+        }
+        
+        # Handle style field
+        if hasattr(dialog.style_field, 'currentText'):
+            new_data["style"] = [dialog.style_field.currentText()]
+        else:
+            new_data["style"] = [style.strip() for style in dialog.style_field.text().split(",")]
+        
+        # Handle muscle groups
+        if hasattr(dialog, 'muscle_checkboxes'):
+            new_data["muscle_groups"] = [cb.text() for cb in dialog.muscle_checkboxes if cb.isChecked()]
+        else:
+            new_data["muscle_groups"] = [muscle.strip() for muscle in dialog.muscles_field.text().split(",")]
+        
+        # Check for placeholder text
+        if (new_data["name"] == "Name your flow" or 
+            new_data["name"].strip() == ""):
+            show_error_message(self, "Invalid Input", "Please enter a real flow name.")
+            return
+        
+        # Validate the data
+        valid, errors = validate_new_sequence_data(new_data)
+        if not valid:
+            show_pose_validation_errors(self, errors)
+            return
+        
+        # Convert data types and calculate duration
+        try:
+            new_data["difficulty"] = int(new_data["difficulty"])
+            
+            # Calculate duration from poses if poses exist
+            if new_data["flow"]:
+                calculated_duration = sum(pose.get("duration", 0.5) for pose in new_data["flow"])
+                new_data["duration"] = round(calculated_duration, 2)
+            else:
+                new_data["duration"] = float(new_data["duration"]) if new_data["duration"] else 1.0
+                
+        except ValueError:
+            show_error_message(self, "Invalid Input", "Difficulty must be 1-5.")
+            return
+        
+        # Generate unique flow key
+        flow_reference = new_data["name"].lower().replace(" ", "_").replace("'", "").strip()
+        
+        # Load existing flows and check for duplicates
+        flows_data = load_flows_data()
+        if flow_reference in flows_data.get("flowing_sequences", {}):
+            show_error_message(self, "Duplicate Flow", f"A flow with the name '{new_data['name']}' already exists.")
+            return
+        
+        # Add new flow to the structure
+        if "flowing_sequences" not in flows_data:
+            flows_data["flowing_sequences"] = {}
+        flows_data["flowing_sequences"][flow_reference] = new_data
+        
+        # Save updated flows data
+        if save_flows_data(flows_data):
+            show_save_success(self, "New flow", new_data["name"])
+            self.update_flows_list()
+        else:
+            show_error_message(self, "Save Failed", "Failed to save new flow. Please try again.")
+
+    def update_flows_list(self):
+        """Refresh the flows list display after changes"""
+        # Clear existing flow cards reference
+        self.flow_cards = {}
+        
+        # Find the flows tab widget and get its scroll area
+        # You have a tabbed interface, so we need to update the flows tab content
+        tab_widget = self.findChild(QTabWidget)
+        if tab_widget:
+            # Find the flows tab (index 1 based on your tab_widget.addTab calls)
+            flows_tab = tab_widget.widget(1)  # Second tab is flows
+            if flows_tab:
+                # Get the scroll area from the flows tab
+                scroll_area = flows_tab.findChild(QScrollArea)
+                if scroll_area:
+                    # Create new flows layout
+                    new_flows_layout = self.create_flows_list()
+                    new_scroll_content = QWidget()
+                    new_scroll_content.setLayout(new_flows_layout)
+                    scroll_area.setWidget(new_scroll_content)

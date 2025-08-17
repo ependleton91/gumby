@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QDialog, QGridLayout,QLineEdit,QFrame,QHBoxLayout,QComboBox, QCheckBox, QGroupBox, QPushButton, QFormLayout, QLabel, QScrollArea, QWidget, QVBoxLayout
+from PyQt6.QtWidgets import QDialog, QListWidget,QLineEdit,QHBoxLayout,QComboBox, QCheckBox, QGroupBox, QPushButton, QFormLayout, QLabel, QScrollArea, QWidget, QVBoxLayout
 from PyQt6.QtCore import Qt
 from config import FLOWS_FILE
 import json
@@ -161,8 +161,6 @@ class flow_details_box(QDialog):
         main_layout = QVBoxLayout()
         main_layout.addWidget(scroll_area)
 
-        self.carousel_container = self.create_pose_carousel()
-        main_layout.addWidget(self.carousel_container)
 
         # Add buttons below the scroll area
         if self.edit_mode or self.create_mode:
@@ -222,206 +220,154 @@ class flow_details_box(QDialog):
             else:
                 self.muscles_field.setText(", ".join(self.flow_info["muscle_groups"]))
 
-    def create_pose_carousel(self):
-        """Create the horizontal pose carousel"""
-        carousel_widget = QWidget()
-        carousel_layout = QHBoxLayout()
+    def sync_poses_to_data(self):
+        """Sync the poses list display with the actual flow_info data"""
+        # This is called automatically by the pose editing methods,
+        # but we can call it before saving to ensure everything is synced
         
-        # Left arrow
-        self.prev_button = QPushButton("←")
-        self.prev_button.setFixedSize(50, 50)
+        if not hasattr(self, 'poses_list'):
+            return  # No editable list (view mode)
         
-        # Main pose display area
-        self.pose_display = self.create_pose_display()
-        
-        # Right arrow  
-        self.next_button = QPushButton("→")
-        self.next_button.setFixedSize(50, 50)
-        
-        # Add to layout
-        carousel_layout.addWidget(self.prev_button)
-        carousel_layout.addWidget(self.pose_display)
-        carousel_layout.addWidget(self.next_button)
+        # Optional: Validate that list matches data
+        if "flow" in self.flow_info:
+            if len(self.flow_info["flow"]) != self.poses_list.count():
 
-        self.prev_button.clicked.connect(self.scroll_left)
-        self.next_button.clicked.connect(self.scroll_right)
-        
-        carousel_widget.setLayout(carousel_layout)
-        return carousel_widget
+                print("Warning: Poses list and data are out of sync!")
+    def accept(self):
+        """Override accept to sync data before closing"""
+        if self.edit_mode or self.create_mode:
+            self.sync_poses_to_data()
+        super().accept()
 
     def create_pose_display(self):
+        """Create editable pose list with add/delete/reorder functionality"""
         display_widget = QWidget()
-        display_layout = QVBoxLayout()
-        pose_carousel_widget = QWidget()
-        pose_carousel_layout = QHBoxLayout()  # Changed to HBoxLayout for better centering
-        pose_carousel_layout.setSpacing(5)  # Reduced spacing
-        pose_carousel_layout.setContentsMargins(10, 10, 10, 10)
-        pose_carousel_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Center the cards
+        layout = QVBoxLayout()
         
-        list_of_pose_cards = self.build_pose_cards_list()
-    
-        # Calculate which cards to show (sliding window)
-        cards_to_show = 5
-        start_index = self.scroll_offset
-        end_index = min(start_index + cards_to_show, len(list_of_pose_cards))
+        # Title
+        poses_label = QLabel("Poses in this Flow:")
+        poses_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        poses_label.setStyleSheet("font-weight: bold; font-size: 14px;")
+        layout.addWidget(poses_label)
         
-        visible_cards = list_of_pose_cards[start_index:end_index]
+        # Editable list widget
+        self.poses_list = QListWidget()
+        self.poses_list.setMaximumHeight(200)
+        self.poses_list.setDragDropMode(QListWidget.DragDropMode.InternalMove)  # Enable drag-drop reordering
         
-        # Add visible cards to layout
-        for i, card in enumerate(visible_cards):
-            pose_carousel_layout.addWidget(card)  # Just add widget, no grid positioning
+        # Populate list
+        self.populate_poses_list()
+        
+        # Buttons for editing (only show in edit/create mode)
+        if self.edit_mode or self.create_mode:
+            buttons_layout = QHBoxLayout()
             
-            # Make center card focused (larger/no opacity)
-            center_position = len(visible_cards) // 2
-            if i == center_position:
-                # Apply focused styling
-                card.setFixedSize(140, 140)
-                card.setStyleSheet("")  # Remove opacity
-            else:
-                # Apply side card styling  
-                card.setFixedSize(100, 100)
-                card.setStyleSheet("opacity: 0.6;")
-
-        # Create info labels based on the center card
-        if len(visible_cards) > 0:
-            center_position = len(visible_cards) // 2
-            focused_pose_index = start_index + center_position
+            self.add_pose_btn = QPushButton("Add Pose")
+            self.remove_pose_btn = QPushButton("Remove Selected")
+            self.move_up_btn = QPushButton("Move Up")
+            self.move_down_btn = QPushButton("Move Down")
             
-            if not self.create_mode and "flow" in self.flow_info and focused_pose_index < len(self.flow_info["flow"]):
-                focused_pose = self.flow_info["flow"][focused_pose_index]
-                self.current_pose_name = QLabel(focused_pose["name"])
-                self.current_pose_index = QLabel(f"{focused_pose_index + 1} of {len(self.flow_info['flow'])}")
-                self.current_pose_duration = QLabel(f"{focused_pose['duration']} min")
-            else:
-                self.current_pose_name = QLabel("No poses yet")
-                self.current_pose_index = QLabel("")
-                self.current_pose_duration = QLabel("")
-        else:
-            self.current_pose_name = QLabel("No poses yet")
-            self.current_pose_index = QLabel("")
-            self.current_pose_duration = QLabel("")
-
-        self.current_pose_name.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.current_pose_index.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.current_pose_duration.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        pose_carousel_widget.setLayout(pose_carousel_layout)
-        display_layout.addWidget(pose_carousel_widget)
-        display_layout.addWidget(self.current_pose_name)
-        display_layout.addWidget(self.current_pose_index)
-        display_layout.addWidget(self.current_pose_duration)
-        display_widget.setLayout(display_layout)
+            buttons_layout.addWidget(self.add_pose_btn)
+            buttons_layout.addWidget(self.remove_pose_btn)
+            buttons_layout.addWidget(self.move_up_btn)
+            buttons_layout.addWidget(self.move_down_btn)
+            
+            # Connect button actions
+            self.add_pose_btn.clicked.connect(self.add_pose_to_flow)
+            self.remove_pose_btn.clicked.connect(self.remove_pose_from_flow)
+            self.move_up_btn.clicked.connect(self.move_pose_up)
+            self.move_down_btn.clicked.connect(self.move_pose_down)
+            
+            layout.addWidget(buttons_layout_widget := QWidget())
+            buttons_layout_widget.setLayout(buttons_layout)
+        
+        layout.addWidget(self.poses_list)
+        display_widget.setLayout(layout)
         return display_widget
 
-    def build_pose_cards_list(self):
-        card_list = []
-        dummy_pose = {
-            "name": "Add New Pose"
-        }
+    def populate_poses_list(self):
+        """Fill the list with current poses"""
+        self.poses_list.clear()
         
-        if self.create_mode:
-            # Create mode: just show the "+" card
-            card_list.append(self.create_pose_card(dummy_pose))
-        else:
-            # Regular mode: add all poses in the flow
-            if "flow" in self.flow_info:
-                for pose in self.flow_info["flow"]:
-                    pose_card = self.create_pose_card(pose)
-                    card_list.append(pose_card)
-
-        # In edit mode, add the "+" card at the end
-        if self.edit_mode:
-            card_list.append(self.create_pose_card(dummy_pose))
-
-        return card_list
-
-    def refresh_carousel(self):
-        # Remove old carousel
-        if hasattr(self, 'carousel_container') and self.carousel_container:
-            self.layout().removeWidget(self.carousel_container)
-            self.carousel_container.deleteLater()
+        if not self.create_mode and "flow" in self.flow_info:
+            for i, pose in enumerate(self.flow_info["flow"]):
+                duration_text = f"{pose.get('duration', 0.5)} min"
+                list_item = f"{pose['name']} ({duration_text})"
+                self.poses_list.addItem(list_item)
         
-        # Create new carousel
-        self.carousel_container = self.create_pose_carousel()
-        # Insert before the buttons (at position -1 or -2 depending on edit mode)
-        if self.edit_mode or self.create_mode:
-            self.layout().insertWidget(self.layout().count() - 2, self.carousel_container)
-        else:
-            self.layout().insertWidget(self.layout().count() - 1, self.carousel_container)
+        if self.poses_list.count() == 0:
+            self.poses_list.addItem("No poses yet - click 'Add Pose' to start")
 
-    def create_pose_card(self, pose_info):
-        card_frame = QFrame()
-        card_frame.setObjectName("poseCard")
-        card_frame.setFrameStyle(QFrame.Shape.Box)
-        layout = QVBoxLayout() 
-        layout.setContentsMargins(2, 2, 2, 2)  # Minimal margins
-        card_frame.setLayout(layout)  
+    def add_pose_to_flow(self):
+        """Add a new pose to the flow"""
+        from PyQt6.QtWidgets import QInputDialog
         
-        pose_image_widget = QLabel()
+        # Get available poses
+        poses_data = load_poses_data()
+        available_poses = list(poses_data.get("poses", {}).keys())
+        pose_names = [poses_data["poses"][key]["name"] for key in available_poses]
         
-        # Handle special case for "Add New Pose" dummy
-        if pose_info["name"] == "Add New Pose":
-            pose_image_widget.setText("+")
-            pose_image_widget.setStyleSheet("font-size: 48px; font-weight: bold; color: green;")
-        else:
-            expected_filename = pose_info["name"].lower().replace(" ", "_") + ".png"
-
+        # Let user select a pose
+        pose_name, ok = QInputDialog.getItem(
+            self, "Add Pose", "Select a pose to add:", pose_names, 0, False
+        )
+        
+        if ok and pose_name:
+            # Get default duration
+            duration, ok = QInputDialog.getDouble(
+                self, "Pose Duration", f"Duration for {pose_name} (minutes):", 0.5, 0.1, 10.0, 1
+            )
             
-            # Try cache first
-            if hasattr(self, 'image_cache') and self.image_cache and expected_filename in self.image_cache:
-                pose_image = self.image_cache[expected_filename]
-                # Scale to fill the widget better
-                scaled_image = pose_image.scaled(90, 90, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                pose_image_widget.setPixmap(scaled_image)
+            if ok:
+                # Add to the list display
+                list_item = f"{pose_name} ({duration} min)"
+                self.poses_list.addItem(list_item)
+                
+                # Update the flow_info data
+                if "flow" not in self.flow_info:
+                    self.flow_info["flow"] = []
+                
+                self.flow_info["flow"].append({
+                    "name": pose_name,
+                    "duration": duration,
+                    "type": "main"  # Default type
+                })
 
-            else:
-                # Fallback: load directly from file
+    def remove_pose_from_flow(self):
+        """Remove selected pose from flow"""
+        current_row = self.poses_list.currentRow()
+        if current_row >= 0:
+            # Remove from display
+            self.poses_list.takeItem(current_row)
+            
+            # Remove from flow_info data
+            if "flow" in self.flow_info and current_row < len(self.flow_info["flow"]):
+                del self.flow_info["flow"][current_row]
 
-                try:
-                    from config import POSES_IMAGE_DIR
-                    from PyQt6.QtGui import QPixmap
-                    
-                    image_path = POSES_IMAGE_DIR / expected_filename
+    def move_pose_up(self):
+        """Move selected pose up in the list"""
+        current_row = self.poses_list.currentRow()
+        if current_row > 0:
+            # Move in display
+            item = self.poses_list.takeItem(current_row)
+            self.poses_list.insertItem(current_row - 1, item)
+            self.poses_list.setCurrentRow(current_row - 1)
+            
+            # Move in flow_info data
+            if "flow" in self.flow_info:
+                self.flow_info["flow"][current_row], self.flow_info["flow"][current_row - 1] = \
+                    self.flow_info["flow"][current_row - 1], self.flow_info["flow"][current_row]
 
-                    
-                    if image_path.exists():
-                        pixmap = QPixmap(str(image_path))
-                        if not pixmap.isNull():
-                            # Scale to fill the widget better
-                            scaled_image = pixmap.scaled(90, 90, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                            pose_image_widget.setPixmap(scaled_image)
-          
-                        else:
-                            pose_image_widget.setText("Invalid Image")
-                    else:
-                        # Try fallback image
-                        fallback_path = POSES_IMAGE_DIR / "no_image.png"
-                        if fallback_path.exists():
-                            pixmap = QPixmap(str(fallback_path))
-                            scaled_image = pixmap.scaled(90, 90, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                            pose_image_widget.setPixmap(scaled_image)
-                        else:
-                            pose_image_widget.setText("No Image")
-                            
-                except Exception as e:
-                    print(f"Error loading image directly: {e}")
-                    pose_image_widget.setText("Load Error")
-
-        pose_image_widget.pose_name = pose_info["name"] 
-        self.pose_image_widgets.append(pose_image_widget)
-        pose_image_widget.setFixedSize(95, 95)  # Slightly smaller for better fit
-        pose_image_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        
-        layout.addWidget(pose_image_widget)
-        return card_frame
-
-    def scroll_left(self):
-        if self.scroll_offset > 0:
-            self.scroll_offset -= 1
-            self.refresh_carousel()
-
-    def scroll_right(self):
-        max_cards = len(self.build_pose_cards_list())    
-        if self.scroll_offset + 3 <= max_cards:  # 5 is cards_to_show
-            self.scroll_offset += 1
-            self.refresh_carousel()
+    def move_pose_down(self):
+        """Move selected pose down in the list"""
+        current_row = self.poses_list.currentRow()
+        if current_row >= 0 and current_row < self.poses_list.count() - 1:
+            # Move in display
+            item = self.poses_list.takeItem(current_row)
+            self.poses_list.insertItem(current_row + 1, item)
+            self.poses_list.setCurrentRow(current_row + 1)
+            
+            # Move in flow_info data
+            if "flow" in self.flow_info:
+                self.flow_info["flow"][current_row], self.flow_info["flow"][current_row + 1] = \
+                    self.flow_info["flow"][current_row + 1], self.flow_info["flow"][current_row]
