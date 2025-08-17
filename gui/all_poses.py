@@ -2,11 +2,11 @@ from PyQt6.QtWidgets import QMessageBox,QWidget, QDialog, QVBoxLayout, QLabel, Q
 from PyQt6.QtCore import Qt
 from gui.dialogs.pose_details_dialog import pose_details_box
 from gui.dialogs.flow_details_dialog import flow_details_box
-from utils.ui_utils import show_error_message,show_save_success
+from utils.ui_utils import show_error_message,show_save_success,show_pose_validation_errors
 from utils.image_utils import load_pose_image, scale_image_for_display
+from utils.validation_utils import validate_new_pose_data,validate_sequence_data
 from config import POSES_IMAGE_DIR
-from utils.file_utils import load_flows_data, load_poses_data, save_poses_data, save_flows_data
-from utils.validation_utils import validate_new_pose_data, show_pose_validation_errors,validate_new_sequence_data
+from utils.file_utils import load_flows_data, load_poses_data,save_poses_data, save_flows_data
 #The all poses page has two tabs: one for poses and one for flows.
 #Each tab has a header with a title and buttons to add new poses or flows.
 #The poses tab displays a grid of pose cards, each with an image, name, and edit button.
@@ -24,6 +24,7 @@ class PosesWidget(QWidget):
         self.pose_cards = {}
         self.flow_cards={}
         tab_widget = QTabWidget()
+        self.load_pose_images() 
         tab_widget.addTab(self.Poses_Tab(),"POSES")
         tab_widget.addTab(self.flow_tab(),"FLOWS")
 
@@ -158,7 +159,7 @@ class PosesWidget(QWidget):
 
         # Invisible click button (overlay entire image)
         click_button = QPushButton(card_frame)
-        click_button.setGeometry(0, 0, 400, 400) 
+        click_button.setGeometry(0, 0, 300, 400) 
         click_button.setStyleSheet("background: transparent; border: none;")
 
         # Connect click to display flow details
@@ -251,12 +252,12 @@ class PosesWidget(QWidget):
         for image_widget in self.pose_image_widgets:
             pose_name = image_widget.pose_name
         
-        #load the image from the cache or directory
-        pose_image = load_pose_image(pose_name, POSES_IMAGE_DIR)
-        #scale the image for display
-        scaled_image = scale_image_for_display(pose_image, 275, 250)
-        #add the scaled image to the widget
-        image_widget.setPixmap(scaled_image)
+            #load the image from the cache or directory
+            pose_image = load_pose_image(pose_name, POSES_IMAGE_DIR)
+            #scale the image for display
+            scaled_image = scale_image_for_display(pose_image, 275, 250)
+            #add the scaled image to the widget
+            image_widget.setPixmap(scaled_image)
 
     def display_pose_deets(self,pose_info):
         # Display pose details in a dialog
@@ -462,7 +463,7 @@ class PosesWidget(QWidget):
         new_data["tags"] = original_flow_info.get("tags", [])  # Keep existing tags
         
         # Validate the data
-        valid, errors = validate_new_sequence_data(new_data)
+        valid, errors = validate_sequence_data(new_data)
         if not valid:
             show_pose_validation_errors(self, errors)
             return
@@ -535,7 +536,7 @@ class PosesWidget(QWidget):
             return
         
         # Validate the data
-        valid, errors = validate_new_sequence_data(new_data)
+        valid, errors = validate_sequence_data(new_data)
         if not valid:
             show_pose_validation_errors(self, errors)
             return

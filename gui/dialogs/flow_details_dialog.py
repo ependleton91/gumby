@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QDialog, QListWidget,QLineEdit,QHBoxLayout,QComboBox, QCheckBox, QGroupBox, QPushButton, QFormLayout, QLabel, QScrollArea, QWidget, QVBoxLayout
 from PyQt6.QtCore import Qt
 from config import FLOWS_FILE
+from utils.file_utils import load_flows_data,load_poses_data
 import json
 
 class flow_details_box(QDialog):
@@ -12,7 +13,6 @@ class flow_details_box(QDialog):
         self.flow_key = flow_key
         self.image_cache = image_cache  # Set cache BEFORE creating UI
         self.muscle_checkboxes = []
-        self.pose_image_widgets = []
         self.scroll_offset = 0
         
         self.resize(600, 800)
@@ -105,8 +105,7 @@ class flow_details_box(QDialog):
     
     def get_unique_muscles(self):
         try:
-            with open(FLOWS_FILE, 'r') as f:
-                flows_data = json.load(f)
+            flows_data = load_flows_data(FLOWS_FILE)
             
             all_muscles = set()
             for flow in flows_data["flowing_sequences"].values():
@@ -120,8 +119,7 @@ class flow_details_box(QDialog):
         if not (self.edit_mode or self.create_mode):
             return
             
-        with open(FLOWS_FILE, 'r') as f:
-            flows_data = json.load(f)
+        flows_data = load_flows_data(FLOWS_FILE)
 
         self.all_categories = set()
         self.all_energies = set()
@@ -134,7 +132,7 @@ class flow_details_box(QDialog):
         self.style_field.addItems(sorted(list(self.all_styles)))
         self.category_field.addItems(sorted(list(self.all_categories)))
         self.energy_field.addItems(sorted(list(self.all_energies)))
-        
+
     def create_layout(self):
         # Create widget to hold the form
         form_layout = QFormLayout()
@@ -152,15 +150,24 @@ class flow_details_box(QDialog):
         form_widget = QWidget()
         form_widget.setLayout(form_layout)
         
-        # Create scroll area and add the form widget
+        # ADD POSE DISPLAY SECTION:
+        pose_display = self.create_pose_display()
+        
+        # Create main content widget that holds both form and poses
+        content_widget = QWidget()
+        content_layout = QVBoxLayout()
+        content_layout.addWidget(form_widget)
+        content_layout.addWidget(pose_display)  # ← Add poses section
+        content_widget.setLayout(content_layout)
+        
+        # Create scroll area and add the content widget
         scroll_area = QScrollArea()
-        scroll_area.setWidget(form_widget)
+        scroll_area.setWidget(content_widget)  
         scroll_area.setWidgetResizable(True)
         
         # Create main layout for the dialog
         main_layout = QVBoxLayout()
         main_layout.addWidget(scroll_area)
-
 
         # Add buttons below the scroll area
         if self.edit_mode or self.create_mode:
@@ -175,8 +182,8 @@ class flow_details_box(QDialog):
             main_layout.addWidget(self.ok_button)
             self.ok_button.clicked.connect(self.accept)
 
-        self.setLayout(main_layout)
-        
+        self.setLayout(main_layout)    
+
     def populate_fields(self):
         if self.create_mode:
             self.name_field.setText("Name your flow")
@@ -221,9 +228,7 @@ class flow_details_box(QDialog):
                 self.muscles_field.setText(", ".join(self.flow_info["muscle_groups"]))
 
     def sync_poses_to_data(self):
-        """Sync the poses list display with the actual flow_info data"""
-        # This is called automatically by the pose editing methods,
-        # but we can call it before saving to ensure everything is synced
+        #call it before saving to ensure everything is synced
         
         if not hasattr(self, 'poses_list'):
             return  # No editable list (view mode)
@@ -263,9 +268,9 @@ class flow_details_box(QDialog):
             buttons_layout = QHBoxLayout()
             
             self.add_pose_btn = QPushButton("Add Pose")
-            self.remove_pose_btn = QPushButton("Remove Selected")
-            self.move_up_btn = QPushButton("Move Up")
-            self.move_down_btn = QPushButton("Move Down")
+            self.remove_pose_btn = QPushButton("Delete")
+            self.move_up_btn = QPushButton("^")
+            self.move_down_btn = QPushButton("v")
             
             buttons_layout.addWidget(self.add_pose_btn)
             buttons_layout.addWidget(self.remove_pose_btn)
