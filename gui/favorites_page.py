@@ -160,5 +160,6 @@ class FavoritesWidget(QWidget):
     def show_details(self,favorite):
         dialog = details_dialog_box(favorite)
         dialog.exec()
+        self.refresh_favorites()
 
   

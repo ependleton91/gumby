@@ -12,9 +12,8 @@ from .file_utils import (
 from .image_utils import (
     ImageCache,
     standardize_pose_name_to_filename, load_pose_image, load_image_from_path,
-    scale_image_for_display, create_placeholder_image, validate_image_file,
-    get_image_info, clear_image_cache, get_cache_stats,
-    load_thumbnail_image, load_preview_image, load_carousel_image
+    scale_image_for_display, create_placeholder_image, validate_image_file, clear_image_cache,
+    load_thumbnail_image, load_preview_image
 )
 
 from .validation_utils import (

@@ -319,7 +319,7 @@ class flow_details_box(QDialog):
         
         if not self.create_mode and "flow" in self.flow_info:
             for i, pose in enumerate(self.flow_info["flow"]):
-                duration_text = format_duration_minutes(pose.get("duration", 0.5))
+                duration_text = f"{pose.get('duration', 0.5)} min"
                 list_item = f"{pose['name']} ({duration_text})"
                 self.poses_list.addItem(list_item)
         

@@ -271,38 +271,10 @@ def validate_image_file(file_path: Union[str, Path]) -> bool:
     return True
 
 
-def get_image_info(pixmap: QPixmap) -> Dict[str, Union[int, str]]:
-    #Get information about a loaded image.
-    
-    #Args:
-    #    pixmap: QPixmap to analyze
-        
-    #Returns:
-    #    Dictionary with image information
-
-    if pixmap.isNull():
-        return {"width": 0, "height": 0, "depth": 0, "format": "null"}
-    
-    return {
-        "width": pixmap.width(),
-        "height": pixmap.height(),
-        "depth": pixmap.depth(),
-        "size_bytes": pixmap.width() * pixmap.height() * (pixmap.depth() // 8)
-    }
-
-
 def clear_image_cache() -> None:
     """Clear the global image cache."""
     _image_cache.clear()
     logger.info("Cleared image cache")
-
-
-def get_cache_stats() -> Dict[str, int]:
-    """Get image cache statistics."""
-    return {
-        "cached_images": _image_cache.size(),
-        "max_size": _image_cache.max_size
-    }
 
 
 # Convenience functions for specific image sizes used in GUMBY
@@ -316,9 +288,3 @@ def load_preview_image(pose_name: str, image_directory: Union[str, Path]) -> QPi
     """Load pose image sized for preview (400x300)."""
     pixmap = load_pose_image(pose_name, image_directory)
     return scale_image_for_display(pixmap, 400, 300)
-
-
-def load_carousel_image(pose_name: str, image_directory: Union[str, Path]) -> QPixmap:
-    """Load pose image sized for carousel (100x100)."""
-    pixmap = load_pose_image(pose_name, image_directory)
-    return scale_image_for_display(pixmap, 100, 100)

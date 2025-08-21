@@ -486,7 +486,7 @@ class PosesWidget(QWidget):
         
         # Convert data types
         try:
-            new_data["duration"] = float(new_data["duration"])
+            new_data["duration"] = float(new_data["duration"])/60
             new_data["difficulty"] = int(new_data["difficulty"])
         except ValueError:
             show_error_message(self, "Invalid Input", "Duration must be a number and difficulty must be 1-5.")
@@ -494,7 +494,7 @@ class PosesWidget(QWidget):
         
         # Recalculate total duration based on poses
         if new_data["flow"]:
-            calculated_duration = sum(pose.get("duration", 0.5) for pose in new_data["flow"])
+            calculated_duration = sum(pose.get("duration", 30)/60 for pose in new_data["flow"])
             new_data["duration"] = round(calculated_duration, 2)
         
         # Load flows data and find the flow to update

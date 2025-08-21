@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QDialog, QLineEdit, QTextEdit, QPushButton, QFormLayout, QLabel, QFileDialog, QScrollArea, QWidget, QVBoxLayout
 from PIL import Image 
 from utils.ui_utils import show_error_message
+from utils.image_utils import standardize_pose_name_to_filename, validate_image_file, create_placeholder_image, load_image_from_path
 from config import POSES_IMAGE_DIR 
 from PyQt6.QtGui import QPixmap
 
@@ -111,21 +112,34 @@ class pose_details_box(QDialog):
 
     def upload_image(self):
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Select Pose Image", 
-            "", "Image Files (*.png *.jpg *.jpeg)"
+        self, "Select Pose Image", 
+        "", "Image Files (*.png *.jpg *.jpeg)"
         )
-        if file_path:
-            print(f"Selected image: {file_path}")
+    
+        if not file_path:  # User cancelled
+            return
+            
+        # Validate the image FIRST (before doing anything else)
+        if not validate_image_file(file_path):
+            show_error_message(self, "Invalid Image", "Please select a valid image file.")
+            return
 
-        #grab pose name
-        new_filename = self.name_field.text().lower().replace(" ", "_").strip()+".png"
-        new_filepath = POSES_IMAGE_DIR/new_filename
+        # Generate filename and path
+        new_filename = standardize_pose_name_to_filename(self.name_field.text())
+        new_filepath = POSES_IMAGE_DIR / new_filename
+        
+        try:
+            # Convert and save image
+            image = Image.open(file_path)
+            image.save(new_filepath, "PNG")
+            self.pose_info["image_filename"] = new_filename
 
-        image = Image.open(file_path)
-        image.save(new_filepath,"PNG")
-        self.pose_info["image_filename"] = new_filename
+            # Refresh cache properly
+            from utils.image_utils import clear_image_cache
+            clear_image_cache()  # Clear entire cache to ensure consistency
 
-        #refresh cache
-        cache = self.image_cache
-        new_pixmap = QPixmap(str(new_filepath))
-        cache[new_filename] = new_pixmap    
+            
+            print(f"Successfully saved image: {new_filename}")
+            
+        except Exception as e:
+            show_error_message(self, "Upload Failed", f"Failed to save image: {str(e)}")

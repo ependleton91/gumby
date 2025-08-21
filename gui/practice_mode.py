@@ -4,7 +4,7 @@ from config import POSES_IMAGE_DIR
 from gui.dialogs.completion_dialog import completion_dialog_box
 from utils.file_utils import load_favorites_data, save_favorites_data
 from utils.ui_utils import show_success_message, show_error_message
-from utils.image_utils import load_preview_image
+from utils.image_utils import load_preview_image,load_pose_image,scale_image_for_display
 from datetime import datetime
 
 class PracticeWidget(QWidget):
@@ -65,11 +65,11 @@ class PracticeWidget(QWidget):
         self.selected_favorite = favorite
         self.current_state = "PRACTICE"
         self.update_view()
-
-        pixmap = self.load_pose_image(favorite["sequences"]["warm_up"][0]["flow"][0]["name"])
-        scaled_pixmap = pixmap.scaled(300, 400, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        if pixmap is not None:
-            self.practice_image_label.setPixmap(scaled_pixmap)
+        
+        pose_name = favorite["sequences"]["warm_up"][0]["flow"][0]["name"]
+        raw_image = load_pose_image(pose_name, POSES_IMAGE_DIR)
+        scaled_image = scale_image_for_display(raw_image, 300, 400)  # Fit in 300x400 label
+        self.practice_image_label.setPixmap(scaled_image)
             
 
         self.practice_view_label.setText(favorite["sequences"]["warm_up"][0]["flow"][0]["name"])
@@ -183,6 +183,7 @@ class PracticeWidget(QWidget):
         self.active_pose_name = QLabel("CURRENT POSE")
         self.active_pose_image = QLabel() 
         self.active_pose_image.setFixedSize(300, 300)  
+
         self.timer_display = QLabel("00:30")
         self.progress_label = QLabel("1 out of xx")
         
@@ -252,10 +253,10 @@ class PracticeWidget(QWidget):
             self.next_pose_text.setText(f"Next: {current_pose_info["next_pose"]["name"]}")
 
         #Grab current image
-        pixmap = self.load_pose_image(current_pose_info["current_pose"]["name"])
-        if pixmap is not None:
-            scaled_pixmap = pixmap.scaled(300, 400, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            self.active_pose_image.setPixmap(scaled_pixmap)
+        pose_name = current_pose_info["current_pose"]["name"]
+        raw_image = load_pose_image(pose_name, POSES_IMAGE_DIR)
+        scaled_image = scale_image_for_display(raw_image, 300, 300)  # Fit in 300x300 label
+        self.active_pose_image.setPixmap(scaled_image)
         self.remaining_seconds = current_pose_info["pose_duration_seconds"]
 
         self.update_view()
@@ -319,10 +320,10 @@ class PracticeWidget(QWidget):
                 self.next_pose_text.setText(f"Next: {current_pose_info["next_pose"]["name"]}")
 
             #Grab current image
-            pixmap = self.load_pose_image(current_pose_info["current_pose"]["name"])
-            if pixmap is not None:
-                scaled_pixmap = pixmap.scaled(300, 400, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                self.active_pose_image.setPixmap(scaled_pixmap)
+            pose_name = current_pose_info["current_pose"]["name"]
+            raw_image = load_pose_image(pose_name, POSES_IMAGE_DIR)
+            scaled_image = scale_image_for_display(raw_image, 300, 300)  # Fit in 300x300 label
+            self.active_pose_image.setPixmap(scaled_image)
             self.remaining_seconds = current_pose_info["pose_duration_seconds"]
         else:
             self.end_of_class()
