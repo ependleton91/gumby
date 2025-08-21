@@ -1213,13 +1213,13 @@
     },
     "side_body_stretch_left": {
       "name": "Side Body Stretch Left",
-      "default_duration": "0.6",
+      "default_duration": 0.6,
       "type": "preparation",
       "muscle_groups": [
         "side_body",
         "spine"
       ],
-      "difficulty": "1",
+      "difficulty": 1,
       "description": "Standing lateral stretch",
       "instructions": "Reach one arm overhead and lean to opposite side",
       "modifications": "Hand on hip for support, smaller range of motion",
