@@ -67,8 +67,8 @@ class SequenceBuilder:
             if category in flows_by_category:
                 organized_sequences["main_flow"].extend(flows_by_category[category])
         
-        # Calculate results
-        total_duration = calculate_total_sequence_duration(selected_flows)
+        # Calculate results - FIXED: Use only flow-level durations
+        total_duration = self._calculate_fixed_duration(selected_flows)
         
         # Get muscle groups covered and convert back to display format
         muscles_covered_internal = get_sequence_muscle_groups(selected_flows)
@@ -79,3 +79,26 @@ class SequenceBuilder:
             total_duration=total_duration,
             muscles_covered=muscles_covered
         )
+    
+    def _calculate_fixed_duration(self, flows: List[Dict[str, Any]]) -> float:
+        """Fixed duration calculation - use ONLY flow-level durations."""
+        total = 0.0
+        print("=== DURATION CALCULATION DEBUG ===")
+        
+        for flow in flows:
+            flow_duration = flow.get("duration", 0)
+            total += flow_duration
+            
+            # Also check if there are individual pose durations
+            flow_poses = flow.get("flow", [])
+            pose_duration_sum = sum(pose.get("duration", 0) for pose in flow_poses)
+            
+            print(f"Flow: {flow.get('name', 'Unknown')}")
+            print(f"  Flow-level duration: {flow_duration}min")
+            print(f"  Sum of pose durations: {pose_duration_sum}min")
+            print(f"  Difference: {abs(flow_duration - pose_duration_sum):.1f}min")
+        
+        print(f"Total calculated duration: {total} minutes")
+        print("=== END DURATION DEBUG ===")
+        
+        return round(total, 1)

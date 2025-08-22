@@ -170,14 +170,22 @@ def calculate_flow_compatibility_score(flow: Dict[str, Any], criteria: Dict[str,
     
     return score / max_score if max_score > 0 else 0.0
 
-
 import itertools
 
 def select_best_flows_for_time(flows, target_time, tolerance=0.1):
+    """Select combination of flows that best fits target time."""
+    print(f"=== SELECT_BEST_FLOWS DEBUG ===")
+    print(f"Target time: {target_time}, Tolerance: {tolerance}")
+    print(f"Available flows: {[f.get('name') + f' ({f.get('duration', 0)}min)' for f in flows]}")
+    
     if not flows:
+        print("No flows provided!")
         return []
+    
     min_time = target_time * (1 - tolerance)
     max_time = target_time * (1 + tolerance)
+    print(f"Acceptable range: {min_time:.1f} - {max_time:.1f} minutes")
+    
     best_combo = []
     best_total = 0
 
@@ -185,27 +193,40 @@ def select_best_flows_for_time(flows, target_time, tolerance=0.1):
     for r in range(1, len(flows) + 1):
         for combo in itertools.combinations(flows, r):
             total = sum(f.get("duration", 0) for f in combo)
+            print(f"  Trying combo: {[f.get('name') for f in combo]} = {total}min")
+            
             if min_time <= total <= max_time and total > best_total:
                 best_combo = list(combo)
                 best_total = total
+                print(f"    ✅ New best: {total}min")
                 if best_total == max_time:
                     break
 
     # If best combo is still short, repeat flows to fill the gap
     selected = list(best_combo)
     total_time = sum(f.get("duration", 0) for f in selected)
-    flows_sorted = sorted(flows, key=lambda f: f.get("duration", 0), reverse=True)
-    while total_time < min_time:
-        for flow in flows_sorted:
-            dur = flow.get("duration", 0)
-            if total_time + dur <= max_time:
-                selected.append(flow)
-                total_time += dur
-                if total_time >= min_time:
-                    break
-        else:
-            # If nothing fits, break to avoid infinite loop
-            break
+    
+    if total_time < min_time:
+        print(f"Best combo ({total_time}min) still short, trying to add more...")
+        flows_sorted = sorted(flows, key=lambda f: f.get("duration", 0), reverse=True)
+        while total_time < min_time:
+            for flow in flows_sorted:
+                dur = flow.get("duration", 0)
+                if total_time + dur <= max_time:
+                    selected.append(flow)
+                    total_time += dur
+                    print(f"    Added {flow.get('name')} ({dur}min), total now {total_time}min")
+                    if total_time >= min_time:
+                        break
+            else:
+                # If nothing fits, break to avoid infinite loop
+                print("    No more flows fit, stopping")
+                break
+    
+    final_total = sum(f.get("duration", 0) for f in selected)
+    print(f"Selected flows: {[f.get('name') for f in selected]} = {final_total}min")
+    print(f"=== END SELECT_BEST_FLOWS DEBUG ===")
+    
     return selected
 
 def load_class_template(style: str) -> Dict[str, Any]:
@@ -363,8 +384,7 @@ def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str
         
         if section_flows:
             # Select best flows for this section's time allocation
-            section_selected = select_best_flows_for_time(section_flows, section_duration, tolerance=0.5)  # 50% tolerance instead of 10%
-            selected_flows.extend(section_selected)
+            section_selected = select_best_flows_for_time(section_flows, section_duration, tolerance=0.2) 
         else:
             logger.warning(f"No flows available for section: {section_name}")
     

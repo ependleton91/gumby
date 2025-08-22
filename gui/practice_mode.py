@@ -105,6 +105,9 @@ class PracticeWidget(QWidget):
             layout.addWidget(header)
             layout.addWidget(message)
             layout.addWidget(generate_button)
+
+            selection_widget.setLayout(layout)
+            return selection_widget
         else:
             # Has favorites - show dropdown
             header = QLabel("Choose a sequence to practice:")
