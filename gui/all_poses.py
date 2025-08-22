@@ -4,7 +4,7 @@ from gui.dialogs.pose_details_dialog import pose_details_box
 from gui.dialogs.flow_details_dialog import flow_details_box
 from utils.ui_utils import show_error_message,show_save_success,show_pose_validation_errors
 from utils.image_utils import load_pose_image, scale_image_for_display
-from utils.validation_utils import validate_new_pose_data,validate_sequence_data
+from utils.validation_utils import validate_new_pose_data,validate_sequence_data,update_flow_durations
 from config import POSES_IMAGE_DIR
 from utils.file_utils import load_flows_data, load_poses_data,save_poses_data, save_flows_data,update_favorites_after_pose_change, update_favorites_after_flow_change
 #The all poses page has two tabs: one for poses and one for flows.
@@ -319,10 +319,13 @@ class PosesWidget(QWidget):
                         updated_flows = True
                         print(f"Updated pose name in flow '{flow_data['name']}'")
             
+            
             if updated_flows:
                 if not save_flows_data(flows_data):
                     show_error_message(self, "Warning", "Pose updated but failed to update some sequences. Some flows may still reference the old pose name.")
                     return
+                else:
+                    update_flow_durations()
 
         # Save poses data
         poses_saved = save_poses_data(poses_data)

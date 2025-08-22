@@ -1,6 +1,7 @@
 import re
 import logging
-from typing import List, Dict, Any, Tuple, Optional, Union
+from typing import List, Dict, Any, Tuple
+from utils.file_utils import load_flows_data, save_flows_data
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -296,6 +297,22 @@ def validate_new_pose_data(pose_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     
     return len(errors) == 0, errors
 
+
+# Add to utils/validation_utils.py
+
+def update_flow_durations():
+    # Load flows
+    flows_data = load_flows_data()
+    
+    # Update each flow's duration
+    for flow_id, flow in flows_data["flowing_sequences"].items():
+        poses = flow.get("flow", [])
+        total_duration = sum(pose.get("duration", 0) for pose in poses)
+        flow["duration"] = round(total_duration, 2)
+    
+    # Save back
+    save_flows_data(flows_data)
+    print("Flow durations updated")
 
 def validate_favorites_integrity() -> Tuple[bool, List[str]]:
     """Check favorites for broken references to poses/flows.

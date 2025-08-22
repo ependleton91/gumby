@@ -120,7 +120,6 @@ class MainWindow(QMainWindow):
                 filename = image_path.name
                 if not pixmap.isNull():
                     self.image_cache[filename] = pixmap
-                    print(f"image added to cache: {filename}")
             except:
                 print(f"Failed to load {filename}: {e}")
 

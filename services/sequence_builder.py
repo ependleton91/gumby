@@ -51,23 +51,36 @@ class SequenceBuilder:
         
         selected_flows = select_flows_for_sequence(user_preferences)
         
-        # Group flows into sections based on their categories
-        flows_by_category = group_flows_by_category(selected_flows)
+        # NEW: Organize flows by section based on template structure
+        from utils.sequence_utils import load_class_template, calculate_section_durations
         
-        # Organize into the structure expected by your existing UI
+        template = load_class_template(internal_style)
+        section_durations = calculate_section_durations(request.duration, template)
+        
+        # Initialize organized sequences
         organized_sequences = {
-            "warm_up": flows_by_category.get("warm_up", []),
+            "warm_up": [],
             "main_flow": [],
-            "cool_down": flows_by_category.get("cool_down", [])
+            "cool_down": []
         }
         
-        # Combine all main flow categories into "main_flow" section
-        main_flow_categories = ["standing_flow", "seated_flow", "hip_opener", "backbend_flow"]
-        for category in main_flow_categories:
-            if category in flows_by_category:
-                organized_sequences["main_flow"].extend(flows_by_category[category])
+        # Map categories to sections
+        warm_up_categories = ["warm_up"]
+        cool_down_categories = ["cool_down"]
+        # Everything else is main_flow
         
-        # Calculate results - FIXED: Use only flow-level durations
+        # Sort flows into appropriate sections
+        for flow in selected_flows:
+            category = flow.get("category", "")
+            if category in warm_up_categories:
+                organized_sequences["warm_up"].append(flow)
+            elif category in cool_down_categories:
+                organized_sequences["cool_down"].append(flow)
+            else:
+                # Everything else goes to main_flow
+                organized_sequences["main_flow"].append(flow)
+        
+        # Calculate results
         total_duration = self._calculate_fixed_duration(selected_flows)
         
         # Get muscle groups covered and convert back to display format

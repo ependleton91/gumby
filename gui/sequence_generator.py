@@ -8,6 +8,7 @@ from utils.file_utils import load_favorites_data, save_favorites_data
 from utils.ui_utils import show_success_message, show_error_message, hide_widgets
 from services.sequence_builder import SequenceBuilder
 from utils.display_utils import format_list_for_display
+from utils.validation_utils import update_flow_durations
 import datetime
 
 
@@ -66,6 +67,7 @@ class SequenceGeneratorWidget(QWidget):
         #Build layout
         self.setLayout(self.main_layout)
         self.main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        update_flow_durations()
     
     def create_duration_section(self):
         # Create group box for organization

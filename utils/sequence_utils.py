@@ -174,9 +174,7 @@ import itertools
 
 def select_best_flows_for_time(flows, target_time, tolerance=0.1):
     """Select combination of flows that best fits target time."""
-    print(f"=== SELECT_BEST_FLOWS DEBUG ===")
     print(f"Target time: {target_time}, Tolerance: {tolerance}")
-    print(f"Available flows: {[f.get('name') + f' ({f.get('duration', 0)}min)' for f in flows]}")
     
     if not flows:
         print("No flows provided!")
@@ -193,7 +191,6 @@ def select_best_flows_for_time(flows, target_time, tolerance=0.1):
     for r in range(1, len(flows) + 1):
         for combo in itertools.combinations(flows, r):
             total = sum(f.get("duration", 0) for f in combo)
-            print(f"  Trying combo: {[f.get('name') for f in combo]} = {total}min")
             
             if min_time <= total <= max_time and total > best_total:
                 best_combo = list(combo)
@@ -207,7 +204,6 @@ def select_best_flows_for_time(flows, target_time, tolerance=0.1):
     total_time = sum(f.get("duration", 0) for f in selected)
     
     if total_time < min_time:
-        print(f"Best combo ({total_time}min) still short, trying to add more...")
         flows_sorted = sorted(flows, key=lambda f: f.get("duration", 0), reverse=True)
         while total_time < min_time:
             for flow in flows_sorted:
@@ -215,7 +211,6 @@ def select_best_flows_for_time(flows, target_time, tolerance=0.1):
                 if total_time + dur <= max_time:
                     selected.append(flow)
                     total_time += dur
-                    print(f"    Added {flow.get('name')} ({dur}min), total now {total_time}min")
                     if total_time >= min_time:
                         break
             else:
@@ -224,8 +219,6 @@ def select_best_flows_for_time(flows, target_time, tolerance=0.1):
                 break
     
     final_total = sum(f.get("duration", 0) for f in selected)
-    print(f"Selected flows: {[f.get('name') for f in selected]} = {final_total}min")
-    print(f"=== END SELECT_BEST_FLOWS DEBUG ===")
     
     return selected
 
@@ -385,6 +378,7 @@ def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str
         if section_flows:
             # Select best flows for this section's time allocation
             section_selected = select_best_flows_for_time(section_flows, section_duration, tolerance=0.2) 
+            selected_flows.extend(section_selected)
         else:
             logger.warning(f"No flows available for section: {section_name}")
     

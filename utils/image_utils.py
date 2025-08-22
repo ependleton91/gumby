@@ -153,9 +153,7 @@ def load_image_from_path(image_path: Union[str, Path]) -> QPixmap:
     
     try:
         pixmap = QPixmap(str(image_path))
-        if not pixmap.isNull():
-            logger.debug(f"Successfully loaded image: {image_path}")
-        else:
+        if pixmap.isNull():
             logger.warning(f"Failed to load image: {image_path}")
         return pixmap
         

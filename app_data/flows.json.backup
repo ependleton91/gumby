@@ -2,12 +2,12 @@
   "flowing_sequences": {
     "sun_salutation_flow": {
       "name": "Sun Salutation Flow",
-      "duration": 3,
+      "duration": 2.1,
       "tags": [],
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.3,
+          "duration": 0.15,
           "type": "setup"
         },
         {
@@ -17,12 +17,12 @@
         },
         {
           "name": "Forward Fold",
-          "duration": 0.4,
+          "duration": 0.2,
           "type": "main"
         },
         {
           "name": "Halfway Lift",
-          "duration": 0.25,
+          "duration": 0.1,
           "type": "main"
         },
         {
@@ -42,37 +42,36 @@
         },
         {
           "name": "Forward Fold",
-          "duration": 0.4,
+          "duration": 0.2,
           "type": "main"
         },
         {
           "name": "Mountain Pose",
-          "duration": 0.25,
+          "duration": 0.15,
           "type": "closing"
         }
       ],
       "category": "warm_up",
       "style": [
-        "vinyasa",
-        "hatha",
-        "yin"
+        "vinyasa"
       ],
       "muscle_groups": [
-        "full_body",
         "arms",
-        "back"
+        "back",
+        "full_body",
+        "shoulders"
       ],
       "difficulty": 2,
       "energy_level": "building"
     },
     "warrior_standing_flow": {
       "name": "Warrior Standing Flow",
-      "duration": 5,
+      "duration": 5.4,
       "tags": [],
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.25,
+          "duration": 0.15,
           "type": "setup"
         },
         {
@@ -122,7 +121,7 @@
         },
         {
           "name": "Mountain Pose",
-          "duration": 0.25,
+          "duration": 0.15,
           "type": "closing"
         }
       ],
@@ -140,7 +139,7 @@
     },
     "seated_twist_flow": {
       "name": "Seated Twist Flow",
-      "duration": 4,
+      "duration": 2.9,
       "tags": [],
       "flow": [
         {
@@ -160,7 +159,7 @@
         },
         {
           "name": "Seated Twist Right",
-          "duration": 1,
+          "duration": 0.5,
           "type": "right_side"
         },
         {
@@ -170,7 +169,7 @@
         },
         {
           "name": "Seated Twist Left",
-          "duration": 1,
+          "duration": 0.5,
           "type": "left_side"
         },
         {
@@ -194,7 +193,7 @@
     },
     "hip_opening_flow": {
       "name": "Hip Opening Flow",
-      "duration": 6,
+      "duration": 5.8,
       "tags": [],
       "flow": [
         {
@@ -219,12 +218,12 @@
         },
         {
           "name": "Lizard Pose Right",
-          "duration": 1,
+          "duration": 0.5,
           "type": "right_side"
         },
         {
           "name": "Half Pigeon Right",
-          "duration": 1.25,
+          "duration": 0.5,
           "type": "right_side"
         },
         {
@@ -244,12 +243,12 @@
         },
         {
           "name": "Lizard Pose Left",
-          "duration": 1,
+          "duration": 0.5,
           "type": "left_side"
         },
         {
           "name": "Half Pigeon Left",
-          "duration": 1.25,
+          "duration": 0.5,
           "type": "left_side"
         },
         {
@@ -273,7 +272,7 @@
     },
     "simple_backbend_flow": {
       "name": "Simple Backbend Flow",
-      "duration": 4.5,
+      "duration": 4.4,
       "tags": [],
       "flow": [
         {
@@ -337,16 +336,16 @@
     },
     "gentle_cooldown_flow": {
       "name": "Gentle Cool-down Flow",
-      "duration": 5,
+      "duration": 3.5,
       "tags": [],
       "flow": [
         {
           "name": "Seated Forward Fold",
-          "duration": 1,
+          "duration": 0.5,
           "type": "main"
         },
         {
-          "name": "Supine Knee to Chest",
+          "name": "Supine Knees to Chest",
           "duration": 0.5,
           "type": "main"
         },
@@ -357,17 +356,17 @@
         },
         {
           "name": "Supine Spinal Twist Right",
-          "duration": 1,
+          "duration": 0.5,
           "type": "right_side"
         },
         {
-          "name": "Knees to Chest",
+          "name": "Supine Knees to Chest",
           "duration": 0.25,
           "type": "transition"
         },
         {
           "name": "Supine Spinal Twist Left",
-          "duration": 1,
+          "duration": 0.5,
           "type": "left_side"
         },
         {
@@ -390,12 +389,12 @@
     },
     "sun_salutation_b_flow": {
       "name": "Sun Salutation B Flow",
-      "duration": 6,
+      "duration": 6.6,
       "tags": [],
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.3,
+          "duration": 0.15,
           "type": "setup"
         },
         {
@@ -405,7 +404,7 @@
         },
         {
           "name": "Forward Fold",
-          "duration": 0.4,
+          "duration": 0.2,
           "type": "main"
         },
         {
@@ -470,7 +469,7 @@
         },
         {
           "name": "Forward Fold",
-          "duration": 0.4,
+          "duration": 0.2,
           "type": "main"
         },
         {
@@ -480,7 +479,7 @@
         },
         {
           "name": "Mountain Pose",
-          "duration": 0.3,
+          "duration": 0.15,
           "type": "closing"
         }
       ],
@@ -499,12 +498,12 @@
     },
     "triangle_sequence": {
       "name": "Triangle Sequence",
-      "duration": 7,
+      "duration": 4.1,
       "tags": [],
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.5,
+          "duration": 0.2,
           "type": "setup"
         },
         {
@@ -514,7 +513,7 @@
         },
         {
           "name": "Triangle Pose Right",
-          "duration": 1.5,
+          "duration": 0.5,
           "type": "right_side"
         },
         {
@@ -524,7 +523,7 @@
         },
         {
           "name": "Triangle Pose Left",
-          "duration": 1.5,
+          "duration": 0.5,
           "type": "left_side"
         },
         {
@@ -534,17 +533,17 @@
         },
         {
           "name": "Revolved Triangle Right",
-          "duration": 1.0,
+          "duration": 0.5,
           "type": "right_side"
         },
         {
           "name": "Revolved Triangle Left",
-          "duration": 1.0,
+          "duration": 0.5,
           "type": "left_side"
         },
         {
           "name": "Mountain Pose",
-          "duration": 0.25,
+          "duration": 0.15,
           "type": "closing"
         }
       ],
@@ -563,22 +562,22 @@
     },
     "balance_flow": {
       "name": "Balance Flow",
-      "duration": 5,
+      "duration": 3.7,
       "tags": [],
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.5,
+          "duration": 0.2,
           "type": "setup"
         },
         {
           "name": "Tree Pose Right",
-          "duration": 1,
+          "duration": 0.5,
           "type": "right_side"
         },
         {
           "name": "Tree Pose Left",
-          "duration": 1,
+          "duration": 0.5,
           "type": "left_side"
         },
         {
@@ -617,7 +616,7 @@
     },
     "core_strengthening_flow": {
       "name": "Core Strengthening Flow",
-      "duration": 4,
+      "duration": 4.0,
       "tags": [],
       "flow": [
         {
@@ -651,7 +650,7 @@
           "type": "main"
         },
         {
-          "name": "Knees to Chest",
+          "name": "Supine Knees to Chest",
           "duration": 0.5,
           "type": "counter"
         }
@@ -670,22 +669,22 @@
     },
     "heart_opening_sequence": {
       "name": "Heart Opening Sequence",
-      "duration": 8,
+      "duration": 5.75,
       "tags": [],
       "flow": [
         {
           "name": "Cat-Cow Stretches",
-          "duration": 1,
-          "type": "preparation"
-        },
-        {
-          "name": "Low Cobra",
           "duration": 0.75,
           "type": "preparation"
         },
         {
+          "name": "Low Cobra",
+          "duration": 0.25,
+          "type": "preparation"
+        },
+        {
           "name": "Cobra Pose",
-          "duration": 1,
+          "duration": 0.25,
           "type": "main"
         },
         {
@@ -695,7 +694,7 @@
         },
         {
           "name": "Camel Pose",
-          "duration": 1.25,
+          "duration": 0.5,
           "type": "main"
         },
         {
@@ -734,7 +733,7 @@
     },
     "morning_energizer_flow": {
       "name": "Morning Energizer Flow",
-      "duration": 6,
+      "duration": 5.65,
       "tags": [],
       "flow": [
         {
@@ -753,7 +752,7 @@
           "type": "preparation"
         },
         {
-          "name": "Standing Forward Fold",
+          "name": "Forward Fold",
           "duration": 0.5,
           "type": "main"
         },
@@ -784,7 +783,7 @@
         },
         {
           "name": "Mountain Pose",
-          "duration": 0.5,
+          "duration": 0.15,
           "type": "closing"
         }
       ],
@@ -803,7 +802,7 @@
     },
     "yin_flow_hips": {
       "name": "Yin Flow for Hips",
-      "duration": 12,
+      "duration": 12.0,
       "tags": [],
       "flow": [
         {
@@ -827,7 +826,7 @@
           "type": "left_side"
         },
         {
-          "name": "Supported Fish Pose",
+          "name": "Fish Pose",
           "duration": 2,
           "type": "main"
         }
@@ -846,12 +845,12 @@
     },
     "power_flow_sequence": {
       "name": "Power Flow Sequence",
-      "duration": 7,
+      "duration": 6.4,
       "tags": [],
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.25,
+          "duration": 0.15,
           "type": "setup"
         },
         {
@@ -901,7 +900,7 @@
         },
         {
           "name": "Child's Pose",
-          "duration": 1.5,
+          "duration": 1,
           "type": "closing"
         }
       ],
@@ -920,12 +919,12 @@
     },
     "therapeutic_back_sequence": {
       "name": "Therapeutic Back Sequence",
-      "duration": 10.0,
+      "duration": 9,
       "tags": [],
       "flow": [
         {
-          "name": "Knees to Chest",
-          "duration": 1.5,
+          "name": "Supine Knees to Chest",
+          "duration": 1,
           "type": "setup"
         },
         {
@@ -950,7 +949,7 @@
         },
         {
           "name": "Legs Up Wall",
-          "duration": 1.5,
+          "duration": 1,
           "type": "closing"
         }
       ],
@@ -967,7 +966,7 @@
     },
     "arm_balance_flow": {
       "name": "Arm Balance Flow",
-      "duration": 5,
+      "duration": 5.0,
       "tags": [],
       "flow": [
         {
@@ -1021,7 +1020,7 @@
     },
     "twisting_flow": {
       "name": "Twisting Flow",
-      "duration": 6,
+      "duration": 4.0,
       "tags": [],
       "flow": [
         {
@@ -1030,23 +1029,23 @@
           "type": "setup"
         },
         {
-          "name": "Seated Spinal Twist Right",
-          "duration": 1,
+          "name": "Seated Twist Right",
+          "duration": 0.5,
           "type": "right_side"
         },
         {
-          "name": "Seated Spinal Twist Left",
-          "duration": 1,
+          "name": "Seated Twist Left",
+          "duration": 0.5,
           "type": "left_side"
         },
         {
           "name": "Revolved Triangle Right",
-          "duration": 1,
+          "duration": 0.5,
           "type": "right_side"
         },
         {
           "name": "Revolved Triangle Left",
-          "duration": 1,
+          "duration": 0.5,
           "type": "left_side"
         },
         {
@@ -1076,12 +1075,12 @@
     },
     "inversion_flow": {
       "name": "Inversion Flow",
-      "duration": 7,
+      "duration": 6.5,
       "tags": [],
       "flow": [
         {
           "name": "Downward Dog",
-          "duration": 1,
+          "duration": 0.5,
           "type": "preparation"
         },
         {
@@ -1125,22 +1124,22 @@
     },
     "flowing_vinyasa": {
       "name": "Flowing Vinyasa",
-      "duration": 8,
+      "duration": 5.3,
       "tags": [],
       "flow": [
         {
           "name": "Mountain Pose",
-          "duration": 0.25,
+          "duration": 0.2,
           "type": "setup"
         },
         {
           "name": "Forward Fold",
-          "duration": 0.5,
+          "duration": 0.2,
           "type": "main"
         },
         {
           "name": "Halfway Lift",
-          "duration": 0.25,
+          "duration": 0.1,
           "type": "main"
         },
         {
@@ -1155,12 +1154,12 @@
         },
         {
           "name": "Downward Dog",
-          "duration": 1,
+          "duration": 0.5,
           "type": "main"
         },
         {
           "name": "Warrior I Right",
-          "duration": 1,
+          "duration": 0.5,
           "type": "right_side"
         },
         {
@@ -1180,7 +1179,7 @@
         },
         {
           "name": "Warrior I Left",
-          "duration": 1,
+          "duration": 0.5,
           "type": "left_side"
         },
         {
@@ -1200,12 +1199,12 @@
         },
         {
           "name": "Forward Fold",
-          "duration": 0.5,
+          "duration": 0.3,
           "type": "main"
         },
         {
           "name": "Mountain Pose",
-          "duration": 1,
+          "duration": 0.5,
           "type": "closing"
         }
       ],
@@ -1220,6 +1219,779 @@
       ],
       "difficulty": 3,
       "energy_level": "peak"
+    },
+    "deep_yin_release": {
+      "name": "Deep Yin Release",
+      "duration": 14.5,
+      "tags": [
+        "evening",
+        "stress_relief"
+      ],
+      "flow": [
+        {
+          "name": "Child's Pose",
+          "duration": 1.0,
+          "type": "setup"
+        },
+        {
+          "name": "Sphinx Pose",
+          "duration": 3.0,
+          "type": "main"
+        },
+        {
+          "name": "Shoelace Pose Right",
+          "duration": 2.0,
+          "type": "main"
+        },
+        {
+          "name": "Shoelace Pose Left",
+          "duration": 2.0,
+          "type": "main"
+        },
+        {
+          "name": "Twisted Roots Right",
+          "duration": 2.0,
+          "type": "main"
+        },
+        {
+          "name": "Twisted Roots Left",
+          "duration": 3.0,
+          "type": "main"
+        },
+        {
+          "name": "Caterpillar Pose",
+          "duration": 1.5,
+          "type": "main"
+        }
+      ],
+      "category": "cool_down",
+      "style": [
+        "yin"
+      ],
+      "muscle_groups": [
+        "full_body",
+        "hips",
+        "spine"
+      ],
+      "difficulty": 1,
+      "energy_level": "deeply_relaxing"
+    },
+    "yin_heart_opening": {
+      "name": "Yin Heart Opening",
+      "duration": 10.5,
+      "tags": [
+        "heart_opening",
+        "emotional_release"
+      ],
+      "flow": [
+        {
+          "name": "Child's Pose",
+          "duration": 1.5,
+          "type": "setup"
+        },
+        {
+          "name": "Sphinx Pose",
+          "duration": 2.0,
+          "type": "preparation"
+        },
+        {
+          "name": "Melting Heart",
+          "duration": 2.0,
+          "type": "main"
+        },
+        {
+          "name": "Fish Pose",
+          "duration": 3.0,
+          "type": "main"
+        },
+        {
+          "name": "Reclined Butterfly",
+          "duration": 2.0,
+          "type": "closing"
+        }
+      ],
+      "category": "main_flow",
+      "style": [
+        "yin"
+      ],
+      "muscle_groups": [
+        "chest",
+        "shoulders",
+        "heart",
+        "hips"
+      ],
+      "difficulty": 2,
+      "energy_level": "releasing"
+    },
+    "yin_spinal_care": {
+      "name": "Yin Spinal Care",
+      "duration": 9.5,
+      "tags": [
+        "back_care",
+        "therapeutic"
+      ],
+      "flow": [
+        {
+          "name": "Supine Knees to Chest",
+          "duration": 1.5,
+          "type": "setup"
+        },
+        {
+          "name": "Caterpillar Pose",
+          "duration": 2.0,
+          "type": "main"
+        },
+        {
+          "name": "Sphinx Pose",
+          "duration": 1.5,
+          "type": "main"
+        },
+        {
+          "name": "Twisted Roots Right",
+          "duration": 2.0,
+          "type": "main"
+        },
+        {
+          "name": "Twisted Roots Left",
+          "duration": 2.0,
+          "type": "main"
+        },
+        {
+          "name": "Savasana",
+          "duration": 0.5,
+          "type": "closing"
+        }
+      ],
+      "category": "therapeutic",
+      "style": [
+        "yin"
+      ],
+      "muscle_groups": [
+        "spine",
+        "back",
+        "hips"
+      ],
+      "difficulty": 1,
+      "energy_level": "deeply_relaxing"
+    },
+    "yin_quad_release": {
+      "name": "Yin Quad Release",
+      "duration": 11.0,
+      "tags": [
+        "leg_release",
+        "hip_flexors"
+      ],
+      "flow": [
+        {
+          "name": "Child's Pose",
+          "duration": 1.5,
+          "type": "setup"
+        },
+        {
+          "name": "Low Lunge Right",
+          "duration": 2.0,
+          "type": "right_side"
+        },
+        {
+          "name": "Low Lunge Left",
+          "duration": 2.0,
+          "type": "left_side"
+        },
+        {
+          "name": "Saddle Pose",
+          "duration": 4.0,
+          "type": "main"
+        },
+        {
+          "name": "Reclined Butterfly",
+          "duration": 1.5,
+          "type": "closing"
+        }
+      ],
+      "category": "hip_opener",
+      "style": [
+        "yin"
+      ],
+      "muscle_groups": [
+        "quadriceps",
+        "hip_flexors",
+        "hips"
+      ],
+      "difficulty": 3,
+      "energy_level": "releasing"
+    },
+    "evening_yin_wind_down": {
+      "name": "Evening Yin Wind Down",
+      "duration": 15.0,
+      "tags": [
+        "bedtime",
+        "relaxation"
+      ],
+      "flow": [
+        {
+          "name": "Reclined Butterfly",
+          "duration": 3.0,
+          "type": "setup"
+        },
+        {
+          "name": "Happy Baby Pose",
+          "duration": 2.0,
+          "type": "main"
+        },
+        {
+          "name": "Legs Up Wall",
+          "duration": 4.0,
+          "type": "main"
+        },
+        {
+          "name": "Twisted Roots Right",
+          "duration": 1.5,
+          "type": "main"
+        },
+        {
+          "name": "Twisted Roots Left",
+          "duration": 1.5,
+          "type": "main"
+        },
+        {
+          "name": "Savasana",
+          "duration": 3.0,
+          "type": "closing"
+        }
+      ],
+      "category": "cool_down",
+      "style": [
+        "yin",
+        "restorative"
+      ],
+      "muscle_groups": [
+        "full_body",
+        "circulation"
+      ],
+      "difficulty": 1,
+      "energy_level": "deeply_relaxing"
+    },
+    "yin_hip_meditation": {
+      "name": "Yin Hip Meditation",
+      "duration": 16.0,
+      "tags": [
+        "hip_opening",
+        "meditation"
+      ],
+      "flow": [
+        {
+          "name": "Easy Pose",
+          "duration": 1.0,
+          "type": "setup"
+        },
+        {
+          "name": "Butterfly Pose",
+          "duration": 4.0,
+          "type": "main"
+        },
+        {
+          "name": "Shoelace Pose Right",
+          "duration": 2.0,
+          "type": "main"
+        },
+        {
+          "name": "Shoelace Pose Left",
+          "duration": 2.0,
+          "type": "main"
+        },
+        {
+          "name": "Dragon Pose Right",
+          "duration": 3.0,
+          "type": "right_side"
+        },
+        {
+          "name": "Dragon Pose Left",
+          "duration": 3.0,
+          "type": "left_side"
+        },
+        {
+          "name": "Savasana",
+          "duration": 1.0,
+          "type": "closing"
+        }
+      ],
+      "category": "hip_opener",
+      "style": [
+        "yin"
+      ],
+      "muscle_groups": [
+        "hips",
+        "groin",
+        "quadriceps"
+      ],
+      "difficulty": 2,
+      "energy_level": "deeply_relaxing"
+    },
+    "gentle_morning_awakening": {
+      "name": "Gentle Morning Awakening",
+      "duration": 4.5,
+      "tags": [
+        "morning",
+        "gentle"
+      ],
+      "flow": [
+        {
+          "name": "Easy Pose",
+          "duration": 0.5,
+          "type": "setup"
+        },
+        {
+          "name": "Neck and Shoulder Rolls",
+          "duration": 0.5,
+          "type": "preparation"
+        },
+        {
+          "name": "Seated Cat-Cow",
+          "duration": 0.5,
+          "type": "preparation"
+        },
+        {
+          "name": "Side Body Stretch",
+          "duration": 0.6,
+          "type": "preparation"
+        },
+        {
+          "name": "Gentle Backbend",
+          "duration": 0.4,
+          "type": "preparation"
+        },
+        {
+          "name": "Cat-Cow Stretches",
+          "duration": 0.75,
+          "type": "preparation"
+        },
+        {
+          "name": "Child's Pose",
+          "duration": 0.5,
+          "type": "preparation"
+        },
+        {
+          "name": "Downward Dog",
+          "duration": 0.75,
+          "type": "closing"
+        }
+      ],
+      "category": "warm_up",
+      "style": [
+        "hatha",
+        "gentle"
+      ],
+      "muscle_groups": [
+        "spine",
+        "shoulders",
+        "full_body"
+      ],
+      "difficulty": 1,
+      "energy_level": "building"
+    },
+    "joint_mobility_warm_up": {
+      "name": "Joint Mobility Warm-Up",
+      "duration": 4.85,
+      "tags": [
+        "mobility",
+        "preparation"
+      ],
+      "flow": [
+        {
+          "name": "Mountain Pose",
+          "duration": 0.3,
+          "type": "setup"
+        },
+        {
+          "name": "Neck and Shoulder Rolls",
+          "duration": 0.5,
+          "type": "preparation"
+        },
+        {
+          "name": "Wrist Circles",
+          "duration": 0.3,
+          "type": "preparation"
+        },
+        {
+          "name": "Ankle Circles",
+          "duration": 0.4,
+          "type": "preparation"
+        },
+        {
+          "name": "Cat-Cow Stretches",
+          "duration": 0.75,
+          "type": "preparation"
+        },
+        {
+          "name": "Downward Dog",
+          "duration": 0.5,
+          "type": "preparation"
+        },
+        {
+          "name": "Forward Fold",
+          "duration": 0.5,
+          "type": "preparation"
+        },
+        {
+          "name": "Upward Salute",
+          "duration": 0.4,
+          "type": "preparation"
+        },
+        {
+          "name": "Chair Pose",
+          "duration": 0.5,
+          "type": "preparation"
+        },
+        {
+          "name": "Forward Fold",
+          "duration": 0.4,
+          "type": "preparation"
+        },
+        {
+          "name": "Mountain Pose",
+          "duration": 0.3,
+          "type": "closing"
+        }
+      ],
+      "category": "warm_up",
+      "style": [
+        "hatha",
+        "vinyasa"
+      ],
+      "muscle_groups": [
+        "full_body",
+        "joints"
+      ],
+      "difficulty": 1,
+      "energy_level": "building"
+    },
+    "energizing_flow_prep": {
+      "name": "Energizing Flow Prep",
+      "duration": 6.25,
+      "tags": [
+        "energizing",
+        "flow_prep"
+      ],
+      "flow": [
+        {
+          "name": "Child's Pose",
+          "duration": 0.5,
+          "type": "setup"
+        },
+        {
+          "name": "Table Top",
+          "duration": 0.25,
+          "type": "preparation"
+        },
+        {
+          "name": "Cat-Cow Stretches",
+          "duration": 0.75,
+          "type": "preparation"
+        },
+        {
+          "name": "Downward Dog",
+          "duration": 0.75,
+          "type": "preparation"
+        },
+        {
+          "name": "Forward Fold",
+          "duration": 0.5,
+          "type": "preparation"
+        },
+        {
+          "name": "Halfway Lift",
+          "duration": 0.25,
+          "type": "preparation"
+        },
+        {
+          "name": "Upward Salute",
+          "duration": 0.25,
+          "type": "preparation"
+        },
+        {
+          "name": "Chair Pose",
+          "duration": 0.75,
+          "type": "preparation"
+        },
+        {
+          "name": "Mountain Pose",
+          "duration": 0.25,
+          "type": "preparation"
+        },
+        {
+          "name": "Sun Salutation Flow",
+          "duration": 2.0,
+          "type": "main"
+        }
+      ],
+      "category": "warm_up",
+      "style": [
+        "vinyasa"
+      ],
+      "muscle_groups": [
+        "full_body",
+        "core",
+        "legs"
+      ],
+      "difficulty": 2,
+      "energy_level": "energizing"
+    },
+    "breath_based_warm_up": {
+      "name": "Breath-Based Warm-Up",
+      "duration": 4.0,
+      "tags": [
+        "breath_work",
+        "centering"
+      ],
+      "flow": [
+        {
+          "name": "Easy Pose",
+          "duration": 0.75,
+          "type": "setup"
+        },
+        {
+          "name": "Gentle Neck Rolls",
+          "duration": 0.5,
+          "type": "preparation"
+        },
+        {
+          "name": "Seated Cat-Cow",
+          "duration": 0.75,
+          "type": "preparation"
+        },
+        {
+          "name": "Side Body Stretch",
+          "duration": 0.6,
+          "type": "preparation"
+        },
+        {
+          "name": "Table Top",
+          "duration": 0.25,
+          "type": "preparation"
+        },
+        {
+          "name": "Cat-Cow Stretches",
+          "duration": 0.75,
+          "type": "preparation"
+        },
+        {
+          "name": "Child's Pose",
+          "duration": 0.4,
+          "type": "closing"
+        }
+      ],
+      "category": "warm_up",
+      "style": [
+        "hatha",
+        "yin"
+      ],
+      "muscle_groups": [
+        "spine",
+        "breath"
+      ],
+      "difficulty": 1,
+      "energy_level": "calming"
+    },
+    "restorative_evening_sequence": {
+      "name": "Restorative Evening Sequence",
+      "duration": 8.0,
+      "tags": [
+        "evening",
+        "restorative"
+      ],
+      "flow": [
+        {
+          "name": "Seated Forward Fold",
+          "duration": 1.5,
+          "type": "main"
+        },
+        {
+          "name": "Reclined Butterfly",
+          "duration": 2.0,
+          "type": "main"
+        },
+        {
+          "name": "Legs Up Wall",
+          "duration": 3.0,
+          "type": "main"
+        },
+        {
+          "name": "Twisted Roots Right",
+          "duration": 0.75,
+          "type": "main"
+        },
+        {
+          "name": "Twisted Roots Left",
+          "duration": 0.75,
+          "type": "main"
+        }
+      ],
+      "category": "cool_down",
+      "style": [
+        "restorative",
+        "yin"
+      ],
+      "muscle_groups": [
+        "full_body",
+        "nervous_system"
+      ],
+      "difficulty": 1,
+      "energy_level": "deeply_relaxing"
+    },
+    "tension_release_cooldown": {
+      "name": "Tension Release Cool-Down",
+      "duration": 6.5,
+      "tags": [
+        "tension_relief",
+        "stress_release"
+      ],
+      "flow": [
+        {
+          "name": "Child's Pose",
+          "duration": 1.0,
+          "type": "setup"
+        },
+        {
+          "name": "Supine Knees to Chest",
+          "duration": 0.75,
+          "type": "main"
+        },
+        {
+          "name": "Happy Baby Pose",
+          "duration": 1.0,
+          "type": "main"
+        },
+        {
+          "name": "Supine Spinal Twist Right",
+          "duration": 1.0,
+          "type": "right_side"
+        },
+        {
+          "name": "Supine Spinal Twist Left",
+          "duration": 1.0,
+          "type": "left_side"
+        },
+        {
+          "name": "Legs Up Wall",
+          "duration": 1.75,
+          "type": "closing"
+        }
+      ],
+      "category": "cool_down",
+      "style": [
+        "hatha",
+        "restorative"
+      ],
+      "muscle_groups": [
+        "hips",
+        "spine",
+        "full_body"
+      ],
+      "difficulty": 1,
+      "energy_level": "releasing"
+    },
+    "hip_release_cooldown": {
+      "name": "Hip Release Cool-Down",
+      "duration": 7.5,
+      "tags": [
+        "hip_release",
+        "flexibility"
+      ],
+      "flow": [
+        {
+          "name": "Seated Forward Fold",
+          "duration": 1.0,
+          "type": "setup"
+        },
+        {
+          "name": "Butterfly Pose",
+          "duration": 2.0,
+          "type": "main"
+        },
+        {
+          "name": "Half Pigeon Right",
+          "duration": 1.5,
+          "type": "right_side"
+        },
+        {
+          "name": "Half Pigeon Left",
+          "duration": 1.5,
+          "type": "left_side"
+        },
+        {
+          "name": "Reclined Butterfly",
+          "duration": 1.5,
+          "type": "closing"
+        }
+      ],
+      "category": "cool_down",
+      "style": [
+        "yin",
+        "hatha"
+      ],
+      "muscle_groups": [
+        "hips",
+        "groin",
+        "glutes"
+      ],
+      "difficulty": 2,
+      "energy_level": "releasing"
+    },
+    "complete_relaxation_sequence": {
+      "name": "Complete Relaxation Sequence",
+      "duration": 9.0,
+      "tags": [
+        "deep_relaxation",
+        "meditation"
+      ],
+      "flow": [
+        {
+          "name": "Child's Pose",
+          "duration": 1.5,
+          "type": "setup"
+        },
+        {
+          "name": "Fish Pose",
+          "duration": 2.5,
+          "type": "main"
+        },
+        {
+          "name": "Supine Knees to Chest",
+          "duration": 0.5,
+          "type": "transition"
+        },
+        {
+          "name": "Happy Baby Pose",
+          "duration": 1.0,
+          "type": "main"
+        },
+        {
+          "name": "Supine Spinal Twist Right",
+          "duration": 1.0,
+          "type": "right_side"
+        },
+        {
+          "name": "Supine Spinal Twist Left",
+          "duration": 1.0,
+          "type": "left_side"
+        },
+        {
+          "name": "Savasana",
+          "duration": 1.5,
+          "type": "closing"
+        }
+      ],
+      "category": "cool_down",
+      "style": [
+        "restorative",
+        "yin"
+      ],
+      "muscle_groups": [
+        "full_body",
+        "nervous_system"
+      ],
+      "difficulty": 1,
+      "energy_level": "deeply_relaxing"
     }
   }
 }
