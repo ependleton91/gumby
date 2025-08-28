@@ -1224,6 +1224,725 @@
       "instructions": "Reach one arm overhead and lean to opposite side",
       "modifications": "Hand on hip for support, smaller range of motion",
       "image_filename": "side_body_stretch.png"
+    },
+    "high_lunge_right": {
+      "name": "High Lunge Right",
+      "default_duration": "0.75",
+      "type": "right_side",
+      "muscle_groups": [
+        "legs",
+        "core",
+        "hip_flexors"
+      ],
+      "difficulty": "2",
+      "description": "Standing lunge with right foot forward, back knee lifted",
+      "instructions": "Step right foot forward, lift back heel, bend front knee over ankle, arms can be on hips or overhead.",
+      "modifications": "Lower back knee to mat, use blocks under hands for support.",
+      "image_filename": "high_lunge_right.png"
+    },
+    "high_lunge_left": {
+      "name": "High Lunge Left",
+      "default_duration": "0.75",
+      "type": "left_side",
+      "muscle_groups": [
+        "legs",
+        "core",
+        "hip_flexors"
+      ],
+      "difficulty": "2",
+      "description": "Standing lunge with left foot forward, back knee lifted",
+      "instructions": "Step left foot forward, lift back heel, bend front knee over ankle, arms can be on hips or overhead.",
+      "modifications": "Lower back knee to mat, use blocks under hands for support.",
+      "image_filename": "high_lunge_left.png"
+    },
+    "revolved_lunge_right": {
+      "name": "Revolved Lunge Right",
+      "default_duration": "0.75",
+      "type": "right_side",
+      "muscle_groups": [
+        "legs",
+        "spine",
+        "core"
+      ],
+      "difficulty": "4",
+      "description": "Twisted lunge with right foot forward, left hand down",
+      "instructions": "From lunge with right foot forward, place left hand inside right foot, twist right arm up toward ceiling.",
+      "modifications": "Use block under bottom hand, keep back knee down, hand on shin instead of floor.",
+      "image_filename": "revolved_lunge_right.png"
+    },
+    "revolved_lunge_left": {
+      "name": "Revolved Lunge Left",
+      "default_duration": "0.75",
+      "type": "left_side",
+      "muscle_groups": [
+        "legs",
+        "spine",
+        "core"
+      ],
+      "difficulty": "4",
+      "description": "Twisted lunge with left foot forward, right hand down",
+      "instructions": "From lunge with left foot forward, place right hand inside left foot, twist left arm up toward ceiling.",
+      "modifications": "Use block under bottom hand, keep back knee down, hand on shin instead of floor.",
+      "image_filename": "revolved_lunge_left.png"
+    },
+    "hand_to_big_toe_right": {
+      "name": "Hand to Big Toe Right",
+      "default_duration": "0.75",
+      "type": "right_side",
+      "muscle_groups": [
+        "legs",
+        "core"
+      ],
+      "difficulty": "4",
+      "description": "Standing balance holding right big toe with right hand",
+      "instructions": "Stand on left leg, bend right knee, grab right big toe with right hand, slowly extend right leg forward.",
+      "modifications": "Use strap around foot, hold knee instead of toe, use wall support.",
+      "image_filename": "hand_to_big_toe_right.png"
+    },
+    "hand_to_big_toe_left": {
+      "name": "Hand to Big Toe Left",
+      "default_duration": "0.75",
+      "type": "left_side",
+      "muscle_groups": [
+        "legs",
+        "core"
+      ],
+      "difficulty": "4",
+      "description": "Standing balance holding left big toe with left hand",
+      "instructions": "Stand on right leg, bend left knee, grab left big toe with left hand, slowly extend left leg forward.",
+      "modifications": "Use strap around foot, hold knee instead of toe, use wall support.",
+      "image_filename": "hand_to_big_toe_left.png"
+    },
+    "goddess_pose": {
+      "name": "Goddess Pose",
+      "default_duration": "0.75",
+      "type": "main",
+      "muscle_groups": [
+        "legs",
+        "glutes",
+        "core"
+      ],
+      "difficulty": "2",
+      "description": "Wide-legged squat with arms in goal post position",
+      "instructions": "Stand with legs wide, turn toes out, bend knees, arms in goal posts at shoulder height.",
+      "modifications": "Less depth in squat, hands on hips, back against wall.",
+      "image_filename": "goddess_pose.png"
+    },
+    "star_pose": {
+      "name": "Star Pose",
+      "default_duration": "0.5",
+      "type": "main",
+      "muscle_groups": [
+        "legs",
+        "core",
+        "shoulders"
+      ],
+      "difficulty": "1",
+      "description": "Standing pose with arms and legs wide like a star",
+      "instructions": "Stand with feet wide apart, arms extended wide to sides, palms facing forward.",
+      "modifications": "Narrower stance, arms at shoulder height instead of overhead.",
+      "image_filename": "star_pose.png"
+    },
+    "pyramid_pose_right": {
+      "name": "Pyramid Pose Right",
+      "default_duration": "1.0",
+      "type": "right_side",
+      "muscle_groups": [
+        "hamstrings",
+        "legs",
+        "spine"
+      ],
+      "difficulty": "3",
+      "description": "Standing forward fold over straight front leg with right foot forward",
+      "instructions": "Step right foot forward, straighten both legs, fold forward over right leg.",
+      "modifications": "Hands on blocks, bend front knee slightly, hands on shin.",
+      "image_filename": "pyramid_pose_right.png"
+    },
+    "pyramid_pose_left": {
+      "name": "Pyramid Pose Left",
+      "default_duration": "1.0",
+      "type": "left_side",
+      "muscle_groups": [
+        "hamstrings",
+        "legs",
+        "spine"
+      ],
+      "difficulty": "3",
+      "description": "Standing forward fold over straight front leg with left foot forward",
+      "instructions": "Step left foot forward, straighten both legs, fold forward over left leg.",
+      "modifications": "Hands on blocks, bend front knee slightly, hands on shin.",
+      "image_filename": "pyramid_pose_left.png"
+    },
+    "reverse_warrior_right": {
+      "name": "Reverse Warrior Right",
+      "default_duration": "0.6",
+      "type": "right_side",
+      "muscle_groups": [
+        "legs",
+        "side_body",
+        "shoulders"
+      ],
+      "difficulty": "2",
+      "description": "Side bend from Warrior II with right foot forward",
+      "instructions": "From Warrior II right, drop left hand to back leg, reach right arm over head.",
+      "modifications": "Hand stays on thigh, smaller side bend, use wall support.",
+      "image_filename": "reverse_warrior_right.png"
+    },
+    "reverse_warrior_left": {
+      "name": "Reverse Warrior Left",
+      "default_duration": "0.6",
+      "type": "left_side",
+      "muscle_groups": [
+        "legs",
+        "side_body",
+        "shoulders"
+      ],
+      "difficulty": "2",
+      "description": "Side bend from Warrior II with left foot forward",
+      "instructions": "From Warrior II left, drop right hand to back leg, reach left arm over head.",
+      "modifications": "Hand stays on thigh, smaller side bend, use wall support.",
+      "image_filename": "reverse_warrior_left.png"
+    },
+    "forearm_plank": {
+      "name": "Forearm Plank",
+      "default_duration": "0.75",
+      "type": "main",
+      "muscle_groups": [
+        "core",
+        "shoulders",
+        "arms"
+      ],
+      "difficulty": "3",
+      "description": "Plank pose on forearms instead of hands",
+      "instructions": "Lower to forearms, body in straight line from head to heels.",
+      "modifications": "Drop knees to ground, shorter hold time, use wall.",
+      "image_filename": "forearm_plank.png"
+    },
+    "compass_pose_right": {
+      "name": "Compass Pose Right",
+      "default_duration": "1.0",
+      "type": "right_side",
+      "muscle_groups": [
+        "hamstrings",
+        "shoulders",
+        "spine"
+      ],
+      "difficulty": "5",
+      "description": "Advanced seated pose extending right leg up and to side",
+      "instructions": "Sit with right leg extended up, thread right arm under right leg, left hand holds foot.",
+      "modifications": "Bend extended leg, use strap around foot, stay seated upright.",
+      "image_filename": "compass_pose_right.png"
+    },
+    "compass_pose_left": {
+      "name": "Compass Pose Left",
+      "default_duration": "1.0",
+      "type": "left_side",
+      "muscle_groups": [
+        "hamstrings",
+        "shoulders",
+        "spine"
+      ],
+      "difficulty": "5",
+      "description": "Advanced seated pose extending left leg up and to side",
+      "instructions": "Sit with left leg extended up, thread left arm under left leg, right hand holds foot.",
+      "modifications": "Bend extended leg, use strap around foot, stay seated upright.",
+      "image_filename": "compass_pose_left.png"
+    },
+    "wild_thing_right": {
+      "name": "Wild Thing Right",
+      "default_duration": "0.5",
+      "type": "right_side",
+      "muscle_groups": [
+        "chest",
+        "shoulders",
+        "core"
+      ],
+      "difficulty": "4",
+      "description": "Heart-opening transition from side plank",
+      "instructions": "From side plank right, lift top leg, arch back, reach top arm over head.",
+      "modifications": "Keep bottom knee down, smaller backbend, use wall support.",
+      "image_filename": "wild_thing_right.png"
+    },
+    "wild_thing_left": {
+      "name": "Wild Thing Left",
+      "default_duration": "0.5",
+      "type": "left_side",
+      "muscle_groups": [
+        "chest",
+        "shoulders",
+        "core"
+      ],
+      "difficulty": "4",
+      "description": "Heart-opening transition from side plank",
+      "instructions": "From side plank left, lift top leg, arch back, reach top arm over head.",
+      "modifications": "Keep bottom knee down, smaller backbend, use wall support.",
+      "image_filename": "wild_thing_left.png"
+    },
+    "thread_needle_right": {
+      "name": "Thread Needle Right",
+      "default_duration": "0.75",
+      "type": "right_side",
+      "muscle_groups": [
+        "shoulders",
+        "spine",
+        "neck"
+      ],
+      "difficulty": "2",
+      "description": "Shoulder and neck release threading right arm under left",
+      "instructions": "From table top, thread right arm under left arm, lower right shoulder to floor.",
+      "modifications": "Stay higher, place pillow under shoulder, use block under head.",
+      "image_filename": "thread_needle_right.png"
+    },
+    "thread_needle_left": {
+      "name": "Thread Needle Left",
+      "default_duration": "0.75",
+      "type": "left_side",
+      "muscle_groups": [
+        "shoulders",
+        "spine",
+        "neck"
+      ],
+      "difficulty": "2",
+      "description": "Shoulder and neck release threading left arm under right",
+      "instructions": "From table top, thread left arm under right arm, lower left shoulder to floor.",
+      "modifications": "Stay higher, place pillow under shoulder, use block under head.",
+      "image_filename": "thread_needle_left.png"
+    },
+    "puppy_pose": {
+      "name": "Puppy Pose",
+      "default_duration": "1.0",
+      "type": "main",
+      "muscle_groups": [
+        "shoulders",
+        "chest",
+        "spine"
+      ],
+      "difficulty": "2",
+      "description": "Heart opener from hands and knees with chest lowered",
+      "instructions": "From table top, walk hands forward, lower chest toward floor, hips over knees.",
+      "modifications": "Forehead on block, less depth, pillow under chest.",
+      "image_filename": "puppy_pose.png"
+    },
+    "seated_pigeon_right": {
+      "name": "Seated Pigeon Right",
+      "default_duration": "2.0",
+      "type": "right_side",
+      "muscle_groups": [
+        "hips",
+        "glutes"
+      ],
+      "difficulty": "2",
+      "description": "Hip opener sitting in chair or on floor with right ankle on left thigh",
+      "instructions": "Sit and place right ankle on left thigh, gently fold forward if comfortable.",
+      "modifications": "Stay upright, use pillow under right knee, less depth.",
+      "image_filename": "seated_pigeon_right.png"
+    },
+    "seated_pigeon_left": {
+      "name": "Seated Pigeon Left",
+      "default_duration": "2.0",
+      "type": "left_side",
+      "muscle_groups": [
+        "hips",
+        "glutes"
+      ],
+      "difficulty": "2",
+      "description": "Hip opener sitting in chair or on floor with left ankle on right thigh",
+      "instructions": "Sit and place left ankle on right thigh, gently fold forward if comfortable.",
+      "modifications": "Stay upright, use pillow under left knee, less depth.",
+      "image_filename": "seated_pigeon_left.png"
+    },
+    "garland_pose": {
+      "name": "Garland Pose",
+      "default_duration": "1.0",
+      "type": "main",
+      "muscle_groups": [
+        "legs",
+        "hips",
+        "ankles"
+      ],
+      "difficulty": "2",
+      "description": "Deep squat with hands at heart center",
+      "instructions": "Feet wider than hips, squat down, palms together at heart, elbows against inner thighs.",
+      "modifications": "Sit on block, hold onto something for balance, place blanket under heels.",
+      "image_filename": "garland_pose.png"
+    },
+    "twisted_lunge_right": {
+      "name": "Twisted Lunge Right",
+      "default_duration": 0.75,
+      "type": "right_side",
+      "muscle_groups": [
+        "legs",
+        "spine",
+        "core"
+      ],
+      "difficulty": 3,
+      "description": "Lunge with spinal rotation, right foot forward",
+      "instructions": "From lunge right, place left hand on floor, twist right arm to ceiling.",
+      "modifications": "Hand on block, back knee down, smaller twist.",
+      "image_filename": "twisted_lunge_right.png"
+    },
+    "twisted_lunge_left": {
+      "name": "Twisted Lunge Left",
+      "default_duration": 0.75,
+      "type": "left_side",
+      "muscle_groups": [
+        "legs",
+        "spine",
+        "core"
+      ],
+      "difficulty": 3,
+      "description": "Lunge with spinal rotation, left foot forward",
+      "instructions": "From lunge left, place right hand on floor, twist left arm to ceiling.",
+      "modifications": "Hand on block, back knee down, smaller twist.",
+      "image_filename": "twisted_lunge_left.png"
+    },
+    "cow_face_pose": {
+      "name": "Cow Face Pose",
+      "default_duration": "1.5",
+      "type": "main",
+      "muscle_groups": [
+        "shoulders",
+        "hips"
+      ],
+      "difficulty": "3",
+      "description": "Seated pose with crossed legs and arms reaching behind back",
+      "instructions": "Sit with knees stacked, one arm up and one down reaching behind back to clasp hands.",
+      "modifications": "Use strap between hands, sit on blanket, arms don't need to touch.",
+      "image_filename": "cow_face_pose.png"
+    },
+    "gate_pose_right": {
+      "name": "Gate Pose Right",
+      "default_duration": "0.75",
+      "type": "right_side",
+      "muscle_groups": [
+        "side_body",
+        "legs"
+      ],
+      "difficulty": "2",
+      "description": "Kneeling side stretch with right leg extended to side",
+      "instructions": "Kneel on left knee, extend right leg to side, reach left arm over head toward right.",
+      "modifications": "Hand on extended leg, smaller side bend, use block under right hand.",
+      "image_filename": "gate_pose_right.png"
+    },
+    "gate_pose_left": {
+      "name": "Gate Pose Left",
+      "default_duration": "0.75",
+      "type": "left_side",
+      "muscle_groups": [
+        "side_body",
+        "legs"
+      ],
+      "difficulty": "2",
+      "description": "Kneeling side stretch with left leg extended to side",
+      "instructions": "Kneel on right knee, extend left leg to side, reach right arm over head toward left.",
+      "modifications": "Hand on extended leg, smaller side bend, use block under left hand.",
+      "image_filename": "gate_pose_left.png"
+    },
+    "reclining_spinal_twist_right": {
+      "name": "Reclining Spinal Twist Right",
+      "default_duration": 2.0,
+      "type": "right_side",
+      "muscle_groups": [
+        "spine",
+        "hips"
+      ],
+      "difficulty": 1,
+      "description": "Gentle lying twist with knees falling to right side",
+      "instructions": "Lie on back, hug knees to chest, drop both knees to right side, arms open wide.",
+      "modifications": "Pillow between knees, support knees with bolster.",
+      "image_filename": "reclining_spinal_twist_right.png"
+    },
+    "reclining_spinal_twist_left": {
+      "name": "Reclining Spinal Twist Left",
+      "default_duration": 2.0,
+      "type": "left_side",
+      "muscle_groups": [
+        "spine",
+        "hips"
+      ],
+      "difficulty": 1,
+      "description": "Gentle lying twist with knees falling to left side",
+      "instructions": "Lie on back, hug knees to chest, drop both knees to left side, arms open wide.",
+      "modifications": "Pillow between knees, support knees with bolster.",
+      "image_filename": "reclining_spinal_twist_left.png"
+    },
+    "windshield_wipers": {
+      "name": "Windshield Wipers",
+      "default_duration": "0.75",
+      "type": "main",
+      "muscle_groups": [
+        "hips",
+        "spine"
+      ],
+      "difficulty": "1",
+      "description": "Gentle hip and spine mobility lying on back",
+      "instructions": "Lie on back with knees bent, slowly drop knees side to side like windshield wipers.",
+      "modifications": "Smaller range of motion, place hands on knees for control.",
+      "image_filename": "windshield_wipers.png"
+    },
+    "supported_backbend": {
+      "name": "Supported Backbend",
+      "default_duration": 2.0,
+      "type": "main",
+      "muscle_groups": [
+        "chest",
+        "shoulders"
+      ],
+      "difficulty": 1,
+      "description": "Passive heart opener over bolster or block",
+      "instructions": "Place bolster or block under shoulder blades, lie back with arms open wide.",
+      "modifications": "Use folded blanket instead of bolster, adjust height for comfort.",
+      "image_filename": "supported_backbend.png"
+    },
+    "flying_pigeon_right": {
+      "name": "Flying Pigeon Right",
+      "default_duration": "0.75",
+      "type": "right_side",
+      "muscle_groups": [
+        "arms",
+        "core",
+        "hips"
+      ],
+      "difficulty": "5",
+      "description": "Advanced arm balance with right leg in pigeon position",
+      "instructions": "From crow pose, slide right shin onto left upper arm, extend left leg back.",
+      "modifications": "Keep both feet on ground, use block under forehead, practice crow first.",
+      "image_filename": "flying_pigeon_right.png"
+    },
+    "flying_pigeon_left": {
+      "name": "Flying Pigeon Left",
+      "default_duration": "0.75",
+      "type": "left_side",
+      "muscle_groups": [
+        "arms",
+        "core",
+        "hips"
+      ],
+      "difficulty": "5",
+      "description": "Advanced arm balance with left leg in pigeon position",
+      "instructions": "From crow pose, slide left shin onto right upper arm, extend right leg back.",
+      "modifications": "Keep both feet on ground, use block under forehead, practice crow first.",
+      "image_filename": "flying_pigeon_left.png"
+    },
+    "eight_angle_pose_right": {
+      "name": "Eight Angle Pose Right",
+      "default_duration": "0.5",
+      "type": "right_side",
+      "muscle_groups": [
+        "arms",
+        "core",
+        "shoulders"
+      ],
+      "difficulty": "5",
+      "description": "Advanced arm balance with legs extending to right side",
+      "instructions": "Hook right leg around right arm, extend both legs to right, balance on hands.",
+      "modifications": "Keep feet on ground, use block under hip, practice side crow first.",
+      "image_filename": "eight_angle_pose_right.png"
+    },
+    "eight_angle_pose_left": {
+      "name": "Eight Angle Pose Left",
+      "default_duration": "0.5",
+      "type": "left_side",
+      "muscle_groups": [
+        "arms",
+        "core",
+        "shoulders"
+      ],
+      "difficulty": "5",
+      "description": "Advanced arm balance with legs extending to left side",
+      "instructions": "Hook left leg around left arm, extend both legs to left, balance on hands.",
+      "modifications": "Keep feet on ground, use block under hip, practice side crow first.",
+      "image_filename": "eight_angle_pose_left.png"
+    },
+    "firefly_pose": {
+      "name": "Firefly Pose",
+      "default_duration": "0.5",
+      "type": "main",
+      "muscle_groups": [
+        "arms",
+        "core",
+        "hamstrings"
+      ],
+      "difficulty": "5",
+      "description": "Advanced arm balance with legs extended forward",
+      "instructions": "Squat, hands under thighs, straighten legs forward, balance on hands.",
+      "modifications": "Keep toes on ground, use blocks under hands, bend knees.",
+      "image_filename": "firefly_pose.png"
+    },
+    "scorpion_pose": {
+      "name": "Scorpion Pose",
+      "default_duration": "1.0",
+      "type": "main",
+      "muscle_groups": [
+        "arms",
+        "back",
+        "core"
+      ],
+      "difficulty": "5",
+      "description": "Advanced backbend in forearm stand",
+      "instructions": "From forearm stand, bend knees and arch back to bring feet toward head.",
+      "modifications": "Practice against wall, stay in forearm stand, use spotter.",
+      "image_filename": "scorpion_pose.png"
+    },
+    "wheel_pose": {
+      "name": "Wheel Pose",
+      "default_duration": "1.0",
+      "type": "main",
+      "muscle_groups": [
+        "back",
+        "shoulders",
+        "arms"
+      ],
+      "difficulty": "4",
+      "description": "Full backbend with hands and feet on ground",
+      "instructions": "Lie on back, hands by ears, press up into full backbend arch.",
+      "modifications": "Stay in bridge, use blocks under hands, practice against wall.",
+      "image_filename": "wheel_pose.png"
+    },
+    "king_pigeon_right": {
+      "name": "King Pigeon Right",
+      "default_duration": "1.5",
+      "type": "right_side",
+      "muscle_groups": [
+        "hips",
+        "back",
+        "shoulders"
+      ],
+      "difficulty": "4",
+      "description": "Deep backbend in pigeon pose reaching back foot",
+      "instructions": "From pigeon right, bend back leg, reach back with both hands to grab foot.",
+      "modifications": "Use strap around back foot, stay in regular pigeon, one hand only.",
+      "image_filename": "king_pigeon_right.png"
+    },
+    "king_pigeon_left": {
+      "name": "King Pigeon Left",
+      "default_duration": 1.5,
+      "type": "left_side",
+      "muscle_groups": [
+        "hips",
+        "back",
+        "shoulders"
+      ],
+      "difficulty": 4,
+      "description": "Deep backbend in pigeon pose reaching back foot",
+      "instructions": "From pigeon left, bend back leg, reach back with both hands to grab foot.",
+      "modifications": "Use strap around back foot, stay in regular pigeon, one hand only.",
+      "image_filename": "king_pigeon_left.png"
+    },
+    "hollow_body_rocks": {
+      "name": "Hollow Body Rocks",
+      "default_duration": 0.5,
+      "type": "main",
+      "muscle_groups": [
+        "core",
+        "hip_flexors"
+      ],
+      "difficulty": 4,
+      "description": "Dynamic core exercise rocking in hollow body position",
+      "instructions": "In hollow body hold, gently rock forward and back maintaining curved spine.",
+      "modifications": "Rock smaller, bend knees, hands behind head for support.",
+      "image_filename": "hollow_body_rocks.png"
+    },
+    "russian_twists": {
+      "name": "Russian Twists",
+      "default_duration": 0.5,
+      "type": "main",
+      "muscle_groups": [
+        "core",
+        "obliques"
+      ],
+      "difficulty": 3,
+      "description": "Seated core exercise twisting side to side",
+      "instructions": "Sit with knees bent, lean back, lift feet, twist torso side to side touching ground.",
+      "modifications": "Keep feet on ground, hands on chest, smaller twists.",
+      "image_filename": "russian_twists.png"
+    },
+    "bird_dog_right": {
+      "name": "Bird Dog Right",
+      "default_duration": 0.75,
+      "type": "right_side",
+      "muscle_groups": [
+        "core",
+        "back",
+        "glutes"
+      ],
+      "difficulty": 2,
+      "description": "Core stability extending right arm and left leg from table top",
+      "instructions": "From table top, extend right arm forward and left leg back, hold steady.",
+      "modifications": "Extend one limb at a time, use wall for hand support, shorter holds.",
+      "image_filename": "bird_dog_right.png"
+    },
+    "bird_dog_left": {
+      "name": "Bird Dog Left",
+      "default_duration": 0.75,
+      "type": "left_side",
+      "muscle_groups": [
+        "core",
+        "back",
+        "glutes"
+      ],
+      "difficulty": 2,
+      "description": "Core stability extending left arm and right leg from table top",
+      "instructions": "From table top, extend left arm forward and right leg back, hold steady.",
+      "modifications": "Extend one limb at a time, use wall for hand support, shorter holds.",
+      "image_filename": "bird_dog_left.png"
+    },
+    "frog_pose": {
+      "name": "Frog Pose",
+      "default_duration": 3.0,
+      "type": "main",
+      "muscle_groups": [
+        "hips",
+        "groin",
+        "inner_thighs"
+      ],
+      "difficulty": 3,
+      "description": "Deep yin hip opener on forearms with knees wide",
+      "instructions": "From table top, widen knees, lower to forearms, feet in line with knees.",
+      "modifications": "Stay on hands, pillow under knees, less wide stance.",
+      "image_filename": "frog_pose.png"
+    },
+    "seal_pose": {
+      "name": "Seal Pose",
+      "default_duration": 3.0,
+      "type": "main",
+      "muscle_groups": [
+        "back",
+        "shoulders"
+      ],
+      "difficulty": 2,
+      "description": "Yin backbend lying on belly with straight arms",
+      "instructions": "Lie on belly, straighten arms completely, lift chest high, minimal effort in back.",
+      "modifications": "Stay on forearms (sphinx), use pillow under hips, bend elbows slightly.",
+      "image_filename": "seal_pose.png"
+    },
+    "banana_pose_right": {
+      "name": "Banana Pose Right",
+      "default_duration": 3.0,
+      "type": "right_side",
+      "muscle_groups": [
+        "side_body",
+        "spine"
+      ],
+      "difficulty": 1,
+      "description": "Yin side body stretch lying on back in curved shape to right",
+      "instructions": "Lie on back, shift hips left, curve body to right like a banana shape.",
+      "modifications": "Arms at sides instead of overhead, pillow under head, smaller curve.",
+      "image_filename": "banana_pose_right.png"
+    },
+    "banana_pose_left": {
+      "name": "Banana Pose Left",
+      "default_duration": 3.0,
+      "type": "left_side",
+      "muscle_groups": [
+        "side_body",
+        "spine"
+      ],
+      "difficulty": 1,
+      "description": "Yin side body stretch lying on back in curved shape to left",
+      "instructions": "Lie on back, shift hips right, curve body to left like a banana shape.",
+      "modifications": "Arms at sides instead of overhead, pillow under head, smaller curve.",
+      "image_filename": "banana_pose_left.png"
     }
   }
 }
