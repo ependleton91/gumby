@@ -6,10 +6,79 @@ filtering flows by criteria, and selecting optimal flow combinations.
 
 import logging
 from typing import List, Dict, Any, Set, Tuple
-from utils.file_utils import safe_load_json
-from config import FLOWS_FILE
+import itertools
 
 logger = logging.getLogger(__name__)
+
+
+def load_class_template(style: str) -> Dict[str, Any]:
+    """Load class structure template for given style from database.
+    
+    Args:
+        style: Yoga style name (e.g., "vinyasa", "hatha")
+        
+    Returns:
+        Template dictionary with structure rules
+        
+    Raises:
+        KeyError: If style not found in templates
+    """
+    try:
+        from utils.database_utils import get_db_manager
+        
+        db = get_db_manager()
+        with db.get_connection() as conn:
+            cursor = conn.execute(
+                "SELECT * FROM class_templates WHERE style_name = ?", 
+                (style.lower(),)
+            )
+            result = cursor.fetchone()
+            
+            if not result:
+                # Get available styles for error message
+                cursor = conn.execute("SELECT style_name FROM class_templates")
+                available_styles = [row["style_name"] for row in cursor.fetchall()]
+                raise KeyError(f"Style '{style}' not found. Available styles: {available_styles}")
+            
+            # Convert database row to template format
+            template = {
+                "warm_up_percentage": result["warm_up_percentage"],
+                "main_flow_percentage": result["main_flow_percentage"],
+                "cool_down_percentage": result["cool_down_percentage"],
+                "energy_progression": result["energy_progression"],
+                "max_difficulty_jump": result["max_difficulty_jump"],
+                "requires_counter_poses": bool(result["requires_counter_poses"]),
+                "flow_style": result["flow_style"],
+                "typical_peak_difficulty": result["typical_peak_difficulty"],
+                "min_flows": result["min_flows"],
+                "max_flows": result["max_flows"],
+                "time_tolerance": result["time_tolerance"]
+            }
+            
+            return template
+            
+    except Exception as e:
+        logger.error(f"Error loading class template for {style}: {e}")
+        raise
+
+
+def get_available_styles() -> List[str]:
+    """Get list of all available class styles from database.
+    
+    Returns:
+        Sorted list of available style names
+    """
+    try:
+        from utils.database_utils import get_db_manager
+        
+        db = get_db_manager()
+        with db.get_connection() as conn:
+            cursor = conn.execute("SELECT style_name FROM class_templates ORDER BY style_name")
+            return [row["style_name"] for row in cursor.fetchall()]
+            
+    except Exception as e:
+        logger.error(f"Error getting available styles: {e}")
+        return []
 
 
 def extract_unique_values(flows_data: Dict[str, Any], field_path: str) -> List[str]:
@@ -60,57 +129,38 @@ def filter_flows_by_criteria(flows: List[Dict[str, Any]], criteria: Dict[str, An
     filtered_flows = []
     
     for flow in flows:
-        matches_category_criteria = True
-        matches_energy_criteria = True
-        matches_muscle_criteria = True
-        matches_tags_criteria = True
-        
         # Check style matching
         if "style" in criteria:
             flow_styles = flow.get("style", [])
             required_styles = criteria["style"]
             if not any(style in flow_styles for style in required_styles):
-                matches_style_criteria = False
                 continue
         
         # Check category matching
         if "category" in criteria:
             if flow.get("category") not in criteria["category"]:
-                matches_category_criteria = False
                 continue
-            else:
-                matches_category_criteria = True
         
         # Check energy level matching
         if "energy_level" in criteria:
             if flow.get("energy_level") not in criteria["energy_level"]:
-                matches_energy_criteria = False
                 continue
-            else:
-                matches_energy_criteria = True
         
         # Check muscle group overlap
-        if "muscle_groups" in criteria and criteria["muscle_groups"]:  # Add the second condition
+        if "muscle_groups" in criteria and criteria["muscle_groups"]:
             flow_muscles = flow.get("muscle_groups", [])
             required_muscles = criteria["muscle_groups"]
             if not any(muscle in flow_muscles for muscle in required_muscles):
-                matches_muscle_criteria = False
                 continue
-            else:
-                matches_muscle_criteria = True
         
         # Check tags overlap
         if "tags" in criteria:
             flow_tags = flow.get("tags", [])
             required_tags = criteria["tags"]
             if not any(tag in flow_tags for tag in required_tags):
-                matches_tags_criteria = False
                 continue
-            else:
-                matches_tags_criteria = True
         
-        if matches_category_criteria or matches_energy_criteria or matches_muscle_criteria or matches_tags_criteria:
-            filtered_flows.append(flow)
+        filtered_flows.append(flow)
     
     return filtered_flows
 
@@ -166,11 +216,10 @@ def calculate_flow_compatibility_score(flow: Dict[str, Any], criteria: Dict[str,
         if target_duration > 0:
             duration_ratio = min(flow_duration / target_duration, target_duration / flow_duration)
             score += duration_ratio * 0.1  # 10% weight
-        max_score += 0.5
+        max_score += 0.1
     
     return score / max_score if max_score > 0 else 0.0
 
-import itertools
 
 def select_best_flows_for_time(flows, target_time, tolerance=0.1):
     """Select combination of flows that best fits target time."""
@@ -195,7 +244,7 @@ def select_best_flows_for_time(flows, target_time, tolerance=0.1):
             if min_time <= total <= max_time and total > best_total:
                 best_combo = list(combo)
                 best_total = total
-                print(f"    ✅ New best: {total}min")
+                print(f"    New best: {total}min")
                 if best_total == max_time:
                     break
 
@@ -222,46 +271,10 @@ def select_best_flows_for_time(flows, target_time, tolerance=0.1):
     
     return selected
 
-def load_class_template(style: str) -> Dict[str, Any]:
-    """Load class structure template for given style.
-    
-    Args:
-        style: Yoga style name (e.g., "vinyasa", "hatha")
-        
-    Returns:
-        Template dictionary with structure rules
-        
-    Raises:
-        KeyError: If style not found in templates
-    """
-    # First, load the templates data
-    from config import CLASS_TEMPLATES_FILE
-    templates_data = safe_load_json(CLASS_TEMPLATES_FILE, {"class_structure_templates": {}})
-    templates = templates_data.get("class_structure_templates", {})
-    
-    # Check if style exists
-    if style.lower() not in templates:
-        available_styles = list(templates.keys())
-        raise KeyError(f"Style '{style}' not found. Available styles: {available_styles}")
-    
-    # Return the template for the style
-    return templates[style.lower()]
-
-
-def get_available_styles() -> List[str]:
-    """Get list of all available class styles.
-    
-    Returns:
-        Sorted list of available style names
-    """
-    sequences_data = safe_load_json(FLOWS_FILE, {"flowing_sequences": {}})
-    return sorted(sequences_data.get("class_structure_templates", {}).keys())
-
 
 def calculate_section_durations(total_duration: float, template: Dict[str, Any]) -> Dict[str, float]:
     """Calculate duration for each class section based on template percentages."""
     
-    # Your templates use individual percentage fields, not structure/ratios
     section_durations = {
         "warm_up": total_duration * template.get("warm_up_percentage", 0.25),
         "main_flow": total_duration * template.get("main_flow_percentage", 0.5), 
@@ -297,14 +310,17 @@ def group_flows_by_category(flows: List[Dict[str, Any]]) -> Dict[str, List[Dict[
 
 def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Main function to select flows for a complete yoga sequence.
+    
     Args:
         user_preferences: Dictionary with user's requirements
             - duration: Total class duration in minutes
             - style: Yoga style (vinyasa, hatha, yin)
             - muscle_groups: List of target muscle groups
             - difficulty: Preferred difficulty level (1-5) 
+            
     Returns:
         List of selected flows forming a complete sequence
+        
     Example:
         preferences = {
             "duration": 60,
@@ -314,7 +330,7 @@ def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str
         }
         flows = select_flows_for_sequence(preferences)
     """
-    # Load sequences data
+    # Load flows data from database
     from utils.file_utils import load_flows_data
     sequences_data = load_flows_data()
     all_flows = list(sequences_data.get("flowing_sequences", {}).values())
@@ -341,17 +357,13 @@ def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str
     }
     
     suitable_flows = filter_flows_by_criteria(all_flows, filter_criteria)
-
-    print(f"❗ Filtering result: {len(suitable_flows)} flows")
+    print(f"Filtering result: {len(suitable_flows)} flows")
 
     # Group flows by category
     flows_by_category = group_flows_by_category(suitable_flows)
-    print(f"🔍 Grouped by category: {list(flows_by_category.keys())}")
+    print(f"Grouped by category: {list(flows_by_category.keys())}")
     for category, flows in flows_by_category.items():
         print(f"  {category}: {len(flows)} flows")
-    
-    # Group flows by category
-    flows_by_category = group_flows_by_category(suitable_flows)
     
     # Select flows for each section
     selected_flows = []
@@ -360,7 +372,7 @@ def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str
         # Map section names to flow categories
         category_mapping = {
             "warm_up": "warm_up",
-            "main_flow": ["standing_flow", "seated_flow", "hip_opener", "backbend_flow","main_flow","energizing_flow","therapeutic","arm_balance","twist_flow","inversion",],
+            "main_flow": ["standing_flow", "seated_flow", "hip_opener", "backbend_flow","main_flow","energizing_flow","therapeutic","arm_balance","twist_flow","inversion"],
             "cool_down": "cool_down"
         }
         
@@ -387,6 +399,7 @@ def select_flows_for_sequence(user_preferences: Dict[str, Any]) -> List[Dict[str
 
 
 def validate_sequence_structure(flows: List[Dict[str, Any]], template: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """Validate that a sequence follows proper structure rules."""
     issues = []
     
     if not flows:
@@ -394,12 +407,7 @@ def validate_sequence_structure(flows: List[Dict[str, Any]], template: Dict[str,
         return False, issues
     
     # Check if we have flows for each required section
-    required_sections = template.get("structure", [])
     flows_by_category = group_flows_by_category(flows)
-    
-    for section in required_sections:
-        if section not in flows_by_category:
-            issues.append(f"Missing flows for required section: {section}")
     
     # Check total duration reasonableness
     total_duration = sum(flow.get("duration", 0) for flow in flows)
