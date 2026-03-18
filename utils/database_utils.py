@@ -449,40 +449,8 @@ def get_all_flows() -> List[Dict[str, Any]]:
         
         flows = []
         for row in cursor.fetchall():
-            flow_poses=[]
             # Get poses for this flow
-            for jobject in row.keys("flow_data"):
-                flow_poses.append({
-                    "name": jobject["name"],
-                    "duration": jobject["duration"],
-                    "type": jobject["type"]
-                })
-            
-            styles = row["style"].split(",") if row["style"] else []
-            for style in styles:
-                cursor.execute("SELECT name FROM yoga_styles WHERE id = ?", (style,))
-                style_name = cursor.fetchone()
-                if style_name:
-                    styles.replace(style, style_name["name"])
-            muscle_groups = row["muscle_groups"].split(",") if row["muscle_groups"] else []
-            for muscle_group in muscle_groups:
-                cursor.execute("SELECT name FROM muscle_groups WHERE id = ?", (muscle_group,))
-                muscle_name = cursor.fetchone()
-                if muscle_name:
-                    muscle_groups.replace(muscle_group, muscle_name["name"])
-            
-            flows.append({
-                "id": row["id"],
-                "name": row["name"],
-                "duration": row["duration"],
-                "category": row["category"] or "",
-                "style": styles,
-                "muscle_groups": muscle_groups,
-                "difficulty": row["difficulty"],
-                "energy_level": row["energy_level"] or "",
-                "flow": flow_poses
-            })
-        
+            flows.append(get_flow_with_full_poses(row["id"]))
         return flows
 
 def update_flow(original_name: str, flow_data: Dict[str, Any]) -> bool:
@@ -638,59 +606,8 @@ def get_all_sequences() -> List[Dict[str, Any]]:
                 sequence_ids.append(row["sequence_id"])
 
         for id in sequence_ids:
-            flows = []
-            for row in cursor.fetchall():
-                if row["sequence_id"] == id:
-                    flows.append({
-                        "id": row["flow_id"],
-                        "duration": row["flow_duration"],
-                        "index": row["index"],
-                        "style": row["style_names"].split(",") if row["style_names"] else [],
-                        "muscle_groups": row["muscle_group_names"].split(",") if row["muscle_group_names"] else [],
-                        "flow_data": row["flow_data"] if row["flow_data"] else {}
-                    })
-            flow_cursor = conn.execute("SELECT * FROM flows WHERE flow_id = ?", (id,))
-            
-            
-            # Get flows organized by section
-            flows_by_section = {}
-            for flow_row in flow_cursor.fetchall():
-                section = flow_row["section_type"]
-                if section not in flows_by_section:
-                    flows_by_section[section] = []
-                
-                flows_by_section[section].append({
-                    "name": flow_row["name"],
-                    "duration": row["duration"] if row["duration"] else flow_row["duration"]
-                })
+            sequences.append(get_sequence_with_full_flows(id))
 
-            style_ids = set(flow["style"] for flow in flows) if flows else []
-            styles = []
-            for style_id in style_ids:
-                cursor.execute("SELECT name FROM yoga_styles WHERE id = ?", (style_id,))
-                style_name = cursor.fetchone()
-                if style_name:
-                    styles.replace(styles, style_name["name"])
-
-            muscle_groups =  set(flow["muscle_groups"] for flow in flows) if flows else []
-
-            muscle_groups = []
-            for muscle_id in muscle_groups:
-                cursor.execute("SELECT name FROM muscle_groups WHERE id = ?", (muscle_id,))
-                muscle_name = cursor.fetchone()
-                if muscle_name:
-                    muscle_groups.replace(muscle_id, muscle_name["name"])
-
-            sequences.append({
-                "id": row["id"],
-                "name": row["name"],
-                "total_duration": sum(flow["duration"] for flow in flows),
-                "style": styles,
-                "muscle_groups": muscle_groups,
-                "flows": flows_by_section,
-                "created_at": row["created_at"]
-            })
-        
         return sequences
 
 # FAVORITES OPERATIONS
@@ -700,85 +617,45 @@ def create_favorite(name: str, item_type: str, item_id: int) -> bool:
     
     try:
         with db.get_connection() as conn:
-            # Create favorite entry
-            cursor = conn.execute("""
-                INSERT INTO favorites (name, type) VALUES (?, ?)
-            """, (name, item_type))
-            
+            # Create favorite entry by type
+            cursor = conn.execute(f"""
+                INSERT INTO favorites_{item_type}s (name, item_id) VALUES (?, ?)
+            """, (name, item_id))
+
             favorite_id = cursor.lastrowid
-            
-            # Link to appropriate item
-            if item_type == "pose":
-                conn.execute(
-                    "INSERT INTO favorite_poses (favorite_id, pose_id) VALUES (?, ?)",
-                    (favorite_id, item_id)
-                )
-            elif item_type == "flow":
-                conn.execute(
-                    "INSERT INTO favorite_flows (favorite_id, flow_id) VALUES (?, ?)",
-                    (favorite_id, item_id)
-                )
-            elif item_type == "sequence":
-                conn.execute(
-                    "INSERT INTO favorite_sequences (favorite_id, sequence_id) VALUES (?, ?)",
-                    (favorite_id, item_id)
-                )
-        
-        logger.info(f"Created favorite: {name} ({item_type})")
+
+        logger.info(f"Created favorite: {name} ({item_type}) with reference id {favorite_id}")
         return True
     except Exception as e:
         logger.error(f"Error creating favorite: {e}")
         return False
 
-def get_all_favorites() -> List[Dict[str, Any]]:
-    """Get all favorites with complete data."""
+def get_favorite_poses()->List[Dict[str, Any]]:
     db = get_db_manager()
-    
     with db.get_connection() as conn:
-        cursor = conn.execute("SELECT * FROM favorites ORDER BY created_at DESC")
+        cursor = conn.execute("SELECT * FROM favorites_poses ORDER BY created_at DESC")
         favorites = []
-        
         for row in cursor.fetchall():
-            favorite = {
+            favorites.append({
                 "id": row["id"],
                 "name": row["name"],
-                "type": row["type"],
-                "created_at": row["created_at"]
-            }
-            
-            # Get the actual favorited item data
-            if row["type"] == "pose":
-                pose_cursor = conn.execute("""
-                    SELECT p.* FROM favorite_poses fp
-                    JOIN poses p ON fp.pose_id = p.id
-                    WHERE fp.favorite_id = ?
-                """, (row["id"],))
-                pose_data = pose_cursor.fetchone()
-                if pose_data:
-                    favorite["pose_data"] = dict(pose_data)
-            
-            elif row["type"] == "flow":
-                flow_cursor = conn.execute("""
-                    SELECT f.* FROM favorite_flows ff
-                    JOIN flows f ON ff.flow_id = f.id
-                    WHERE ff.favorite_id = ?
-                """, (row["id"],))
-                flow_data = flow_cursor.fetchone()
-                if flow_data:
-                    favorite["flow_data"] = dict(flow_data)
-            
-            elif row["type"] == "sequence":
-                seq_cursor = conn.execute("""
-                    SELECT s.* FROM favorite_sequences fs
-                    JOIN sequences s ON fs.sequence_id = s.id
-                    WHERE fs.favorite_id = ?
-                """, (row["id"],))
-                sequence_data = seq_cursor.fetchone()
-                if sequence_data:
-                    favorite["sequence_data"] = dict(sequence_data)
-            
-            favorites.append(favorite)
-        
+                "created_at": row["created_at"],
+                "pose_data": get_pose_by_name(row["name"])
+            })
+        return favorites
+    
+def get_favorite_flows()->List[Dict[str, Any]]:
+    db = get_db_manager()
+    with db.get_connection() as conn:
+        cursor = conn.execute("SELECT * FROM favorites_flows ORDER BY created_at DESC")
+        favorites = []
+        for row in cursor.fetchall():
+            favorites.append({
+                "id": row["id"],
+                "name": row["name"],
+                "created_at": row["created_at"],
+                "flow_data": get_flow_with_full_poses(row["name"])
+            })
         return favorites
 
 def delete_favorite(favorite_id: int) -> bool:
@@ -799,22 +676,19 @@ def delete_favorite(favorite_id: int) -> bool:
         logger.error(f"Error deleting favorite: {e}")
         return False
 
-def get_favorite_by_name(name: str) -> Optional[Dict[str, Any]]:
-    """Get favorite by name for updating."""
+def get_favorite_sequences()->List[Dict[str, Any]]:
     db = get_db_manager()
-    
     with db.get_connection() as conn:
-        cursor = conn.execute("SELECT * FROM favorites WHERE name = ?", (name,))
-        result = cursor.fetchone()
-        
-        if result:
-            return {
-                "id": result["id"],
-                "name": result["name"],
-                "type": result["type"],
-                "created_at": result["created_at"]
-            }
-        return None
+        cursor = conn.execute("SELECT * FROM favorites_sequences ORDER BY created_at DESC")
+        favorites = []
+        for row in cursor.fetchall():
+            favorites.append({
+                "id": row["id"],
+                "name": row["name"],
+                "created_at": row["created_at"],
+                "sequence_data": get_sequence_with_full_flows(row["name"])
+            })
+        return favorites
 
 # PRACTICE SESSION OPERATIONS
 def create_practice_session(session_data: Dict[str, Any]) -> bool:
@@ -824,13 +698,15 @@ def create_practice_session(session_data: Dict[str, Any]) -> bool:
     try:
         with db.get_connection() as conn:
             conn.execute("""
-                INSERT INTO practice_sessions (sequence_id, duration_minutes, rating, notes)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO practice_sessions (session_date,sequence_name, duration_minutes, rating, notes,sequence_data)
+                VALUES (?, ?, ?, ?, ?, ?)
             """, (
-                session_data.get("sequence_id"),
+                session_data.get("session_date"),
+                session_data.get("sequence_name"),
                 session_data.get("duration_minutes", 0),
                 session_data.get("rating", 3),
-                session_data.get("notes", "")
+                session_data.get("notes", ""),
+                session_data.get("sequence_data", "")
             ))
         
         logger.info(f"Created practice session")
@@ -890,6 +766,67 @@ def get_all_yoga_styles() -> List[str]:
     with db.get_connection() as conn:
         cursor = conn.execute("SELECT name FROM yoga_styles ORDER BY name")
         return [row["name"] for row in cursor.fetchall()]
+
+def get_sequence_with_full_flows(sequence_id: int) -> Optional[Dict[str, Any]]:
+    """Get sequence with complete flow information for editing."""
+    db = get_db_manager()
+
+    with db.get_connection() as conn:
+        sequence_cursor = conn.execute("SELECT * FROM sequences WHERE id = ?", (sequence_id,))
+        
+        # Get flows for the sequence
+
+        flows = []
+        for row in sequence_cursor.fetchall():
+              flows.append({
+                    "id": row["flow_id"],
+                    "duration": row["flow_duration"],
+                    "index": row["index"],
+                    "style": row["style_names"].split(",") if row["style_names"] else [],
+                    "muscle_groups": row["muscle_group_names"].split(",") if row["muscle_group_names"] else [],
+                    "flow_data": row["flow_data"] if row["flow_data"] else flow_cursor.fetchone() if flow_cursor.fetchone()["id"] == row["flow_id"] else {}
+                })
+
+            # Get flows organized by section
+        flow_cursor = conn.execute("SELECT * FROM flows WHERE flow_id in (?)", (id in flows["id"],))
+
+        flows_by_section = {}
+        for flow_row in flow_cursor.fetchall():
+            section = flow_row["section_type"]
+            if section not in flows_by_section:
+                flows_by_section[section] = []
+                
+            flows_by_section[section].append({
+                "name": flow_row["name"],
+                "duration": row["duration"] if row["duration"] else flow_row["duration"]
+            })
+
+            style_ids = set(flow["style"] for flow in flows) if flows else []
+            styles = []
+            for style_id in style_ids:
+                style_cursor = conn.execute("SELECT name FROM yoga_styles WHERE id = ?", (style_id,))
+                style_name = style_cursor.fetchone()
+                if style_name:
+                    styles.replace(styles, style_name["name"])
+
+            muscle_groups =  set(flow["muscle_groups"] for flow in flows) if flows else []
+
+            muscle_groups = []
+            for muscle_id in muscle_groups:
+                muscle_cursor = conn.execute("SELECT name FROM muscle_groups WHERE id = ?", (muscle_id,))
+                muscle_name = muscle_cursor.fetchone()
+                if muscle_name:
+                    muscle_groups.replace(muscle_id, muscle_name["name"])
+
+        return {
+                "id": row["id"],
+                "name": row["name"],
+                "total_duration": sum(flow["duration"] for flow in flows),
+                "style": styles,
+                "muscle_groups": muscle_groups,
+                "flows": flows_by_section,
+                "created_at": row["created_at"]
+        }
 
 def get_flow_with_full_poses(flow_id: int) -> Optional[Dict[str, Any]]:
     """Get flow with complete pose information for editing."""
