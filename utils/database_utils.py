@@ -1,9 +1,13 @@
+import datetime
+from random import randint
 import sqlite3
 import logging
 import json
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple, Union
 from contextlib import contextmanager
+
+from click import style
 
 logger = logging.getLogger(__name__)
 
@@ -391,21 +395,21 @@ def create_flow(flow_data: Dict[str, Any]) -> bool:
             
             flow_id = cursor.lastrowid
             
-            # Link styles
+            # Styles as Style ID
             for style_name in flow_data.get("style", []):
                 style_id = ensure_yoga_style_exists(style_name)
                 conn.execute(
-                    "INSERT INTO flow_styles (flow_id, style_id) VALUES (?, ?)",
-                    (flow_id, style_id)
+                    "UPDATE flows SET style = ? WHERE id = ?",
+                    (style_id, flow_id)
                 )
-            
-            # Link muscle groups
+
+            muscle_ids = []
+            # Add Muscles As Muscle IDs
             for muscle_name in flow_data.get("muscle_groups", []):
                 muscle_id = ensure_muscle_group_exists(muscle_name)
-                conn.execute(
-                    "INSERT INTO flow_muscle_groups (flow_id, muscle_group_id) VALUES (?, ?)",
-                    (flow_id, muscle_id)
-                )
+                muscle_ids.append(muscle_id)
+            conn.execute("UPDATE flows SET muscle_groups = ? WHERE id = ?", (muscle_ids, flow_id))
+
             
             # Link poses in sequence
             for order, pose_info in enumerate(flow_data.get("flow", [])):
@@ -437,41 +441,35 @@ def get_all_flows() -> List[Dict[str, Any]]:
     with db.get_connection() as conn:
         # Get flow metadata with aggregated relationships
         cursor = conn.execute("""
-            SELECT f.*,
-                   GROUP_CONCAT(DISTINCT ys.name) as style_names,
-                   GROUP_CONCAT(DISTINCT mg.name) as muscle_group_names
+            SELECT f.*
             FROM flows f
-            LEFT JOIN flow_styles fs ON f.id = fs.flow_id
-            LEFT JOIN yoga_styles ys ON fs.style_id = ys.id
-            LEFT JOIN flow_muscle_groups fmg ON f.id = fmg.flow_id
-            LEFT JOIN muscle_groups mg ON fmg.muscle_group_id = mg.id
             GROUP BY f.id
             ORDER BY f.name
         """)
         
         flows = []
         for row in cursor.fetchall():
-            flow_id = row["id"]
-            
+            flow_poses=[]
             # Get poses for this flow
-            pose_cursor = conn.execute("""
-                SELECT p.name, fp.pose_duration, fp.sequence_order, p.type
-                FROM flow_poses fp
-                JOIN poses p ON fp.pose_id = p.id
-                WHERE fp.flow_id = ?
-                ORDER BY fp.sequence_order
-            """, (flow_id,))
-            
-            flow_poses = []
-            for pose_row in pose_cursor.fetchall():
+            for jobject in row.keys("flow_data"):
                 flow_poses.append({
-                    "name": pose_row["name"],
-                    "duration": pose_row["pose_duration"],
-                    "type": pose_row["type"]
+                    "name": jobject["name"],
+                    "duration": jobject["duration"],
+                    "type": jobject["type"]
                 })
             
-            styles = row["style_names"].split(",") if row["style_names"] else []
-            muscle_groups = row["muscle_group_names"].split(",") if row["muscle_group_names"] else []
+            styles = row["style"].split(",") if row["style"] else []
+            for style in styles:
+                cursor.execute("SELECT name FROM yoga_styles WHERE id = ?", (style,))
+                style_name = cursor.fetchone()
+                if style_name:
+                    styles.replace(style, style_name["name"])
+            muscle_groups = row["muscle_groups"].split(",") if row["muscle_groups"] else []
+            for muscle_group in muscle_groups:
+                cursor.execute("SELECT name FROM muscle_groups WHERE id = ?", (muscle_group,))
+                muscle_name = cursor.fetchone()
+                if muscle_name:
+                    muscle_groups.replace(muscle_group, muscle_name["name"])
             
             flows.append({
                 "id": row["id"],
@@ -513,40 +511,23 @@ def update_flow(original_name: str, flow_data: Dict[str, Any]) -> bool:
                 flow_data.get("category", ""), flow_data.get("difficulty", 1),
                 flow_data.get("energy_level", ""), flow_id
             ))
+
             
-            # Update styles - delete old, insert new
-            conn.execute("DELETE FROM flow_styles WHERE flow_id = ?", (flow_id,))
+            # Update styles
             for style_name in flow_data.get("style", []):
                 style_id = ensure_yoga_style_exists(style_name)
                 conn.execute(
-                    "INSERT INTO flow_styles (flow_id, style_id) VALUES (?, ?)",
-                    (flow_id, style_id)
+                    "UPDATE flows SET style = ? WHERE id = ?",
+                    (style_id, flow_id)
                 )
-            
-            # Update muscle groups - delete old, insert new
-            conn.execute("DELETE FROM flow_muscle_groups WHERE flow_id = ?", (flow_id,))
+            # Update muscle groups
             for muscle_name in flow_data.get("muscle_groups", []):
                 muscle_id = ensure_muscle_group_exists(muscle_name)
                 conn.execute(
-                    "INSERT INTO flow_muscle_groups (flow_id, muscle_group_id) VALUES (?, ?)",
-                    (flow_id, muscle_id)
+                    "UPDATE flows SET muscle_groups = ? WHERE id = ?",
+                    (muscle_id, flow_id)
                 )
-            
-            # Update pose sequence - delete old, insert new
-            conn.execute("DELETE FROM flow_poses WHERE flow_id = ?", (flow_id,))
-            for order, pose_info in enumerate(flow_data.get("flow", [])):
-                pose_name = pose_info.get("name", "")
-                pose_duration = pose_info.get("duration")
-                
-                # Get pose ID by name
-                pose_cursor = conn.execute("SELECT id FROM poses WHERE name = ?", (pose_name,))
-                pose_result = pose_cursor.fetchone()
-                if pose_result:
-                    conn.execute("""
-                        INSERT INTO flow_poses (flow_id, pose_id, sequence_order, pose_duration)
-                        VALUES (?, ?, ?, ?)
-                    """, (flow_id, pose_result["id"], order, pose_duration))
-        
+
         logger.info(f"Updated flow: {original_name} -> {flow_data['name']}")
         return True
     except Exception as e:
@@ -579,46 +560,57 @@ def create_sequence(sequence_data: Dict[str, Any]) -> bool:
     try:
         with db.get_connection() as conn:
             # Insert sequence metadata
-            cursor = conn.execute("""
-                INSERT INTO sequences (name, total_duration, difficulty)
-                VALUES (?, ?, ?)
-            """, (
-                sequence_data["name"], sequence_data.get("total_duration", 0),
-                sequence_data.get("difficulty", 1)
-            ))
-            
-            sequence_id = cursor.lastrowid
-            
-            # Link styles
-            for style_name in sequence_data.get("style", []):
-                style_id = ensure_yoga_style_exists(style_name)
+            sequence_id = randint(100000,999999)
+            existing_ids = []
+            existing_ids = conn.execute("SELECT Distinct sequence_id from sequences")
+
+            # Ensure unique sequence ID
+            while sequence_id in existing_ids:
+                sequence_id = randint(100000,999999)
+            existing_ids.append(sequence_id)
+            logger.info(f"Created new sequence with ID: {sequence_id}")
+
+            # Add each flow as row in sequences db
+            for flow in sequence_data.get("flows", []):
+                flow_cursor = conn.execute("SELECT id FROM flows WHERE name = ?", (flow.get("name", ""),))
+                flow_row = flow_cursor.fetchone()
+                if not flow_row:
+                    logger.warning(f"No flow found with name: {flow.get('name', '')}, creating new flow")
+                    create_flow(flow)
+                    flow_row = flow_cursor.fetchone()
+                    continue
+                flow_id = flow_row["id"]
+                conn.execute("""
+                    INSERT INTO sequences (sequence_name, sequence_id, index, flow_duration, flow_id, flow_data, updated_at, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    sequence_data["name"], sequence_id, sequence_data["index"], 0, flow.get("total_duration", flow_row["total_duration"]),
+                    flow_id, flow.get("data",flow_row["flow_data"]), datetime.now(), datetime.now()
+                ))
+
+                row_id = conn.lastrowid
+
+                # Link styles
+                style_ids = []
+                for style_name in sequence_data.get("style", flow_row["style"].split(",") if flow_row["style"] else []):
+                    style_id = ensure_yoga_style_exists(style_name)
+                    style_ids.append(style_id)
                 conn.execute(
-                    "INSERT INTO sequence_styles (sequence_id, style_id) VALUES (?, ?)",
-                    (sequence_id, style_id)
+                    "UPDATE sequences SET style = ? WHERE id = ?",
+                    (style_ids, row_id)
+                )
+
+                # Link muscle groups
+                muscle_ids = [] 
+                for muscle_name in sequence_data.get("muscle_groups", flow_row["muscle_groups"].split(",") if flow_row["muscle_groups"] else []):
+                    muscle_id = ensure_muscle_group_exists(muscle_name)
+                    muscle_ids.append(muscle_id)
+
+                conn.execute(
+                    "UPDATE sequences SET muscle_groups = ? WHERE id = ?",
+                    (muscle_ids, row_id)
                 )
             
-            # Link muscle groups
-            for muscle_name in sequence_data.get("muscle_groups", []):
-                muscle_id = ensure_muscle_group_exists(muscle_name)
-                conn.execute(
-                    "INSERT INTO sequence_muscle_groups (sequence_id, muscle_group_id) VALUES (?, ?)",
-                    (sequence_id, muscle_id)
-                )
-            
-            # Link flows in sections
-            for section_type, flows_list in sequence_data.get("flows", {}).items():
-                for order, flow_info in enumerate(flows_list):
-                    flow_name = flow_info.get("name", "")
-                    
-                    # Get flow ID by name
-                    flow_cursor = conn.execute("SELECT id FROM flows WHERE name = ?", (flow_name,))
-                    flow_result = flow_cursor.fetchone()
-                    if flow_result:
-                        conn.execute("""
-                            INSERT INTO sequence_flows (sequence_id, flow_id, section_type, sequence_order)
-                            VALUES (?, ?, ?, ?)
-                        """, (sequence_id, flow_result["id"], section_type, order))
-        
         logger.info(f"Created sequence: {sequence_data['name']}")
         return True
     except sqlite3.IntegrityError:
@@ -634,31 +626,33 @@ def get_all_sequences() -> List[Dict[str, Any]]:
     
     with db.get_connection() as conn:
         cursor = conn.execute("""
-            SELECT s.*,
-                   GROUP_CONCAT(DISTINCT ys.name) as style_names,
-                   GROUP_CONCAT(DISTINCT mg.name) as muscle_group_names
+            SELECT s.*
             FROM sequences s
-            LEFT JOIN sequence_styles ss ON s.id = ss.sequence_id
-            LEFT JOIN yoga_styles ys ON ss.style_id = ys.id
-            LEFT JOIN sequence_muscle_groups smg ON s.id = smg.sequence_id
-            LEFT JOIN muscle_groups mg ON smg.muscle_group_id = mg.id
             GROUP BY s.id
             ORDER BY s.created_at DESC
         """)
-        
         sequences = []
+        sequence_ids = []
         for row in cursor.fetchall():
-            sequence_id = row["id"]
+            if row["sequence_id"] not in sequence_ids:
+                sequence_ids.append(row["sequence_id"])
+
+        for id in sequence_ids:
+            flows = []
+            for row in cursor.fetchall():
+                if row["sequence_id"] == id:
+                    flows.append({
+                        "id": row["flow_id"],
+                        "duration": row["flow_duration"],
+                        "index": row["index"],
+                        "style": row["style_names"].split(",") if row["style_names"] else [],
+                        "muscle_groups": row["muscle_group_names"].split(",") if row["muscle_group_names"] else [],
+                        "flow_data": row["flow_data"] if row["flow_data"] else {}
+                    })
+            flow_cursor = conn.execute("SELECT * FROM flows WHERE flow_id = ?", (id,))
+            
             
             # Get flows organized by section
-            flow_cursor = conn.execute("""
-                SELECT f.name, f.duration, sf.section_type, sf.sequence_order
-                FROM sequence_flows sf
-                JOIN flows f ON sf.flow_id = f.id
-                WHERE sf.sequence_id = ?
-                ORDER BY sf.section_type, sf.sequence_order
-            """, (sequence_id,))
-            
             flows_by_section = {}
             for flow_row in flow_cursor.fetchall():
                 section = flow_row["section_type"]
@@ -667,17 +661,30 @@ def get_all_sequences() -> List[Dict[str, Any]]:
                 
                 flows_by_section[section].append({
                     "name": flow_row["name"],
-                    "duration": flow_row["duration"]
+                    "duration": row["duration"] if row["duration"] else flow_row["duration"]
                 })
-            
-            styles = row["style_names"].split(",") if row["style_names"] else []
-            muscle_groups = row["muscle_group_names"].split(",") if row["muscle_group_names"] else []
-            
+
+            style_ids = set(flow["style"] for flow in flows) if flows else []
+            styles = []
+            for style_id in style_ids:
+                cursor.execute("SELECT name FROM yoga_styles WHERE id = ?", (style_id,))
+                style_name = cursor.fetchone()
+                if style_name:
+                    styles.replace(styles, style_name["name"])
+
+            muscle_groups =  set(flow["muscle_groups"] for flow in flows) if flows else []
+
+            muscle_groups = []
+            for muscle_id in muscle_groups:
+                cursor.execute("SELECT name FROM muscle_groups WHERE id = ?", (muscle_id,))
+                muscle_name = cursor.fetchone()
+                if muscle_name:
+                    muscle_groups.replace(muscle_id, muscle_name["name"])
+
             sequences.append({
                 "id": row["id"],
                 "name": row["name"],
-                "total_duration": row["total_duration"],
-                "difficulty": row["difficulty"],
+                "total_duration": sum(flow["duration"] for flow in flows),
                 "style": styles,
                 "muscle_groups": muscle_groups,
                 "flows": flows_by_section,
@@ -896,52 +903,24 @@ def get_flow_with_full_poses(flow_id: int) -> Optional[Dict[str, Any]]:
             return None
         
         # Get poses with full details
-        pose_cursor = conn.execute("""
-            SELECT p.*, fp.pose_duration, fp.sequence_order
-            FROM flow_poses fp
-            JOIN poses p ON fp.pose_id = p.id
-            WHERE fp.flow_id = ?
-            ORDER BY fp.sequence_order
-        """, (flow_id,))
-        
         flow_poses = []
-        for pose_row in pose_cursor.fetchall():
-            # Get muscle groups for this pose
-            muscle_cursor = conn.execute("""
-                SELECT mg.name FROM pose_muscle_groups pmg
-                JOIN muscle_groups mg ON pmg.muscle_group_id = mg.id
-                WHERE pmg.pose_id = ?
-            """, (pose_row["id"],))
-            
-            muscle_groups = [row["name"] for row in muscle_cursor.fetchall()]
-            
-            flow_poses.append({
-                "id": pose_row["id"],
-                "name": pose_row["name"],
-                "duration": pose_row["pose_duration"],
-                "type": pose_row["type"],
-                "muscle_groups": muscle_groups,
-                "difficulty": pose_row["difficulty"],
-                "description": pose_row["description"],
-                "instructions": pose_row["instructions"],
-                "modifications": pose_row["modifications"],
-                "image_filename": pose_row["image_filename"]
-            })
-        
+        for jobject in flow_row["flow_data"]:
+            flow_poses.append(get_pose_by_name(jobject["name"]))
+
         # Get styles and muscle groups for flow
-        style_cursor = conn.execute("""
-            SELECT ys.name FROM flow_styles fs
-            JOIN yoga_styles ys ON fs.style_id = ys.id
-            WHERE fs.flow_id = ?
-        """, (flow_id,))
-        styles = [row["name"] for row in style_cursor.fetchall()]
-        
-        muscle_cursor = conn.execute("""
-            SELECT mg.name FROM flow_muscle_groups fmg
-            JOIN muscle_groups mg ON fmg.muscle_group_id = mg.id
-            WHERE fmg.flow_id = ?
-        """, (flow_id,))
-        muscle_groups = [row["name"] for row in muscle_cursor.fetchall()]
+        styles = flow_row["style"].split(",") if flow_row["style"] else []
+        for style in styles:
+            cursor.execute("SELECT name FROM yoga_styles WHERE id = ?", (style,))
+            style_name = cursor.fetchone()
+            if style_name:
+                styles.replace(style, style_name["name"])
+        muscle_groups = flow_row["muscle_groups"].split(",") if flow_row["muscle_groups"] else []
+        for muscle_group in muscle_groups:
+            cursor.execute("SELECT name FROM muscle_groups WHERE id = ?", (muscle_group,))
+            muscle_name = cursor.fetchone()
+            if muscle_name:
+                muscle_groups.replace(muscle_group, muscle_name["name"])
+            
         
         return {
             "id": flow_row["id"],
@@ -955,28 +934,3 @@ def get_flow_with_full_poses(flow_id: int) -> Optional[Dict[str, Any]]:
             "flow": flow_poses,
             "created_at": flow_row["created_at"]
         }
-
-# MIGRATION UTILITY
-def migrate_from_json_data(json_poses_file: str, json_flows_file: str) -> bool:
-    """Migrate existing JSON data to normalized database."""
-    try:
-        with open(json_poses_file) as f:
-            poses_data = json.load(f)
-        
-        with open(json_flows_file) as f:
-            flows_data = json.load(f)
-        
-        # Migrate poses
-        for pose_info in poses_data.get("poses", {}).values():
-            create_pose(pose_info)
-        
-        # Migrate flows
-        for flow_info in flows_data.get("flowing_sequences", {}).values():
-            create_flow(flow_info)
-        
-        logger.info("JSON data migration completed")
-        return True
-        
-    except Exception as e:
-        logger.error(f"Error migrating JSON data: {e}")
-        return False
