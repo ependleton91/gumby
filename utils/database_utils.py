@@ -94,69 +94,7 @@ class DatabaseManager:
                 name TEXT UNIQUE NOT NULL
             )
         """)
-        
-        # Junction tables for many-to-many relationships
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS pose_muscle_groups (
-                pose_id INTEGER REFERENCES poses(id) ON DELETE CASCADE,
-                muscle_group_id INTEGER REFERENCES muscle_groups(id) ON DELETE CASCADE,
-                PRIMARY KEY (pose_id, muscle_group_id)
-            )
-        """)
-        
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS flow_poses (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                flow_id INTEGER REFERENCES flows(id) ON DELETE CASCADE,
-                pose_id INTEGER REFERENCES poses(id) ON DELETE CASCADE,
-                sequence_order INTEGER NOT NULL,
-                pose_duration REAL,
-                UNIQUE(flow_id, sequence_order)
-            )
-        """)
-        
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS flow_styles (
-                flow_id INTEGER REFERENCES flows(id) ON DELETE CASCADE,
-                style_id INTEGER REFERENCES yoga_styles(id) ON DELETE CASCADE,
-                PRIMARY KEY (flow_id, style_id)
-            )
-        """)
-        
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS flow_muscle_groups (
-                flow_id INTEGER REFERENCES flows(id) ON DELETE CASCADE,
-                muscle_group_id INTEGER REFERENCES muscle_groups(id) ON DELETE CASCADE,
-                PRIMARY KEY (flow_id, muscle_group_id)
-            )
-        """)
-        
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS sequence_flows (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                sequence_id INTEGER REFERENCES sequences(id) ON DELETE CASCADE,
-                flow_id INTEGER REFERENCES flows(id) ON DELETE CASCADE,
-                section_type TEXT NOT NULL,
-                sequence_order INTEGER NOT NULL,
-                UNIQUE(sequence_id, section_type, sequence_order)
-            )
-        """)
-        
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS sequence_muscle_groups (
-                sequence_id INTEGER REFERENCES sequences(id) ON DELETE CASCADE,
-                muscle_group_id INTEGER REFERENCES muscle_groups(id) ON DELETE CASCADE,
-                PRIMARY KEY (sequence_id, muscle_group_id)
-            )
-        """)
-        
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS sequence_styles (
-                sequence_id INTEGER REFERENCES sequences(id) ON DELETE CASCADE,
-                style_id INTEGER REFERENCES yoga_styles(id) ON DELETE CASCADE,
-                PRIMARY KEY (sequence_id, style_id)
-            )
-        """)
+
         
         # Favorites system
         conn.execute("""
