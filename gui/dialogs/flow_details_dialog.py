@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QDialog, QGridLayout,QListWidget,QLineEdit,QHBoxLayout,QComboBox, QCheckBox, QGroupBox, QPushButton, QFormLayout, QLabel, QScrollArea, QWidget, QVBoxLayout
 from PyQt6.QtCore import Qt
-from utils.file_utils import load_flows_data,load_poses_data
 from utils.datetime_utils import format_duration_minutes
+from utils.database_utils import get_all_poses, get_all_flows
 
 class flow_details_box(QDialog):
     def __init__(self, flow_info, edit_mode=False, create_mode=False, flow_key=None, image_cache=None):
@@ -111,7 +111,7 @@ class flow_details_box(QDialog):
         
     def get_unique_muscles(self):
         try:
-            flows_data = load_flows_data()
+            flows_data = get_all_flows()
             
             all_muscles = set()
             for flow in flows_data["flowing_sequences"].values():
@@ -125,7 +125,7 @@ class flow_details_box(QDialog):
         if not (self.edit_mode or self.create_mode):
             return
             
-        flows_data = load_flows_data()
+        flows_data = get_all_flows()
 
         self.all_categories = set()
         self.all_energies = set()
@@ -331,7 +331,7 @@ class flow_details_box(QDialog):
         from PyQt6.QtWidgets import QInputDialog
         
         # Get available poses
-        poses_data = load_poses_data()
+        poses_data = get_all_poses()
         available_poses = list(poses_data.get("poses", {}).keys())
         
         if not available_poses:

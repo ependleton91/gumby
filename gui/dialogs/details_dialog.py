@@ -1,10 +1,10 @@
 from PyQt6.QtWidgets import QDialog, QMessageBox,QPushButton,QLineEdit,QTabWidget,QLabel,QVBoxLayout,QHBoxLayout,QTextEdit, QDialogButtonBox,QWidget,QListWidget,QGroupBox, QInputDialog,QLabel,QTreeWidget, QTreeWidgetItem, QSplitter,QScrollArea
 from PyQt6.QtCore import Qt
-from utils.file_utils import load_favorites_data, save_favorites_data, load_flows_data
+from utils.file_utils import save_favorites_data
 from utils.ui_utils import show_error_message, show_success_message
-from utils.validation_utils import validate_sequence_name, validate_yoga_style
+from utils.validation_utils import validate_sequence_name
 from utils.datetime_utils import format_duration_minutes
-
+from utils.database_utils import get_all_favorites, get_all_flows
 
 class details_dialog_box(QDialog):
         def __init__(self,favorite):
@@ -131,7 +131,7 @@ class General_Tab(QWidget):
     
     def save_changes(self):
         try:
-            favorites_data = load_favorites_data()
+            favorites_data = get_all_favorites()
 
             new_name = self.name_edit.text().strip()
             new_description = self.description_content.toPlainText().strip()
@@ -360,7 +360,7 @@ class Sequence_Tab(QWidget):
         section_key = section_item.data(0, Qt.ItemDataRole.UserRole)["key"]
         
         # Get available flows
-        flows_data = load_flows_data()
+        flows_data = get_all_flows()
         available_flows = list(flows_data.get("flowing_sequences", {}).values())
         flow_names = [flow["name"] for flow in available_flows]
         
@@ -433,7 +433,7 @@ class Sequence_Tab(QWidget):
             self.populate_sequence_tree()
     
     def save_changes(self):
-        favorites_data = load_favorites_data()
+        favorites_data = get_all_favorites()
         for fav in favorites_data["favorites"]:
             if fav["created_date"] == self.favorite["created_date"]:
                 fav["sequences"] = self.favorite["sequences"]
