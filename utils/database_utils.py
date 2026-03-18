@@ -37,6 +37,7 @@ class DatabaseManager:
         finally:
             conn.close()
     
+##Any new tables or changes to columns should be updated here if added in db
     def _create_tables(self, conn: sqlite3.Connection):
         """Create all normalized tables without JSON dependencies."""
         
@@ -154,6 +155,7 @@ class DatabaseManager:
 # Global database manager instance
 _db_manager = None
 
+#DB manager is used to manage database connections and operations between different parts of the app
 def get_db_manager() -> DatabaseManager:
     """Get singleton database manager instance."""
     global _db_manager
@@ -194,19 +196,28 @@ def get_pose_by_name(name: str) -> Optional[Dict[str, Any]]:
     
     with db.get_connection() as conn:
         cursor = conn.execute("""
-            SELECT p.*, GROUP_CONCAT(mg.name) as muscle_group_names
+            SELECT p.*
             FROM poses p
-            LEFT JOIN pose_muscle_groups pmg ON p.id = pmg.pose_id
-            LEFT JOIN muscle_groups mg ON pmg.muscle_group_id = mg.id
             WHERE p.name = ?
             GROUP BY p.id
         """, (name,))
-        
+
         row = cursor.fetchone()
         if not row:
             return None
-            
-        muscle_groups = row["muscle_group_names"].split(",") if row["muscle_group_names"] else []
+        
+        #Look up name for each muscle group id, replace with name
+        muscle_groups = row["muscle_groups"].split(",") if row["muscle_groups"] else []
+        for id in muscle_groups:
+            cursor = conn.execute("""
+                SELECT name 
+                FROM muscle_groups
+                WHERE id = ?
+            """, (id,))
+            muscle_group = cursor.fetchone()
+            if muscle_group:
+                muscle_groups.replace(id, muscle_group["name"])
+
         return {
             "id": row["id"],
             "name": row["name"],
@@ -239,13 +250,16 @@ def create_pose(pose_data: Dict[str, Any]) -> bool:
             ))
             
             pose_id = cursor.lastrowid
-            
-            # Link muscle groups
+            muscle_ids = []
+
+            # Grab Muscle ID's For each Muscle in Muscle Groups
             for muscle_name in pose_data.get("muscle_groups", []):
                 muscle_id = ensure_muscle_group_exists(muscle_name)
-                conn.execute(
-                    "INSERT INTO pose_muscle_groups (pose_id, muscle_group_id) VALUES (?, ?)",
-                    (pose_id, muscle_id)
+                muscle_ids.append(muscle_id)
+            #Add muscle groups to pose as array of muscle ids
+            conn.execute(
+                "UPDATE poses SET muscle_groups = ? WHERE id = ?",
+                 (muscle_ids, pose_id)
                 )
         
         logger.info(f"Created pose: {pose_data['name']}")
@@ -263,17 +277,27 @@ def get_all_poses() -> List[Dict[str, Any]]:
     
     with db.get_connection() as conn:
         cursor = conn.execute("""
-            SELECT p.*, GROUP_CONCAT(mg.name) as muscle_group_names
+            SELECT p.*
             FROM poses p
-            LEFT JOIN pose_muscle_groups pmg ON p.id = pmg.pose_id
-            LEFT JOIN muscle_groups mg ON pmg.muscle_group_id = mg.id
             GROUP BY p.id
             ORDER BY p.name
         """)
         
         poses = []
         for row in cursor.fetchall():
-            muscle_groups = row["muscle_group_names"].split(",") if row["muscle_group_names"] else []
+
+            #Look up name for each muscle group id, replace with name
+            muscle_groups = row["muscle_groups"].split(",") if row["muscle_groups"] else []
+            for id in muscle_groups:
+                cursor = conn.execute("""
+                    SELECT name 
+                    FROM muscle_groups
+                    WHERE id = ?
+                """, (id,))
+                muscle_group = cursor.fetchone()
+                if muscle_group:
+                    muscle_groups.replace(id, muscle_group["name"])
+
             poses.append({
                 "id": row["id"],
                 "name": row["name"],
@@ -303,30 +327,27 @@ def update_pose(pose_name: str, pose_data: Dict[str, Any]) -> bool:
                 return False
             
             pose_id = result["id"]
+
+            muscle_ids = []
+            # Grab Muscle ID's For each Muscle in Muscle Groups
+            for muscle_name in pose_data.get("muscle_groups", []):
+                muscle_id = ensure_muscle_group_exists(muscle_name)
+                muscle_ids.append(muscle_id)
             
             # Update pose
             cursor = conn.execute("""
                 UPDATE poses SET 
                     name = ?, default_duration = ?, type = ?, difficulty = ?,
                     description = ?, instructions = ?, modifications = ?, 
-                    image_filename = ?, updated_at = CURRENT_TIMESTAMP
+                    image_filename = ?, updated_at = CURRENT_TIMESTAMP, muscle_groups = ?
                 WHERE id = ?
             """, (
                 pose_data["name"], pose_data["default_duration"], pose_data["type"],
                 pose_data["difficulty"], pose_data.get("description", ""),
                 pose_data.get("instructions", ""), pose_data.get("modifications", ""),
-                pose_data.get("image_filename", ""), pose_id
+                pose_data.get("image_filename", ""), muscle_ids, pose_id
             ))
-            
-            # Update muscle groups - delete old, insert new
-            conn.execute("DELETE FROM pose_muscle_groups WHERE pose_id = ?", (pose_id,))
-            for muscle_name in pose_data.get("muscle_groups", []):
-                muscle_id = ensure_muscle_group_exists(muscle_name)
-                conn.execute(
-                    "INSERT INTO pose_muscle_groups (pose_id, muscle_group_id) VALUES (?, ?)",
-                    (pose_id, muscle_id)
-                )
-        
+
         logger.info(f"Updated pose: {pose_name} -> {pose_data['name']}")
         return True
     except Exception as e:
