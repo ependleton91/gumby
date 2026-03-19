@@ -2,6 +2,8 @@ import logging
 from pathlib import Path
 from typing import Dict, Any, Union, Optional, List
 
+from utils.database_utils import get_favorite_flows
+
 logger = logging.getLogger(__name__)
 
 # Keep the directory and backup utilities for other files (like images, exports)
@@ -17,7 +19,6 @@ def ensure_directory_exists(file_path: Union[str, Path]) -> None:
         logger.error(f"Failed to create directory {parent_dir}: {e}")
         raise
 
-# Replace JSON functions with database functions
 def load_flows_data() -> Dict[str, Any]:
     """Load flows data from database."""
     from utils.database_utils import get_all_flows
@@ -28,25 +29,18 @@ def load_poses_data() -> Dict[str, Any]:
     from utils.database_utils import get_all_poses
     return get_all_poses()
 
-def load_favorites_data() -> Dict[str, Any]:
+def load_favorite_flows() -> Dict[str, Any]:
     """Load favorites data from database."""
-    from utils.database_utils import get_all_favorites
-    return get_all_favorites()
+    from utils.database_utils import get_favorite_flows
+    return get_favorite_flows()
 
-def save_flows_data(data: Dict[str, Any]) -> bool:
-    """Save flows data - not needed with database, but kept for compatibility."""
-    logger.warning("save_flows_data called - use database_utils.create_flow() instead")
-    return True
+def load_favorite_poses() ->Dict[str, Any]:
+    from utils.database_utils import get_favorite_poses
+    return get_favorite_poses()
 
-def save_poses_data(data: Dict[str, Any]) -> bool:
-    """Save poses data - not needed with database, but kept for compatibility."""
-    logger.warning("save_poses_data called - use database_utils.create_pose() instead")
-    return True
-
-def save_favorites_data(data: Dict[str, Any]) -> bool:
-    """Save favorites data - not needed with database, but kept for compatibility."""
-    logger.warning("save_favorites_data called - use database_utils.create_favorite() instead")
-    return True
+def load_favorite_sequences() -> Dict[str, Any]:    
+    from utils.database_utils import get_favorite_sequences
+    return get_favorite_sequences()
 
 def update_favorites_after_pose_change(original_name: str, new_name: str, new_pose_data: Dict[str, Any]) -> bool:
     """Update any favorited content that contains the changed pose."""
@@ -102,74 +96,45 @@ def update_favorites_after_pose_change(original_name: str, new_name: str, new_po
 def remove_pose_from_favorites(pose_name: str) -> bool:
     """Remove a deleted pose from all favorites."""
     try:
-        from utils.database_utils import get_db_manager
-        import json
-        
-        db = get_db_manager()
-        removed_count = 0
-        
+        from utils.database_utils import get_db_manager, get_pose_by_name
+        db = get_db_manager()        
         with db.get_connection() as conn:
             # Remove direct pose favorites
-            result = conn.execute("DELETE FROM favorites WHERE name = ? AND type = 'pose'", (pose_name,))
-            removed_count += result.rowcount
-            
-            # Update sequences that contain this pose
-            cursor = conn.execute("SELECT id, favorite_data FROM favorites WHERE favorite_data LIKE ?", 
-                                (f'%"{pose_name}"%',))
-            favorites = cursor.fetchall()
-            
-            for favorite in favorites:
-                try:
-                    favorite_data = json.loads(favorite["favorite_data"]) if favorite["favorite_data"] else {}
-                    
-                    if "flow" in favorite_data:
-                        original_count = len(favorite_data["flow"])
-                        favorite_data["flow"] = [pose for pose in favorite_data["flow"] 
-                                               if pose.get("name") != pose_name]
-                        
-                        if len(favorite_data["flow"]) < original_count:
-                            conn.execute(
-                                "UPDATE favorites SET favorite_data = ? WHERE id = ?",
-                                (json.dumps(favorite_data), favorite["id"])
-                            )
-                            removed_count += 1
-                
-                except json.JSONDecodeError:
-                    continue
-        
-        logger.info(f"Removed pose '{pose_name}' from {removed_count} favorites")
+            pose_info = get_pose_by_name(pose_name)
+            conn.execute("DELETE FROM favorite_poses WHERE pose_id = ? ", (pose_info("id"),))               
+        logger.info(f"Removed pose '{pose_name}' from favorites")
         return True
         
     except Exception as e:
         logger.error(f"Error removing pose from favorites: {e}")
         return False
 
-# Export functions for backing up database to JSON
-def export_database_to_json(export_dir: Union[str, Path] = "database_export") -> bool:
-    """Export entire database to JSON files for backup purposes."""
+def remove_sequence_from_favorites(sequence_name: str) -> bool:
     try:
-        export_path = Path(export_dir)
-        export_path.mkdir(parents=True, exist_ok=True)
-        
-        # Export poses
-        poses_data = load_poses_data()
-        with open(export_path / "poses_export.json", 'w') as f:
-            import json
-            json.dump(poses_data, f, indent=2)
-        
-        # Export flows
-        flows_data = load_flows_data()
-        with open(export_path / "flows_export.json", 'w') as f:
-            json.dump(flows_data, f, indent=2)
-        
-        # Export favorites
-        favorites_data = load_favorites_data()
-        with open(export_path / "favorites_export.json", 'w') as f:
-            json.dump(favorites_data, f, indent=2)
-        
-        logger.info(f"Database exported to {export_path}")
-        return True
-        
+            from utils.database_utils import get_db_manager, get_sequence_by_name
+            db = get_db_manager()        
+            with db.get_connection() as conn:
+                # Remove direct pose favorites
+                sequence_info = get_sequence_by_name(sequence_name)
+                conn.execute("DELETE FROM favorite_sequences WHERE sequence_id = ? ", (sequence_info("id"),))               
+            logger.info(f"Removed sequence '{sequence_name}' from favorites")
+            return True
+            
     except Exception as e:
-        logger.error(f"Error exporting database: {e}")
+        logger.error(f"Error removing sequence from favorites: {e}")
+        return False
+    
+def remove_flow_from_favorites(flow_name: str) -> bool:
+    try:
+        from utils.database_utils import get_db_manager, get_flow_by_name
+        db = get_db_manager()        
+        with db.get_connection() as conn:
+            # Remove direct flow favorites
+            flow_info = get_flow_by_name(flow_name)
+            conn.execute("DELETE FROM favorite_flows WHERE flow_id = ? ", (flow_info("id"),))               
+        logger.info(f"Removed flow '{flow_name}' from favorites")
+        return True
+
+    except Exception as e:
+        logger.error(f"Error removing flow from favorites: {e}")
         return False

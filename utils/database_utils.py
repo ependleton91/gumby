@@ -235,6 +235,57 @@ def get_pose_by_name(name: str) -> Optional[Dict[str, Any]]:
             "image_filename": row["image_filename"] or ""
         }
 
+def get_sequence_by_name(name: str) -> Optional[Dict[str, Any]]:
+    """Get sequence by name with flows and poses."""
+    db = get_db_manager()
+    
+    with db.get_connection() as conn:
+        cursor = conn.execute("""
+            SELECT s.*
+            FROM sequences s
+            WHERE s.name = ?
+            GROUP BY s.id
+        """, (name,))
+
+        row = cursor.fetchone()
+        if not row:
+            return None
+        flows = get_sequence_with_full_flows(row["sequence_id"])
+
+        return {
+            "id": row["sequence_id"],
+            "name": row["name"],
+            "total_duration": sum(flow["duration"] for flow in flows),
+            "difficulty": row["difficulty"],
+            "created_at": row["created_at"],
+            "flows": flows
+        }
+
+def get_flow_by_name(name: str) -> Optional[Dict[str, Any]]:
+    """Get flow by name."""
+    db = get_db_manager()
+    with db.get_connection() as conn:
+        cursor = conn.execute("""
+            SELECT f.*
+            FROM flows f
+            WHERE f.name = ?
+        """, (name,))
+        row =  cursor.fetchone()
+
+        poses = get_flow_with_full_poses(row["id"]) if row else []
+    
+        return {
+            "id": row["id"],
+            "name": row["name"],
+            "duration": row["duration"],
+            "category": row["category"],
+            "difficulty": row["difficulty"],
+            "energy_level": row["energy_level"],
+            "created_at": row["created_at"],
+            "poses": poses
+        }
+  
+        
 # POSE OPERATIONS
 def create_pose(pose_data: Dict[str, Any]) -> bool:
     """Create pose with normalized muscle group relationships."""
@@ -819,7 +870,7 @@ def get_sequence_with_full_flows(sequence_id: int) -> Optional[Dict[str, Any]]:
                     muscle_groups.replace(muscle_id, muscle_name["name"])
 
         return {
-                "id": row["id"],
+                "id": row["sequence_id"],
                 "name": row["name"],
                 "total_duration": sum(flow["duration"] for flow in flows),
                 "style": styles,
