@@ -1,8 +1,8 @@
 import pytest
 import tempfile
-import json
 import sys
 from pathlib import Path
+import logging
 from unittest.mock import patch, mock_open, MagicMock
 from datetime import datetime, timedelta
 
@@ -19,20 +19,30 @@ if app is None:
     app = QApplication([])
 
 from utils.file_utils import (
-    safe_load_json, safe_save_json, ensure_directory_exists,
-    create_backup_file, load_flows_data, load_poses_data
+    ensure_directory_exists,load_flows_data, load_poses_data, 
+    load_favorite_flows,load_favorite_poses, load_favorite_sequences,
+    remove_flow_from_favorites,remove_pose_from_favorites,
+    remove_sequence_from_favorites
+)
+from utils.database_utils import (
+    get_db_manager,ensure_muscle_group_exists, ensure_yoga_style_exists,
+    get_pose_by_name,get_flow_by_name,get_style_by_name,create_pose,
+    get_all_poses,update_pose,delete_pose,create_flow,get_all_flows,update_flow,
+    delete_flow,create_sequence,get_all_sequences,create_favorite,get_favorite_poses,
+    get_favorite_flows,get_favorite_sequences,delete_favorite,create_practice_session,
+    get_practice_sessions,get_all_muscle_groups,get_all_yoga_styles,get_sequence_with_full_flows,
+    get_flow_with_full_poses
 )
 from utils.image_utils import (
     standardize_pose_name_to_filename, create_placeholder_image,
-    validate_image_file, scale_image_for_display
+    validate_image_file
 )
 from utils.validation_utils import (
     validate_pose_name, validate_duration, validate_difficulty,
     validate_muscle_groups, validate_sequence_name, validate_yoga_style
 )
 from utils.ui_utils import (
-    hide_widgets, show_widgets, confirm_action, 
-    show_error_message, center_widget_on_screen
+    hide_widgets, show_widgets
 )
 from utils.datetime_utils import (
     format_duration_minutes, format_duration_seconds, parse_timestamp,
@@ -44,73 +54,278 @@ from utils.display_utils import (
     format_list_for_display, format_list_for_internal
 )
 from utils.sequence_utils import (
-    extract_unique_values, filter_flows_by_criteria,
-    calculate_flow_compatibility_score, group_flows_by_category,
-    calculate_total_sequence_duration
+    load_class_template,get_available_styles,filter_flows_by_criteria,
+    calculate_flow_compatibility_score, select_best_flows_for_time, 
+    calculate_section_durations, group_flows_by_category, select_flows_for_sequence,
+    validate_sequence_structure,optimize_sequence_order, get_flow_summary, calculate_total_sequence_duration,
+    get_sequence_muscle_groups
 )
 
+#UPDATED 3/24/26
+class TestDatabaseUtils:
+    def get_db_manager(self):
+        logging.info("Testing database manager retrieval")
+        test = get_db_manager()
+        logging.info(f"Database manager instance: {test}")
 
+    def ensure_muscle_group_exists(self):
+        logging.info("Testing ensuring muscle group exists: arms, expecting success")
+        ensure_muscle_group_exists("arms")
+        logging.info("Testing ensuring muscle group exists: invalid_muscle, expecting failure")
+        ensure_muscle_group_exists("invalid_muscle")
+
+    def ensure_yoga_style_exists(self):
+        logging.info("Testing ensuring yoga style exists: hatha, expecting success")
+        ensure_yoga_style_exists("hatha")
+        logging.info("Testing ensuring yoga style exists: invalid_style, expecting failure")
+        ensure_yoga_style_exists("invalid_style")
+
+    def get_pose_by_name(self):
+        logging.info("Testing get pose by name: Mountain Pose, expecting success")
+        successTest = get_pose_by_name("Mountain Pose")
+        logging.info(f"Get pose by name success: {successTest}")
+
+        logging.info("Testing get pose by name: Invalid Pose, expecting failure")
+        failureTest = get_pose_by_name("Invalid Pose")
+        logging.info(f"Get pose by name failure: {failureTest}")
+
+    def get_flow_by_name(self):
+        logging.info("Testing get flow by name: Sun Salutation Flow, expecting success")
+        successTest = get_flow_by_name("Sun Salutation Flow")
+        logging.info(f"Get flow by name success: {successTest}")
+
+        logging.info("Testing get flow by name: Invalid Flow, expecting failure")
+        failureTest = get_flow_by_name("Invalid Flow")
+        logging.info(f"Get flow by name failure: {failureTest}")
+
+    def get_style_by_name(self):
+        logging.info("Testing get style by name: hatha, expecting success")
+        successTest = get_style_by_name("hatha")
+        logging.info(f"Get style by name success: {successTest}")
+
+        logging.info("Testing get style by name: Invalid Style, expecting failure")
+        failureTest = get_style_by_name("Invalid Style")
+        logging.info(f"Get style by name failure: {failureTest}")
+
+    def create_pose(self):
+        logging.info("Testing create pose")
+        pose_data = {
+            "name": "Test Pose",
+            "default_duration": 30,
+            "type": "standing",
+            "difficulty": "easy",
+            "description": "A test pose",
+            "instructions": "Stand tall and breathe",
+            "modifications": "Use a chair for support",
+            "image_filename": "test_pose.png"
+        }
+        successTest = create_pose(pose_data)
+        logging.info(f"Create pose success: {successTest}")
+
+    def get_all_poses(self):
+        logging.info("Testing get all poses")
+        test = get_all_poses()
+        logging.info(f"Get all poses success: {test}")
+
+    def update_pose(self):
+        logging.info("Testing update pose")
+        pose_data = {
+            "name": "Updated Test Pose",
+            "default_duration": 45,
+            "type": "seated",
+            "difficulty": "medium",
+            "description": "An updated test pose",
+            "instructions": "Sit tall and breathe deeply",
+            "modifications": "Use a cushion for support",
+            "image_filename": "updated_test_pose.png"
+        }
+        successTest = update_pose("Test Pose", pose_data)
+        logging.info(f"Update pose success: {successTest}")
+
+    def delete_pose(self):
+        logging.info("Testing delete pose")
+        successTest = delete_pose("Updated Test Pose")
+        logging.info(f"Delete pose success: {successTest}")
+
+    def create_flow(self):
+        logging.info("Testing create flow")
+        test_flow = {
+            "name": "Test Flow",
+            "duration": 60,
+            "category": "Vinyasa",
+            "difficulty": 2,
+            "energy_level": 3
+        }
+        successTest = create_flow(test_flow)
+        logging.info(f"Create flow success: {successTest}")
+
+    def get_all_flows(self):
+        logging.info("Testing get all flows")
+        test = get_all_flows()
+        logging.info(f"Get all flows success: {test}")
+
+    def update_flow(self):
+        logging.info("Testing update flow")
+        flow_data = {
+            "name": "Updated Test Flow",
+            "duration": 75,
+            "category": "Vinyasa",
+            "difficulty": 3,
+            "energy_level": 4
+        }
+        successTest = update_flow("Test Flow", flow_data)
+        logging.info(f"Update flow success: {successTest}")
+
+    def delete_flow(self):
+        logging.info("Testing delete flow")
+        successTest = delete_flow("Updated Test Flow")
+        logging.info(f"Delete flow success: {successTest}")
+
+    def create_sequence(self):
+        logging.info("Testing create sequence")
+        flows_data = {
+            "Test Flow": {
+                "duration": 60,
+                "category": "Vinyasa",
+                "difficulty": 2,
+                "energy_level": 3
+            }
+        }
+        sequence_data = {
+            "name": "Test Sequence",
+            "duration": 0,
+            "flows_data": flows_data,
+            "style": "Vinyasa",
+            "muscle_groups": ["hamstrings", "quadriceps"],
+            "created_at": datetime.now(),
+            "updated_at": datetime.now()
+        }
+
+        success_test = create_sequence(sequence_data)
+        logging.info(f"Create sequence success: {success_test}")
+
+
+    def get_all_sequences(self):
+        logging.info("Testing get all sequences")
+        test = get_all_sequences()
+        logging.info(f"Get all sequences success: {test}")
+
+    def create_favorite(self):
+        logging.info("Testing create favorite - pose")
+        success_test = create_favorite("Upward Salute", "pose", 2)
+        logging.info(f"Create favorite pose success: {success_test}")
+
+        logging.info("Testing create favorite - flow")
+        success_test = create_favorite("Warrior Standing Flow", "flow", 2)
+        logging.info(f"Create favorite flow success: {success_test}")
+
+        logging.info("Testing create favorite - sequence")
+        success_test = create_favorite("Hatha 64 Minute Flow", "sequence", 111111)
+        logging.info(f"Create favorite sequence success: {success_test}")
+
+    def get_favorite_poses(self):
+        logging.info("Testing get favorite poses")
+        test = get_favorite_poses()
+        logging.info(f"Get favorite poses success: {test}")
+
+    def get_favorite_flows(self):
+        logging.info("Testing get favorite flows")
+        test = get_favorite_flows()
+        logging.info(f"Get favorite flows success: {test}")
+
+    def get_favorite_sequences(self):
+        logging.info("Testing get favorite sequences")
+        test = get_favorite_sequences()
+        logging.info(f"Get favorite sequences success: {test}")
+
+    def delete_favorite(self):
+        favorite_info = get_favorite_poses()
+        for favorites in favorite_info:
+            if favorites["name"] == "Upward Salute":
+                logging.info("Testing delete favorite")
+                success_test = delete_favorite(favorites["id"])
+                logging.info(f"Delete favorite success: {success_test}")
+                if success_test:
+                    logging.info("Favorite deleted successfully")
+                    logging.info("Re-creating favorite for future tests")
+                    create_favorite("Upward Salute", "pose", 2)
+                else:
+                    logging.warning("Failed to delete favorite")
+
+    def create_practice_session(self):
+        logging.info("Testing create practice session")
+        test_session = {
+                "session_date": datetime.now(),
+                "sequence_name": "Test Sequence",
+                "duration_minutes": 60,
+                "rating": 3,
+                "notes": "A great practice session!",
+                "sequence_data": ""
+            }
+        create_practice_session(test_session)
+
+    def get_practice_sessions(self):
+        logging.info("Testing get practice sessions")
+        test = get_practice_sessions()
+        logging.info(f"Get practice sessions success: {test}")
+
+    def get_all_muscle_groups(self):
+        logging.info("Testing get all muscle groups")
+        test = get_all_muscle_groups()
+        logging.info(f"Get all muscle groups success: {test}")
+
+    def get_all_yoga_styles(self):
+        logging.info("Testing get all yoga styles")
+        test = get_all_yoga_styles()
+        logging.info(f"Get all yoga styles success: {test}")
+
+    def get_sequence_with_full_flows(self):
+        logging.info("Testing get sequence with full flows")
+        sequences = get_all_sequences()
+        test = get_sequence_with_full_flows(sequences[1]["id"])
+        logging.info(f"Get sequence with full flows success: {test}")
+
+    def get_flow_with_full_poses(self):
+        logging.info("Testing get flow with full poses")
+
+#UPDATED 3/24/26
 class TestFileUtils:
-    """Test file operation utilities."""
-    
-    def test_safe_load_json_existing_file(self):
-        """Test loading an existing JSON file."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-            test_data = {"test": "value", "number": 42}
-            json.dump(test_data, f)
-            temp_path = f.name
-        
-        result = safe_load_json(temp_path, {})
-        assert result == test_data
-        
-        # Cleanup
-        Path(temp_path).unlink()
-    
-    def test_safe_load_json_missing_file(self):
-        """Test loading a non-existent file returns default."""
-        default = {"default": "data"}
-        result = safe_load_json("nonexistent.json", default)
-        assert result == default
-    
-    def test_safe_load_json_corrupted_file(self):
-        """Test loading corrupted JSON returns default."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-            f.write("{ invalid json content")
-            temp_path = f.name
-        
-        default = {"default": "data"}
-        result = safe_load_json(temp_path, default)
-        assert result == default
-        
-        # Cleanup
-        Path(temp_path).unlink()
-    
-    def test_safe_save_json(self):
-        """Test saving JSON data."""
-        test_data = {"flows": {"test_flow": {"name": "Test"}}}
-        
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-            temp_path = f.name
-        
-        # Remove the temp file so we can test creation
-        Path(temp_path).unlink()
-        
-        success = safe_save_json(temp_path, test_data)
-        assert success
-        
-        # Verify content
-        loaded_data = safe_load_json(temp_path, {})
-        assert loaded_data == test_data
-        
-        # Cleanup
-        Path(temp_path).unlink()
-    
+
     def test_ensure_directory_exists(self):
+        logging
         """Test directory creation."""
         with tempfile.TemporaryDirectory() as temp_dir:
             test_path = Path(temp_dir) / "new_dir" / "test_file.json"
             ensure_directory_exists(test_path)
             assert test_path.parent.exists()
+
+    def load_favorite_flows(self):
+        logging.info("Testing loading of favorite flows")
+        favorite_flows = load_favorite_flows()
+        logging.info(f"Loaded favorite flows: {favorite_flows}")
+
+    def load_favorite_poses(self):
+        logging.info("Testing loading of favorite poses")
+        favorite_poses = load_favorite_poses()
+        logging.info(f"Loaded favorite poses: {favorite_poses}")
+
+    def load_favorite_sequences(self):
+        logging.info("Testing loading of favorite sequences")
+        favorite_sequences = load_favorite_sequences()
+        logging.info(f"Loaded favorite sequences: {favorite_sequences}")
+
+    def remove_flow_from_favorites(self):
+        logging.info("Testing removal of flow from favorites")
+        remove_flow_from_favorites("Test Flow")
+
+    def remove_pose_from_favorites(self):
+        logging.info("Testing removal of pose from favorites")
+        remove_pose_from_favorites("Test Pose")
+
+    def remove_sequence_from_favorites(self):
+        logging.info("Testing removal of sequence from favorites")
+        remove_sequence_from_favorites("Test Sequence")
+
 
 
 class TestImageUtils:

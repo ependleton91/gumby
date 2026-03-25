@@ -1,7 +1,4 @@
 """Sequence building utilities for GUMBY yoga app.
-
-This module provides utilities for extracting data from flows,
-filtering flows by criteria, and selecting optimal flow combinations.
 """
 
 import logging
@@ -12,32 +9,24 @@ logger = logging.getLogger(__name__)
 
 
 def load_class_template(style: str) -> Dict[str, Any]:
-    """Load class structure template for given style from database.
-    
-    Args:
-        style: Yoga style name (e.g., "vinyasa", "hatha")
-        
-    Returns:
-        Template dictionary with structure rules
-        
-    Raises:
-        KeyError: If style not found in templates
-    """
-    try:
-        from utils.database_utils import get_db_manager
+   # Get class template for a specific style
+   try:
+        from utils.database_utils import get_db_manager, get_style_by_name
         
         db = get_db_manager()
         with db.get_connection() as conn:
+            style_info = get_style_by_name(style)
+            style_id = style_info["id"] if style_info else None
             cursor = conn.execute(
                 "SELECT * FROM class_templates WHERE style_name = ?", 
-                (style.lower(),)
+                (style_id,)
             )
             result = cursor.fetchone()
             
             if not result:
                 # Get available styles for error message
-                cursor = conn.execute("SELECT style_name FROM class_templates")
-                available_styles = [row["style_name"] for row in cursor.fetchall()]
+                available_styles = get_available_styles()
+                logger.error(f"Style '{style}' not found in class_templates. Available styles: {available_styles}")
                 raise KeyError(f"Style '{style}' not found. Available styles: {available_styles}")
             
             # Convert database row to template format
@@ -48,7 +37,7 @@ def load_class_template(style: str) -> Dict[str, Any]:
                 "energy_progression": result["energy_progression"],
                 "max_difficulty_jump": result["max_difficulty_jump"],
                 "requires_counter_poses": bool(result["requires_counter_poses"]),
-                "flow_style": result["flow_style"],
+                "flow_style": result["flow_style"].replace("_", " ").title(),
                 "typical_peak_difficulty": result["typical_peak_difficulty"],
                 "min_flows": result["min_flows"],
                 "max_flows": result["max_flows"],
@@ -57,57 +46,28 @@ def load_class_template(style: str) -> Dict[str, Any]:
             
             return template
             
-    except Exception as e:
+   except Exception as e:
         logger.error(f"Error loading class template for {style}: {e}")
         raise
 
 
 def get_available_styles() -> List[str]:
-    """Get list of all available class styles from database.
-    
-    Returns:
-        Sorted list of available style names
-    """
+    # Get list of all available class styles from database.
     try:
-        from utils.database_utils import get_db_manager
+        from utils.database_utils import get_db_manager, get_style_by_name
         
         db = get_db_manager()
         with db.get_connection() as conn:
-            cursor = conn.execute("SELECT style_name FROM class_templates ORDER BY style_name")
-            return [row["style_name"] for row in cursor.fetchall()]
-            
+            available_styles = []
+            cursor = conn.execute("SELECT style_name FROM class_templates")
+            for row in cursor.fetchall():
+                style_info = get_style_by_name(row["style_name"])
+                available_styles.append(style_info["style_name"])
+
+        return sorted(available_styles)
     except Exception as e:
         logger.error(f"Error getting available styles: {e}")
         return []
-
-
-def extract_unique_values(flows_data: Dict[str, Any], field_path: str) -> List[str]:
-    """Extract all unique values for a field from flows data.
-    
-    Args:
-        flows_data: Complete flows data dictionary
-        field_path: Dot notation path to field (e.g., "style", "muscle_groups")
-        
-    Returns:
-        Sorted list of unique values
-        
-    Example:
-        extract_unique_values(flows_data, "style") -> ["hatha", "vinyasa", "yin"]
-        extract_unique_values(flows_data, "muscle_groups") -> ["arms", "core", "legs"]
-    """
-    unique_values: Set[str] = set()
-    
-    for flow in flows_data.get("flowing_sequences", {}).values():
-        field_value = flow.get(field_path, [])
-        
-        # Handle both single values and lists
-        if isinstance(field_value, list):
-            unique_values.update(field_value)
-        elif field_value:
-            unique_values.add(field_value)
-    
-    return sorted(list(unique_values))
-
 
 def filter_flows_by_criteria(flows: List[Dict[str, Any]], criteria: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Filter flows based on multiple criteria.
@@ -131,19 +91,25 @@ def filter_flows_by_criteria(flows: List[Dict[str, Any]], criteria: Dict[str, An
     for flow in flows:
         # Check style matching
         if "style" in criteria:
-            flow_styles = flow.get("style", [])
+            from database_utils import get_flow_with_full_poses
+            flow_styles = get_flow_with_full_poses(flow["id"]).get("style", [])
             required_styles = criteria["style"]
+            logger.info(f"Flow styles for {flow['id']}: {flow_styles}")
+            logger.info(f"Required styles for {flow['id']}: {required_styles}")
             if not any(style in flow_styles for style in required_styles):
+                logger.info(f"Flow {flow['name']} does not match required styles.")
                 continue
         
         # Check category matching
         if "category" in criteria:
             if flow.get("category") not in criteria["category"]:
+                logger.info(f"Flow {flow['name']} does not match required category.")
                 continue
         
         # Check energy level matching
         if "energy_level" in criteria:
             if flow.get("energy_level") not in criteria["energy_level"]:
+                logger.info(f"Flow {flow['name']} does not match required energy level.")
                 continue
         
         # Check muscle group overlap
@@ -163,7 +129,6 @@ def filter_flows_by_criteria(flows: List[Dict[str, Any]], criteria: Dict[str, An
         filtered_flows.append(flow)
     
     return filtered_flows
-
 
 def calculate_flow_compatibility_score(flow: Dict[str, Any], criteria: Dict[str, Any]) -> float:
     """Calculate how well a flow matches the given criteria.

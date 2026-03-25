@@ -285,7 +285,16 @@ def get_flow_by_name(name: str) -> Optional[Dict[str, Any]]:
             "poses": poses
         }
   
-        
+def get_style_by_name(name: str) -> Optional[Dict[str, Any]]:
+    """Get yoga style by name."""
+    db = get_db_manager()
+    with db.get_connection() as conn:
+        cursor = conn.execute("SELECT * FROM yoga_styles WHERE name = ?", (name,))
+        row = cursor.fetchone()
+        if row:
+            return {"id": row["id"], "name": row["name"]}
+        return None
+
 # POSE OPERATIONS
 def create_pose(pose_data: Dict[str, Any]) -> bool:
     """Create pose with normalized muscle group relationships."""

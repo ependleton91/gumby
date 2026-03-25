@@ -42,57 +42,6 @@ def load_favorite_sequences() -> Dict[str, Any]:
     from utils.database_utils import get_favorite_sequences
     return get_favorite_sequences()
 
-def update_favorites_after_pose_change(original_name: str, new_name: str, new_pose_data: Dict[str, Any]) -> bool:
-    """Update any favorited content that contains the changed pose."""
-    try:
-        from utils.database_utils import get_db_manager
-        import json
-        
-        db = get_db_manager()
-        updated_count = 0
-        
-        with db.get_connection() as conn:
-            # Get favorites that might contain this pose
-            cursor = conn.execute("SELECT id, favorite_data FROM favorites WHERE favorite_data LIKE ?", 
-                                (f'%"{original_name}"%',))
-            favorites = cursor.fetchall()
-            
-            for favorite in favorites:
-                try:
-                    favorite_data = json.loads(favorite["favorite_data"]) if favorite["favorite_data"] else {}
-                    data_updated = False
-                    
-                    # Update pose references in flow data
-                    if "flow" in favorite_data:
-                        for pose in favorite_data["flow"]:
-                            if pose.get("name") == original_name:
-                                pose["name"] = new_name
-                                data_updated = True
-                    
-                    if data_updated:
-                        conn.execute(
-                            "UPDATE favorites SET favorite_data = ? WHERE id = ?",
-                            (json.dumps(favorite_data), favorite["id"])
-                        )
-                        updated_count += 1
-                
-                except json.JSONDecodeError:
-                    logger.warning(f"Invalid JSON in favorite {favorite['id']}")
-                    continue
-            
-            # Update favorites that ARE the pose itself
-            conn.execute(
-                "UPDATE favorites SET name = ? WHERE name = ? AND type = 'pose'",
-                (new_name, original_name)
-            )
-        
-        logger.info(f"Updated {updated_count} favorites after pose name change")
-        return True
-        
-    except Exception as e:
-        logger.error(f"Error updating favorites after pose change: {e}")
-        return False
-
 def remove_pose_from_favorites(pose_name: str) -> bool:
     """Remove a deleted pose from all favorites."""
     try:

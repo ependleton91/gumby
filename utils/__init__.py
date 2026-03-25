@@ -1,11 +1,8 @@
-# Import functions that work with database-first approach
 
 from .file_utils import (
     ensure_directory_exists,
-    load_flows_data, load_poses_data, load_favorites_data,  # Database-backed functions
-    save_flows_data, save_poses_data, save_favorites_data,  # Kept for compatibility
-    update_favorites_after_pose_change, remove_pose_from_favorites,
-    export_database_to_json
+    load_flows_data, load_poses_data, load_favorite_poses, load_favorite_flows, load_favorite_sequences, 
+    update_favorites_after_pose_change, remove_pose_from_favorites, remove_sequence_from_favorites, remove_flow_from_favorites
 )
 
 from .image_utils import (
@@ -76,19 +73,16 @@ from .database_utils import (
     create_pose, get_pose_by_name, get_all_poses, update_pose, delete_pose,
     
     # Flow operations  
-    create_flow, get_all_flows, update_flow, delete_flow, get_flow_with_full_poses,
+    create_flow, get_all_flows, update_flow, delete_flow, get_flow_with_full_poses,get_flow_by_name,
     
     # Sequence operations
-    create_sequence, get_all_sequences,
+    create_sequence, get_all_sequences,get_sequence_by_name,get_sequence_with_full_flows,
     
     # Favorites operations
-    create_favorite, get_all_favorites, delete_favorite, get_favorite_by_name,
+    create_favorite, get_favorite_flows,get_favorite_poses,get_favorite_sequences, delete_favorite, get_favorite_by_name,
     
     # Practice session operations
     create_practice_session, get_practice_sessions,
-    
-    # Migration and utility functions
-    migrate_from_json_data
 )
 
 # Version info for compatibility checking
@@ -101,7 +95,9 @@ def get_all_data():
         "poses": get_all_poses(),
         "flows": get_all_flows(), 
         "sequences": get_all_sequences(),
-        "favorites": get_all_favorites()
+        "favorite flows": get_favorite_flows(),
+        "favorite poses": get_favorite_poses(),
+        "favorite sequences": get_favorite_sequences()
     }
 
 def validate_all_data():
